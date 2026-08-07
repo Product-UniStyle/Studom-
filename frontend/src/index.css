@@ -1,0 +1,18 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: 'Poppins', ui-sans-serif, system-ui, sans-serif;
+  color: #1a1a1a;
+  background: #ffffff;
+}
+
+.font-script {
+  font-family: 'Caveat', cursive;
+}
