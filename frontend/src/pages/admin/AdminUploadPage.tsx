@@ -72,7 +72,7 @@ export default function AdminUploadPage() {
           title="Import MAIN Sheet"
           description={
             <>
-              Upload the data team's <code>Tech_UAE_All_Data.xlsx</code> file. The MAIN tab is
+              Upload the data team's <code>Main sheet</code> file. The MAIN tab is
               imported into the University collection, matched by each row's sheet ID so
               re-uploads update existing records instead of duplicating them.
             </>
