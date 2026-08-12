@@ -22,6 +22,8 @@ import InstitutionApplicationsPage from './pages/institution/InstitutionApplicat
 import InstitutionContributorsPage from './pages/institution/InstitutionContributorsPage'
 import InstitutionUniversityPagePage from './pages/institution/InstitutionUniversityPagePage'
 import InstitutionSettingsPage from './pages/institution/InstitutionSettingsPage'
+import AdminLoginPage from './pages/admin/AdminLoginPage'
+import AdminUploadPage from './pages/admin/AdminUploadPage'
 
 function App() {
   return (
@@ -63,6 +65,9 @@ function App() {
       <Route path="/institution/contributors" element={<InstitutionContributorsPage />} />
       <Route path="/institution/university-page" element={<InstitutionUniversityPagePage />} />
       <Route path="/institution/settings" element={<InstitutionSettingsPage />} />
+
+      <Route path="/admin/login" element={<AdminLoginPage />} />
+      <Route path="/admin" element={<AdminUploadPage />} />
     </Routes>
   )
 }

@@ -1,43 +1,111 @@
-import { useMemo, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { useEffect, useMemo, useState } from 'react'
+import { Link, useSearchParams } from 'react-router-dom'
 import { Search, ChevronDown, ChevronLeft, ChevronRight, MapPin, Landmark } from 'lucide-react'
 import PageShell from '../components/layout/PageShell'
 import SafeImage from '../components/ui/SafeImage'
-import { universities } from '../data/universities'
+import { getPublicUniversityFacets, listPublicUniversities } from '../lib/publicApi'
+import type { PublicUniversityListItem } from '../lib/publicApi'
 
-const COUNTRIES = ['United Arab Emirates', 'Saudi Arabia', 'Qatar', 'India']
-const LOCATIONS: Record<string, string[]> = {
-  'United Arab Emirates': ['Dubai', 'Abu Dhabi', 'Sharjah', 'Ajman'],
-}
-const FIELDS = ['Business Management', 'Engineering', 'Computer Science', 'Medicine']
 const ADDITIONAL_FILTERS = ['QS Ranking', 'Cost of Living', 'Student Population']
+
+const TYPE_PARAM_MAP: Record<string, string> = {
+  schools: 'School',
+  school: 'School',
+  universities: 'University',
+  university: 'University',
+  tuition: 'Tuition',
+  college: 'College',
+  colleges: 'College',
+}
+
+const TYPE_LABELS: Record<string, string> = {
+  School: 'schools',
+  University: 'universities',
+  Tuition: 'tuition centres',
+  College: 'colleges',
+}
 
 const PAGE_SIZE = 8
 
 export default function UniversitySearchPage() {
+  const [searchParams] = useSearchParams()
+  const typeParam = searchParams.get('type') || ''
+  const type = TYPE_PARAM_MAP[typeParam.toLowerCase()] || ''
+
   const [country, setCountry] = useState('')
   const [location, setLocation] = useState('')
   const [field, setField] = useState('')
   const [additional, setAdditional] = useState('QS Ranking')
   const [query, setQuery] = useState('')
   const [page, setPage] = useState(1)
-  const [applied, setApplied] = useState(false)
+  const [applied, setApplied] = useState(Boolean(type))
 
-  const filtered = useMemo(() => {
-    let list = universities
-    if (location) list = list.filter((u) => u.city === location)
-    if (query)
-      list = list.filter((u) =>
-        u.name.toLowerCase().includes(query.toLowerCase())
-      )
-    return list
-  }, [location, query])
+  const [items, setItems] = useState<PublicUniversityListItem[]>([])
+  const [total, setTotal] = useState(0)
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
-  const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE) * 2)
-  const pageItems = filtered.slice(
-    (page - 1) * PAGE_SIZE,
-    (page - 1) * PAGE_SIZE + PAGE_SIZE
-  )
+  const [countries, setCountries] = useState<string[]>([])
+  const [cities, setCities] = useState<string[]>([])
+  const [fields, setFields] = useState<string[]>([])
+
+  useEffect(() => {
+    setApplied(Boolean(type))
+    setPage(1)
+  }, [type])
+
+  useEffect(() => {
+    getPublicUniversityFacets({ type: type || undefined })
+      .then((res) => {
+        setCountries(res.countries)
+        setFields(res.fieldsOfStudy)
+      })
+      .catch(() => {})
+  }, [type])
+
+  useEffect(() => {
+    getPublicUniversityFacets({ type: type || undefined, country: country || undefined })
+      .then((res) => setCities(res.cities))
+      .catch(() => {})
+  }, [type, country])
+
+  useEffect(() => {
+    if (!applied) return
+    let cancelled = false
+    setLoading(true)
+    setError(null)
+    listPublicUniversities({
+      search: query || undefined,
+      type: type || undefined,
+      country: country || undefined,
+      city: location || undefined,
+      fieldOfStudy: field || undefined,
+      page,
+      limit: PAGE_SIZE,
+    })
+      .then((res) => {
+        if (cancelled) return
+        setItems(res.items)
+        setTotal(res.total)
+      })
+      .catch((err) => {
+        if (cancelled) return
+        setError(err instanceof Error ? err.message : 'Failed to load universities')
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false)
+      })
+    return () => {
+      cancelled = true
+    }
+  }, [applied, query, type, country, location, field, page])
+
+  const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE))
+
+  const heading = useMemo(() => {
+    if (type) return `Top ${TYPE_LABELS[type] || type} in ${location || 'all locations'}`
+    return `Top universities for ${field} in ${location || 'all locations'}`
+  }, [type, field, location])
 
   const handleSearch = () => {
     if (country && field) {
@@ -55,25 +123,32 @@ export default function UniversitySearchPage() {
             label="Country"
             value={country}
             placeholder="Select country"
-            options={COUNTRIES}
+            options={countries}
             onChange={(v) => {
               setCountry(v)
               setLocation('')
+              setPage(1)
             }}
           />
           <FilterDropdown
             label="Location"
             value={location}
             placeholder="Select location"
-            options={country ? LOCATIONS[country] ?? [] : []}
-            onChange={setLocation}
+            options={cities}
+            onChange={(v) => {
+              setLocation(v)
+              setPage(1)
+            }}
           />
           <FilterDropdown
             label="Field of Study"
             value={field}
             placeholder="Select field of study"
-            options={FIELDS}
-            onChange={setField}
+            options={fields}
+            onChange={(v) => {
+              setField(v)
+              setPage(1)
+            }}
           />
           <FilterDropdown
             label="Additional Filters"
@@ -106,56 +181,65 @@ export default function UniversitySearchPage() {
           <div className="mt-8">
             <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-start">
               <div>
-                <h1 className="text-2xl font-bold text-black">
-                  Top universities for {field} in {location || 'all locations'}
-                </h1>
+                <h1 className="text-2xl font-bold text-black">{heading}</h1>
                 <p className="mt-1 text-sm text-gray-500">
-                  Sorted by {additional}
+                  {total} result{total === 1 ? '' : 's'}
                 </p>
               </div>
               <div className="relative w-full sm:w-72">
                 <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
                 <input
                   value={query}
-                  onChange={(e) => setQuery(e.target.value)}
+                  onChange={(e) => {
+                    setQuery(e.target.value)
+                    setPage(1)
+                  }}
                   placeholder="Search universities..."
                   className="w-full rounded-full border border-gray-200 py-2.5 pl-9 pr-4 text-sm focus:border-blue-500 focus:outline-none"
                 />
               </div>
             </div>
 
-            <div className="mt-8 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
-              {pageItems.map((u, idx) => (
-                <Link
-                  to={`/universities/${u.id}`}
-                  key={u.id}
-                  className="group relative overflow-hidden rounded-xl"
-                >
-                  <div className="absolute left-3 top-3 z-10 flex h-8 w-8 items-center justify-center rounded-md bg-white text-sm font-bold text-black shadow">
-                    {(page - 1) * PAGE_SIZE + idx + 1}
-                  </div>
-                  <SafeImage
-                    src={u.image}
-                    alt={u.name}
-                    className="h-48 w-full object-cover transition duration-300 group-hover:scale-105"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/10 to-transparent" />
-                  <div className="absolute bottom-0 left-0 right-0 p-4 text-white">
-                    <div className="text-sm font-semibold leading-snug">
-                      {u.name}
+            {error && <p className="mt-6 text-sm text-red-600">{error}</p>}
+
+            {loading ? (
+              <p className="mt-10 text-center text-gray-400">Loading...</p>
+            ) : items.length === 0 ? (
+              <p className="mt-10 text-center text-gray-400">No results found.</p>
+            ) : (
+              <div className="mt-8 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+                {items.map((u, idx) => (
+                  <Link
+                    to={`/universities/${u._id}`}
+                    key={u._id}
+                    className="group relative overflow-hidden rounded-xl"
+                  >
+                    <div className="absolute left-3 top-3 z-10 flex h-8 w-8 items-center justify-center rounded-md bg-white text-sm font-bold text-black shadow">
+                      {(page - 1) * PAGE_SIZE + idx + 1}
                     </div>
-                    <div className="mt-2 flex items-center gap-2 text-xs">
-                      <span className="flex items-center gap-1">
-                        <MapPin className="h-3 w-3" /> {u.city}, UAE
-                      </span>
-                      <span className="rounded-full bg-white/20 px-2 py-0.5 backdrop-blur">
-                        {u.qsRank ? `QS Rank ${u.qsRank}` : 'Not QS Ranked'}
-                      </span>
+                    <SafeImage
+                      src={u.image}
+                      alt={u.name}
+                      className="h-48 w-full object-cover transition duration-300 group-hover:scale-105"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/10 to-transparent" />
+                    <div className="absolute bottom-0 left-0 right-0 p-4 text-white">
+                      <div className="text-sm font-semibold leading-snug">
+                        {u.name}
+                      </div>
+                      <div className="mt-2 flex items-center gap-2 text-xs">
+                        <span className="flex items-center gap-1">
+                          <MapPin className="h-3 w-3" /> {u.city || u.country || '-'}
+                        </span>
+                        <span className="rounded-full bg-white/20 px-2 py-0.5 backdrop-blur">
+                          {u.qsRank ? `QS Rank ${u.qsRank}` : 'Not QS Ranked'}
+                        </span>
+                      </div>
                     </div>
-                  </div>
-                </Link>
-              ))}
-            </div>
+                  </Link>
+                ))}
+              </div>
+            )}
 
             <Pagination page={page} totalPages={totalPages} onChange={setPage} />
           </div>
