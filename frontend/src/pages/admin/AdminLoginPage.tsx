@@ -1,11 +1,12 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Lock } from 'lucide-react'
+import { Mail, Lock } from 'lucide-react'
 import TextField from '../../components/form/TextField'
 import { adminLogin, getAdminToken } from '../../lib/adminApi'
 
 export default function AdminLoginPage() {
   const navigate = useNavigate()
+  const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
@@ -19,7 +20,7 @@ export default function AdminLoginPage() {
     setError(null)
     setLoading(true)
     try {
-      await adminLogin(password)
+      await adminLogin(email, password)
       navigate('/admin', { replace: true })
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Login failed')
@@ -35,6 +36,16 @@ export default function AdminLoginPage() {
         className="w-full max-w-sm space-y-6 rounded-2xl border border-gray-100 bg-white p-8 shadow-sm"
       >
         <h1 className="text-center text-2xl font-semibold text-black">Admin Login</h1>
+
+        <TextField
+          label="Email"
+          type="email"
+          placeholder="Enter admin email"
+          icon={<Mail className="h-4 w-4" />}
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          required
+        />
 
         <TextField
           label="Password"

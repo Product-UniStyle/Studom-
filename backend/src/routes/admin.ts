@@ -4,16 +4,17 @@ import jwt from 'jsonwebtoken';
 const router = Router();
 
 router.post('/login', (req, res) => {
-  const { password } = req.body as { password?: string };
+  const { email, password } = req.body as { email?: string; password?: string };
+  const adminEmail = process.env.ADMIN_EMAIL;
   const adminPassword = process.env.ADMIN_PASSWORD;
   const secret = process.env.JWT_SECRET;
 
-  if (!adminPassword || !secret) {
+  if (!adminEmail || !adminPassword || !secret) {
     return res.status(500).json({ error: 'Admin login is not configured' });
   }
 
-  if (password !== adminPassword) {
-    return res.status(401).json({ error: 'Incorrect password' });
+  if (email?.toLowerCase() !== adminEmail.toLowerCase() || password !== adminPassword) {
+    return res.status(401).json({ error: 'Incorrect email or password' });
   }
 
   const token = jwt.sign({ role: 'admin' }, secret, { expiresIn: '12h' });
