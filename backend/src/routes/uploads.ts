@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import multer from 'multer';
-import { requireAdmin } from '../middleware/adminAuth';
+import { requireEditorOrAdmin } from '../middleware/adminAuth';
 import { uploadImageToS3, sanitizeFolderSegment } from '../lib/s3';
 
 const router = Router();
@@ -11,9 +11,9 @@ const upload = multer({
   limits: { fileSize: 4 * 1024 * 1024 },
 });
 
-const IMAGE_TYPES = ['logo', 'image', 'gallery'];
+const IMAGE_TYPES = ['logo', 'image', 'gallery', 'cover'];
 
-router.post('/image', requireAdmin, upload.single('file'), async (req, res) => {
+router.post('/image', requireEditorOrAdmin, upload.single('file'), async (req, res) => {
   if (!req.file) {
     return res.status(400).json({ error: 'No file uploaded (field name must be "file")' });
   }
@@ -22,10 +22,17 @@ router.post('/image', requireAdmin, upload.single('file'), async (req, res) => {
   }
 
   const universityName = typeof req.body.universityName === 'string' ? req.body.universityName : '';
+  const articleTitle = typeof req.body.articleTitle === 'string' ? req.body.articleTitle : '';
   const type = IMAGE_TYPES.includes(req.body.type) ? req.body.type : 'misc';
-  const folder = universityName
-    ? `universities/${sanitizeFolderSegment(universityName)}/${type}`
-    : 'universities/_unassigned';
+
+  let folder: string;
+  if (articleTitle) {
+    folder = `articles/${sanitizeFolderSegment(articleTitle)}/${type}`;
+  } else if (universityName) {
+    folder = `universities/${sanitizeFolderSegment(universityName)}/${type}`;
+  } else {
+    folder = 'universities/_unassigned';
+  }
 
   try {
     const url = await uploadImageToS3(req.file.buffer, req.file.originalname, req.file.mimetype, folder);

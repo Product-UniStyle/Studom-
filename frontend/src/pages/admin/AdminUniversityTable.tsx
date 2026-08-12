@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react'
-import { Search, Pencil } from 'lucide-react'
-import { listUniversities, getUniversity } from '../../lib/adminApi'
+import { Search, Pencil, Trash2 } from 'lucide-react'
+import { listUniversities, getUniversity, deleteUniversity } from '../../lib/adminApi'
 import type { UniversityListItem, UniversityDetail } from '../../lib/adminApi'
 import Modal from '../../components/ui/Modal'
 import AdminUniversityForm from './AdminUniversityForm'
@@ -16,6 +16,7 @@ export default function AdminUniversityTable({ refreshKey }: { refreshKey: numbe
   const [error, setError] = useState<string | null>(null)
   const [editing, setEditing] = useState<UniversityDetail | null>(null)
   const [editLoading, setEditLoading] = useState(false)
+  const [deleting, setDeleting] = useState<UniversityListItem | null>(null)
 
   const load = useCallback(async () => {
     setLoading(true)
@@ -48,6 +49,17 @@ export default function AdminUniversityTable({ refreshKey }: { refreshKey: numbe
       setError(err instanceof Error ? err.message : 'Failed to load university')
     } finally {
       setEditLoading(false)
+    }
+  }
+
+  async function handleDelete() {
+    if (!deleting) return
+    try {
+      await deleteUniversity(deleting._id)
+      setDeleting(null)
+      load()
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Delete failed')
     }
   }
 
@@ -116,13 +128,21 @@ export default function AdminUniversityTable({ refreshKey }: { refreshKey: numbe
                     {u.aggregateRating ? `${u.aggregateRating} (${u.aggregateReviewCount ?? 0})` : '-'}
                   </td>
                   <td className="py-3 text-right">
-                    <button
-                      onClick={() => openEdit(u._id)}
-                      disabled={editLoading}
-                      className="inline-flex items-center gap-1 rounded-lg border border-gray-200 px-3 py-1.5 text-xs font-semibold text-gray-700 hover:bg-gray-50 disabled:opacity-50"
-                    >
-                      <Pencil className="h-3.5 w-3.5" /> Edit
-                    </button>
+                    <div className="flex justify-end gap-2">
+                      <button
+                        onClick={() => openEdit(u._id)}
+                        disabled={editLoading}
+                        className="inline-flex items-center gap-1 rounded-lg border border-gray-200 px-3 py-1.5 text-xs font-semibold text-gray-700 hover:bg-gray-50 disabled:opacity-50"
+                      >
+                        <Pencil className="h-3.5 w-3.5" /> Edit
+                      </button>
+                      <button
+                        onClick={() => setDeleting(u)}
+                        className="inline-flex items-center gap-1 rounded-lg border border-gray-200 px-3 py-1.5 text-xs font-semibold text-red-600 hover:bg-red-50"
+                      >
+                        <Trash2 className="h-3.5 w-3.5" />
+                      </button>
+                    </div>
                   </td>
                 </tr>
               ))
@@ -163,6 +183,29 @@ export default function AdminUniversityTable({ refreshKey }: { refreshKey: numbe
               load()
             }}
           />
+        </Modal>
+      )}
+
+      {deleting && (
+        <Modal title={`Delete "${deleting.name}"?`} onClose={() => setDeleting(null)}>
+          <p className="text-sm text-gray-600">
+            This permanently deletes the university record (and any admin-uploaded logo/image/gallery references to
+            it). This cannot be undone.
+          </p>
+          <div className="mt-6 flex justify-end gap-3">
+            <button
+              onClick={() => setDeleting(null)}
+              className="rounded-lg border border-gray-300 px-5 py-2.5 text-sm font-semibold text-gray-700 hover:bg-gray-50"
+            >
+              Cancel
+            </button>
+            <button
+              onClick={handleDelete}
+              className="rounded-lg bg-red-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-red-700"
+            >
+              Delete
+            </button>
+          </div>
         </Modal>
       )}
     </div>

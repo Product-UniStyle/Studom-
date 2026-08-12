@@ -5,9 +5,17 @@ import universitiesRouter from './routes/universities';
 import uploadsRouter from './routes/uploads';
 import importsRouter from './routes/imports';
 import publicUniversitiesRouter from './routes/publicUniversities';
+import { buildArticleAdminRouter } from './routes/articles';
+import NewsArticle from './models/NewsArticle';
+import BlogPost from './models/BlogPost';
+import eventsRouter from './routes/events';
+
+const allowedOrigins = [process.env.CLIENT_URL, 'http://localhost:5173'].filter(
+  (origin): origin is string => Boolean(origin)
+);
 
 const app = express();
-app.use(cors());
+app.use(cors({ origin: allowedOrigins, credentials: true }));
 app.use(express.json());
 
 app.get('/health', (_req, res) => {
@@ -19,5 +27,8 @@ app.use('/api/universities', universitiesRouter);
 app.use('/api/uploads', uploadsRouter);
 app.use('/api/imports', importsRouter);
 app.use('/api/public/universities', publicUniversitiesRouter);
+app.use('/api/news', buildArticleAdminRouter(NewsArticle));
+app.use('/api/blogs', buildArticleAdminRouter(BlogPost));
+app.use('/api/events', eventsRouter);
 
 export default app;

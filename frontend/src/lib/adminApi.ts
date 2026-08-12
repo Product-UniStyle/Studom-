@@ -1,5 +1,8 @@
 const API_URL = (import.meta.env.VITE_API_URL || 'http://localhost:5000').replace(/\/+$/, '')
 const TOKEN_KEY = 'studom-admin-token'
+const ROLE_KEY = 'studom-admin-role'
+
+export type StaffRole = 'admin' | 'editor'
 
 export function getAdminToken(): string | null {
   return localStorage.getItem(TOKEN_KEY)
@@ -9,8 +12,13 @@ export function setAdminToken(token: string): void {
   localStorage.setItem(TOKEN_KEY, token)
 }
 
+export function getAdminRole(): StaffRole | null {
+  return localStorage.getItem(ROLE_KEY) as StaffRole | null
+}
+
 export function clearAdminToken(): void {
   localStorage.removeItem(TOKEN_KEY)
+  localStorage.removeItem(ROLE_KEY)
 }
 
 export async function adminLogin(email: string, password: string): Promise<void> {
@@ -22,6 +30,7 @@ export async function adminLogin(email: string, password: string): Promise<void>
   const data = await res.json()
   if (!res.ok) throw new Error(data.error || 'Login failed')
   setAdminToken(data.token)
+  localStorage.setItem(ROLE_KEY, data.role)
 }
 
 export interface ImportRowResult {
@@ -162,7 +171,19 @@ export async function updateUniversity(
   })
 }
 
-export type ImageUploadType = 'logo' | 'image' | 'gallery'
+export async function deleteUniversity(id: string): Promise<void> {
+  const token = getAdminToken()
+  const res = await fetch(`${API_URL}/api/universities/${id}`, {
+    method: 'DELETE',
+    headers: { Authorization: `Bearer ${token}` },
+  })
+  if (!res.ok) {
+    const data = await res.json().catch(() => ({}))
+    throw new Error(data.error || 'Delete failed')
+  }
+}
+
+export type ImageUploadType = 'logo' | 'image' | 'gallery' | 'cover'
 
 export async function uploadImage(file: File, universityName: string, type: ImageUploadType): Promise<string> {
   const token = getAdminToken()
@@ -170,6 +191,23 @@ export async function uploadImage(file: File, universityName: string, type: Imag
   formData.append('file', file)
   formData.append('universityName', universityName)
   formData.append('type', type)
+
+  const res = await fetch(`${API_URL}/api/uploads/image`, {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${token}` },
+    body: formData,
+  })
+  const data = await res.json()
+  if (!res.ok) throw new Error(data.error || 'Upload failed')
+  return data.url as string
+}
+
+export async function uploadArticleCoverImage(file: File, articleTitle: string): Promise<string> {
+  const token = getAdminToken()
+  const formData = new FormData()
+  formData.append('file', file)
+  formData.append('articleTitle', articleTitle)
+  formData.append('type', 'cover')
 
   const res = await fetch(`${API_URL}/api/uploads/image`, {
     method: 'POST',
@@ -194,4 +232,187 @@ export interface UniversityReview {
 
 export async function listUniversityReviews(universityId: string): Promise<{ items: UniversityReview[]; total: number }> {
   return adminFetch(`/api/universities/${universityId}/reviews`)
+}
+
+export interface StaffUser {
+  _id: string
+  email: string
+  role: StaffRole
+  firstName?: string
+  lastName?: string
+  createdAt: string
+}
+
+export async function listStaffUsers(): Promise<{ users: StaffUser[] }> {
+  return adminFetch('/api/admin/users')
+}
+
+export async function createStaffUser(data: {
+  email: string
+  password: string
+  role: StaffRole
+  firstName?: string
+  lastName?: string
+}): Promise<{ user: StaffUser }> {
+  return adminFetch('/api/admin/users', { method: 'POST', body: JSON.stringify(data) })
+}
+
+export async function updateStaffUserRole(id: string, role: StaffRole): Promise<{ user: StaffUser }> {
+  return adminFetch(`/api/admin/users/${id}/role`, { method: 'PATCH', body: JSON.stringify({ role }) })
+}
+
+export async function deleteStaffUser(id: string): Promise<void> {
+  const token = getAdminToken()
+  const res = await fetch(`${API_URL}/api/admin/users/${id}`, {
+    method: 'DELETE',
+    headers: { Authorization: `Bearer ${token}` },
+  })
+  if (!res.ok) {
+    const data = await res.json().catch(() => ({}))
+    throw new Error(data.error || 'Delete failed')
+  }
+}
+
+export function importNewsSheet(file: File, write: boolean): Promise<ImportReport> {
+  return importSheet('/api/imports/news-sheet', file, write)
+}
+
+export function importBlogSheet(file: File, write: boolean): Promise<ImportReport> {
+  return importSheet('/api/imports/blog-sheet', file, write)
+}
+
+export interface ArticleSection {
+  order: number
+  title?: string
+  image?: string
+  content: string
+}
+
+export interface ArticleListItem {
+  _id: string
+  title: string
+  coverImage?: string
+  author?: string
+  source?: string
+  destination?: string
+  publishedDate?: string
+  type?: string
+  sourceLink?: string
+  updatedAt?: string
+}
+
+export interface ArticleDetail extends ArticleListItem {
+  content: string
+  sections: ArticleSection[]
+  universityIds?: { _id: string; name: string }[]
+}
+
+export type ArticleKind = 'news' | 'blogs'
+
+export async function listArticles(
+  kind: ArticleKind,
+  params: { search?: string; page?: number; limit?: number }
+): Promise<{ items: ArticleListItem[]; total: number; page: number; limit: number }> {
+  const query = new URLSearchParams()
+  if (params.search) query.set('search', params.search)
+  if (params.page) query.set('page', String(params.page))
+  if (params.limit) query.set('limit', String(params.limit))
+  return adminFetch(`/api/${kind}?${query.toString()}`)
+}
+
+export async function getArticle(kind: ArticleKind, id: string): Promise<ArticleDetail> {
+  return adminFetch(`/api/${kind}/${id}`)
+}
+
+export async function updateArticle(
+  kind: ArticleKind,
+  id: string,
+  data: Record<string, unknown>
+): Promise<ArticleDetail> {
+  return adminFetch(`/api/${kind}/${id}`, { method: 'PATCH', body: JSON.stringify(data) })
+}
+
+export async function deleteArticle(kind: ArticleKind, id: string): Promise<void> {
+  const token = getAdminToken()
+  const res = await fetch(`${API_URL}/api/${kind}/${id}`, {
+    method: 'DELETE',
+    headers: { Authorization: `Bearer ${token}` },
+  })
+  if (!res.ok) {
+    const data = await res.json().catch(() => ({}))
+    throw new Error(data.error || 'Delete failed')
+  }
+}
+
+export type EventMode = 'In-person' | 'Online'
+
+export interface EventExpectation {
+  icon?: string
+  text: string
+}
+
+export interface EventListItem {
+  _id: string
+  title: string
+  coverImage?: string
+  date: string
+  mode: EventMode
+  category?: string
+  venue?: string
+  registrationDeadline?: string
+  universityId?: { _id: string; name: string }
+  updatedAt?: string
+}
+
+export interface EventDetail extends EventListItem {
+  time?: string
+  venueAddress?: string
+  latitude?: number
+  longitude?: number
+  language?: string
+  price?: string
+  seatsInfo?: string
+  aboutDescription?: string
+  whatToExpect: EventExpectation[]
+  whoCanAttend?: string
+  whatToBring?: string
+  registrationInfo?: string
+  organiserContactEmail?: string
+  organiserContactPhone?: string
+}
+
+export async function listEvents(params: {
+  search?: string
+  page?: number
+  limit?: number
+}): Promise<{ items: EventListItem[]; total: number; page: number; limit: number }> {
+  const query = new URLSearchParams()
+  if (params.search) query.set('search', params.search)
+  if (params.page) query.set('page', String(params.page))
+  if (params.limit) query.set('limit', String(params.limit))
+  return adminFetch(`/api/events?${query.toString()}`)
+}
+
+export async function getEvent(id: string): Promise<EventDetail> {
+  return adminFetch(`/api/events/${id}`)
+}
+
+export async function createEvent(data: Record<string, unknown>): Promise<EventDetail> {
+  return adminFetch('/api/events', { method: 'POST', body: JSON.stringify(data) })
+}
+
+export async function updateEvent(id: string, data: Record<string, unknown>): Promise<EventDetail> {
+  return adminFetch(`/api/events/${id}`, { method: 'PATCH', body: JSON.stringify(data) })
+}
+
+export async function deleteEvent(id: string): Promise<void> {
+  const token = getAdminToken()
+  const res = await fetch(`${API_URL}/api/events/${id}`, {
+    method: 'DELETE',
+    headers: { Authorization: `Bearer ${token}` },
+  })
+  if (!res.ok) {
+    const data = await res.json().catch(() => ({}))
+    throw new Error(data.error || 'Delete failed')
+  }
 }

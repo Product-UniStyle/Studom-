@@ -1,17 +1,14 @@
 import { useRef, useState } from 'react'
 import { Upload } from 'lucide-react'
-import { uploadImage } from '../../lib/adminApi'
-import type { ImageUploadType } from '../../lib/adminApi'
 
 interface ImageUploadFieldProps {
   label: string
   name: string
   defaultValue?: string
-  universityName: string
-  type: ImageUploadType
+  onUpload: (file: File) => Promise<string>
 }
 
-export default function ImageUploadField({ label, name, defaultValue, universityName, type }: ImageUploadFieldProps) {
+export default function ImageUploadField({ label, name, defaultValue, onUpload }: ImageUploadFieldProps) {
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [value, setValue] = useState(defaultValue || '')
   const [uploading, setUploading] = useState(false)
@@ -24,7 +21,7 @@ export default function ImageUploadField({ label, name, defaultValue, university
     setUploading(true)
     setError(null)
     try {
-      const url = await uploadImage(file, universityName, type)
+      const url = await onUpload(file)
       setValue(url)
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Upload failed')

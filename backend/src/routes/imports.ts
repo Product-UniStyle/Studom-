@@ -1,15 +1,18 @@
 import { Router } from 'express';
 import multer from 'multer';
-import { requireAdmin } from '../middleware/adminAuth';
+import { requireEditorOrAdmin } from '../middleware/adminAuth';
 import { importMainSheet } from '../lib/mainSheetImport';
 import { importPocSheet } from '../lib/pocSheetImport';
 import { importReviewsSheet } from '../lib/reviewSheetImport';
+import { importArticleSheet } from '../lib/articleSheetImport';
+import NewsArticle from '../models/NewsArticle';
+import BlogPost from '../models/BlogPost';
 
 const router = Router();
 const upload = multer({ storage: multer.memoryStorage() });
 
 function importRoute(path: string, importFn: (buffer: Buffer, opts: { write: boolean }) => Promise<unknown>) {
-  router.post(path, requireAdmin, upload.single('file'), async (req, res) => {
+  router.post(path, requireEditorOrAdmin, upload.single('file'), async (req, res) => {
     if (!req.file) {
       return res.status(400).json({ error: 'No file uploaded (field name must be "file")' });
     }
@@ -28,5 +31,7 @@ function importRoute(path: string, importFn: (buffer: Buffer, opts: { write: boo
 importRoute('/main-sheet', importMainSheet);
 importRoute('/poc-sheet', importPocSheet);
 importRoute('/reviews-sheet', importReviewsSheet);
+importRoute('/news-sheet', (buffer, opts) => importArticleSheet(NewsArticle, 'News', buffer, opts));
+importRoute('/blog-sheet', (buffer, opts) => importArticleSheet(BlogPost, 'Blogs', buffer, opts));
 
 export default router;

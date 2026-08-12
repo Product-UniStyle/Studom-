@@ -3,7 +3,7 @@ import TextField from '../../components/form/TextField'
 import SelectField from '../../components/form/SelectField'
 import ImageUploadField from './ImageUploadField'
 import GalleryUploadField from './GalleryUploadField'
-import { listUniversityReviews, updateUniversity } from '../../lib/adminApi'
+import { listUniversityReviews, updateUniversity, uploadImage } from '../../lib/adminApi'
 import type { UniversityDetail, UniversityReview } from '../../lib/adminApi'
 
 const UNIVERSITY_TYPES = ['School', 'College', 'University', 'Tuition']
@@ -115,8 +115,8 @@ export default function AdminUniversityForm({ university, onSaved, onCancel }: A
           defaultValue={university.type}
           required
         />
-                <ImageUploadField label="Logo" name="logo" defaultValue={university.logo} universityName={university.name} type="logo" />
-        <ImageUploadField label="Image" name="image" defaultValue={university.image} universityName={university.name} type="image" />
+                <ImageUploadField label="Logo" name="logo" defaultValue={university.logo} onUpload={(file) => uploadImage(file, university.name, 'logo')} />
+        <ImageUploadField label="Image" name="image" defaultValue={university.image} onUpload={(file) => uploadImage(file, university.name, 'image')} />
         <TextField label="City" name="city" defaultValue={university.city} />
         <TextField label="Country" name="country" defaultValue={university.country} />
         <TextField label="Area" name="area" defaultValue={university.area} />

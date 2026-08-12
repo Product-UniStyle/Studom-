@@ -1,12 +1,12 @@
 import { Router } from 'express';
-import { requireAdmin } from '../middleware/adminAuth';
+import { requireEditorOrAdmin } from '../middleware/adminAuth';
 import { resolveInclusionIds, escapeRegex } from '../lib/inclusions';
 import University, { UNIVERSITY_TYPE_VALUES, UniversityType } from '../models/University';
 import Review from '../models/Review';
 
 const router = Router();
 
-router.get('/', requireAdmin, async (req, res) => {
+router.get('/', requireEditorOrAdmin, async (req, res) => {
   const search = typeof req.query.search === 'string' ? req.query.search.trim() : '';
   const type = typeof req.query.type === 'string' ? req.query.type.trim() : '';
   const page = Math.max(1, Number(req.query.page) || 1);
@@ -29,13 +29,13 @@ router.get('/', requireAdmin, async (req, res) => {
   res.json({ items, total, page, limit });
 });
 
-router.get('/:id', requireAdmin, async (req, res) => {
+router.get('/:id', requireEditorOrAdmin, async (req, res) => {
   const university = await University.findById(req.params.id).populate('inclusions', 'label').lean();
   if (!university) return res.status(404).json({ error: 'University not found' });
   res.json(university);
 });
 
-router.get('/:id/reviews', requireAdmin, async (req, res) => {
+router.get('/:id/reviews', requireEditorOrAdmin, async (req, res) => {
   const reviews = await Review.find({ universityId: req.params.id })
     .select('reviewerName text date rating platform link reviewerMeta')
     .sort({ date: -1 })
@@ -44,7 +44,7 @@ router.get('/:id/reviews', requireAdmin, async (req, res) => {
   res.json({ items: reviews, total: reviews.length });
 });
 
-router.patch('/:id', requireAdmin, async (req, res) => {
+router.patch('/:id', requireEditorOrAdmin, async (req, res) => {
   const body = req.body as Record<string, unknown>;
 
   const update: Record<string, unknown> = {};
@@ -106,6 +106,12 @@ router.patch('/:id', requireAdmin, async (req, res) => {
 
   if (!university) return res.status(404).json({ error: 'University not found' });
   res.json(university);
+});
+
+router.delete('/:id', requireEditorOrAdmin, async (req, res) => {
+  const university = await University.findByIdAndDelete(req.params.id);
+  if (!university) return res.status(404).json({ error: 'University not found' });
+  res.json({ success: true });
 });
 
 export default router;

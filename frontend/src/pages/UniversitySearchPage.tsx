@@ -38,7 +38,7 @@ export default function UniversitySearchPage() {
   const [additional, setAdditional] = useState('QS Ranking')
   const [query, setQuery] = useState('')
   const [page, setPage] = useState(1)
-  const [applied, setApplied] = useState(Boolean(type))
+  const [applied, setApplied] = useState(false)
 
   const [items, setItems] = useState<PublicUniversityListItem[]>([])
   const [total, setTotal] = useState(0)
@@ -50,7 +50,6 @@ export default function UniversitySearchPage() {
   const [fields, setFields] = useState<string[]>([])
 
   useEffect(() => {
-    setApplied(Boolean(type))
     setPage(1)
   }, [type])
 
@@ -104,14 +103,13 @@ export default function UniversitySearchPage() {
 
   const heading = useMemo(() => {
     if (type) return `Top ${TYPE_LABELS[type] || type} in ${location || 'all locations'}`
-    return `Top universities for ${field} in ${location || 'all locations'}`
+    if (field) return `Top universities for ${field} in ${location || 'all locations'}`
+    return `Top universities in ${location || 'all locations'}`
   }, [type, field, location])
 
   const handleSearch = () => {
-    if (country && field) {
-      setApplied(true)
-      setPage(1)
-    }
+    setApplied(true)
+    setPage(1)
   }
 
   return (
