@@ -1,10 +1,25 @@
 import mongoose from 'mongoose';
 
-export async function connectDB(): Promise<void> {
+let connectPromise: Promise<void> | null = null;
+
+export function connectDB(): Promise<void> {
+  if (mongoose.connection.readyState === 1) return Promise.resolve();
+  if (connectPromise) return connectPromise;
+
   const uri = process.env.MONGODB_URI;
   if (!uri) {
-    throw new Error('MONGODB_URI is not set');
+    return Promise.reject(new Error('MONGODB_URI is not set'));
   }
-  await mongoose.connect(uri);
-  console.log('MongoDB connected');
+
+  connectPromise = mongoose
+    .connect(uri)
+    .then(() => {
+      console.log('MongoDB connected');
+    })
+    .catch((err) => {
+      connectPromise = null;
+      throw err;
+    });
+
+  return connectPromise;
 }

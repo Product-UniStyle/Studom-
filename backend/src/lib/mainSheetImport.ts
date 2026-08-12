@@ -1,6 +1,6 @@
 import * as XLSX from 'xlsx';
 import University, { UNIVERSITY_TYPE_VALUES, UniversityType } from '../models/University';
-import { resolveInclusionIds } from './inclusions';
+import { resolveInclusionIdsMap } from './inclusions';
 import { parseGradeField } from './parseGradeField';
 
 interface MainSheetRow {
@@ -83,6 +83,14 @@ export function readMainSheetRows(buffer: Buffer): MainSheetRow[] {
   return XLSX.utils.sheet_to_json<MainSheetRow>(sheet, { defval: null });
 }
 
+interface ValidRow {
+  rowNum: number;
+  sourceId: string;
+  name: string;
+  inclusionLabels: string[];
+  payload: Record<string, unknown>;
+}
+
 export async function importMainSheet(buffer: Buffer, opts: { write: boolean }): Promise<ImportReport> {
   const rows = readMainSheetRows(buffer);
   const report: ImportReport = {
@@ -93,6 +101,8 @@ export async function importMainSheet(buffer: Buffer, opts: { write: boolean }):
     warnings: [],
     rows: [],
   };
+
+  const validRows: ValidRow[] = [];
 
   for (let i = 0; i < rows.length; i++) {
     const rowNum = i + 2; // +1 for 0-index, +1 for header row
@@ -153,23 +163,48 @@ export async function importMainSheet(buffer: Buffer, opts: { write: boolean }):
       mode: row.Mode || undefined,
     };
 
-    const existing = await University.findOne({ sourceId }).select('_id').lean();
+    validRows.push({ rowNum, sourceId, name, inclusionLabels, payload });
+  }
 
-    if (opts.write) {
-      const inclusions = await resolveInclusionIds(inclusionLabels);
-      await University.findOneAndUpdate(
-        { sourceId },
-        { $set: { ...payload, inclusions } },
-        { upsert: true, new: true, setDefaultsOnInsert: true }
-      );
-    }
+  if (validRows.length === 0) return report;
 
-    if (existing) {
+  // One query to know which sourceIds already exist, instead of one findOne per row.
+  const existingDocs = await University.find({ sourceId: { $in: validRows.map((r) => r.sourceId) } })
+    .select('sourceId')
+    .lean();
+  const existingSet = new Set(existingDocs.map((d) => d.sourceId));
+
+  if (opts.write) {
+    // Resolve every distinct inclusion label across the whole batch in one
+    // pass instead of one round-trip per label per row.
+    const allLabels = validRows.flatMap((r) => r.inclusionLabels);
+    const inclusionMap = await resolveInclusionIdsMap(allLabels);
+
+    const ops = validRows.map((r) => ({
+      updateOne: {
+        filter: { sourceId: r.sourceId },
+        update: {
+          $set: {
+            ...r.payload,
+            inclusions: r.inclusionLabels
+              .map((l) => inclusionMap.get(l.toLowerCase()))
+              .filter((id): id is NonNullable<typeof id> => Boolean(id)),
+          },
+        },
+        upsert: true,
+      },
+    }));
+
+    await University.bulkWrite(ops, { ordered: false });
+  }
+
+  for (const r of validRows) {
+    if (existingSet.has(r.sourceId)) {
       report.updated++;
-      report.rows.push({ row: rowNum, sourceId, name, action: 'update' });
+      report.rows.push({ row: r.rowNum, sourceId: r.sourceId, name: r.name, action: 'update' });
     } else {
       report.created++;
-      report.rows.push({ row: rowNum, sourceId, name, action: 'create' });
+      report.rows.push({ row: r.rowNum, sourceId: r.sourceId, name: r.name, action: 'create' });
     }
   }
 

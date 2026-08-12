@@ -42,27 +42,31 @@ export interface ImportReport {
   rows: ImportRowResult[]
 }
 
-export interface CombinedImportReport {
-  write: boolean
-  sheetsFound: string[]
-  main: ImportReport | null
-  poc: ImportReport | null
-  reviews: ImportReport | null
-}
-
-export async function importAllSheets(file: File, write: boolean): Promise<CombinedImportReport> {
+async function importSheet(path: string, file: File, write: boolean): Promise<ImportReport> {
   const token = getAdminToken()
   const formData = new FormData()
   formData.append('file', file)
 
-  const res = await fetch(`${API_URL}/api/imports/all-sheets?write=${write}`, {
+  const res = await fetch(`${API_URL}${path}?write=${write}`, {
     method: 'POST',
     headers: { Authorization: `Bearer ${token}` },
     body: formData,
   })
   const data = await res.json()
   if (!res.ok) throw new Error(data.error || 'Import failed')
-  return data as CombinedImportReport
+  return data as ImportReport
+}
+
+export function importMainSheet(file: File, write: boolean): Promise<ImportReport> {
+  return importSheet('/api/imports/main-sheet', file, write)
+}
+
+export function importPocSheet(file: File, write: boolean): Promise<ImportReport> {
+  return importSheet('/api/imports/poc-sheet', file, write)
+}
+
+export function importReviewsSheet(file: File, write: boolean): Promise<ImportReport> {
+  return importSheet('/api/imports/reviews-sheet', file, write)
 }
 
 export interface UniversityListItem {

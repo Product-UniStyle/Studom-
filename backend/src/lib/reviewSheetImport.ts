@@ -30,6 +30,17 @@ export function readReviewsSheetRows(buffer: Buffer): ReviewSheetRow[] {
   return XLSX.utils.sheet_to_json<ReviewSheetRow>(sheet, { defval: null });
 }
 
+interface ValidRow {
+  rowNum: number;
+  sourceId: string;
+  reviewerName: string;
+  text: string;
+  sourceHash: string;
+  rating?: number;
+  platform?: string;
+  link?: string;
+}
+
 export async function importReviewsSheet(buffer: Buffer, opts: { write: boolean }): Promise<ImportReport> {
   const rows = readReviewsSheetRows(buffer);
   const report: ImportReport = {
@@ -40,6 +51,8 @@ export async function importReviewsSheet(buffer: Buffer, opts: { write: boolean 
     warnings: [],
     rows: [],
   };
+
+  const validRows: ValidRow[] = [];
 
   for (let i = 0; i < rows.length; i++) {
     const rowNum = i + 2;
@@ -54,41 +67,70 @@ export async function importReviewsSheet(buffer: Buffer, opts: { write: boolean 
       continue;
     }
 
-    const university = await University.findOne({ sourceId }).select('_id');
-    if (!university) {
-      report.skipped++;
-      report.rows.push({ row: rowNum, sourceId, name: reviewerName, action: 'skip', reason: `No university found with sourceId "${sourceId}"` });
-      continue;
-    }
+    validRows.push({
+      rowNum,
+      sourceId,
+      reviewerName,
+      text,
+      sourceHash: hashReview(sourceId, reviewerName, text),
+      rating: toNumber(row.Rating),
+      platform: row.Platform || undefined,
+      link: row['Review Link'] || undefined,
+    });
+  }
 
-    const sourceHash = hashReview(sourceId, reviewerName, text);
-    const existing = await Review.findOne({ sourceHash }).select('_id').lean();
+  if (validRows.length === 0) return report;
 
-    if (opts.write) {
-      await Review.findOneAndUpdate(
-        { sourceHash },
-        {
+  // One query for every matching university instead of one findOne per row.
+  const universities = await University.find({ sourceId: { $in: validRows.map((r) => r.sourceId) } })
+    .select('sourceId')
+    .lean();
+  const universityIdBySourceId = new Map(universities.map((u) => [u.sourceId as string, u._id]));
+
+  const matchedRows = validRows.filter((r) => universityIdBySourceId.has(r.sourceId));
+  const unmatchedRows = validRows.filter((r) => !universityIdBySourceId.has(r.sourceId));
+
+  for (const r of unmatchedRows) {
+    report.skipped++;
+    report.rows.push({ row: r.rowNum, sourceId: r.sourceId, name: r.reviewerName, action: 'skip', reason: `No university found with sourceId "${r.sourceId}"` });
+  }
+
+  // One query for every already-imported review instead of one findOne per row.
+  const existingReviews = await Review.find({ sourceHash: { $in: matchedRows.map((r) => r.sourceHash) } })
+    .select('sourceHash')
+    .lean();
+  const existingHashes = new Set(existingReviews.map((r) => r.sourceHash));
+
+  if (opts.write && matchedRows.length > 0) {
+    const ops = matchedRows.map((r) => ({
+      updateOne: {
+        filter: { sourceHash: r.sourceHash },
+        update: {
           $set: {
-            universityId: university._id,
-            reviewerName,
-            text,
-            rating: toNumber(row.Rating),
-            platform: row.Platform || undefined,
-            link: row['Review Link'] || undefined,
+            universityId: universityIdBySourceId.get(r.sourceId),
+            reviewerName: r.reviewerName,
+            text: r.text,
+            rating: r.rating,
+            platform: r.platform,
+            link: r.link,
           },
         },
-        { upsert: true, setDefaultsOnInsert: true }
-      );
-    }
+        upsert: true,
+      },
+    }));
+    await Review.bulkWrite(ops, { ordered: false });
+  }
 
-    if (existing) {
+  for (const r of matchedRows) {
+    if (existingHashes.has(r.sourceHash)) {
       report.updated++;
-      report.rows.push({ row: rowNum, sourceId, name: reviewerName, action: 'update' });
+      report.rows.push({ row: r.rowNum, sourceId: r.sourceId, name: r.reviewerName, action: 'update' });
     } else {
       report.created++;
-      report.rows.push({ row: rowNum, sourceId, name: reviewerName, action: 'create' });
+      report.rows.push({ row: r.rowNum, sourceId: r.sourceId, name: r.reviewerName, action: 'create' });
     }
   }
 
+  report.rows.sort((a, b) => a.row - b.row);
   return report;
 }

@@ -1,13 +1,21 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { UploadCloud, LogOut } from 'lucide-react'
-import { clearAdminToken, getAdminToken } from '../../lib/adminApi'
+import {
+  clearAdminToken,
+  getAdminToken,
+  importMainSheet,
+  importPocSheet,
+  importReviewsSheet,
+} from '../../lib/adminApi'
 import AdminUniversityTable from './AdminUniversityTable'
-import AdminImportAllModal from './AdminImportAllModal'
+import AdminImportModal from './AdminImportModal'
+
+type ImportKind = 'main' | 'poc' | 'reviews'
 
 export default function AdminUploadPage() {
   const navigate = useNavigate()
-  const [showImportModal, setShowImportModal] = useState(false)
+  const [activeImport, setActiveImport] = useState<ImportKind | null>(null)
   const [tableRefreshKey, setTableRefreshKey] = useState(0)
 
   useEffect(() => {
@@ -34,20 +42,75 @@ export default function AdminUploadPage() {
       <main className="mx-auto max-w-7xl px-6 py-10">
         <div className="flex items-center justify-between rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
           <h2 className="text-lg font-semibold text-black">University Data Upload</h2>
-          <button
-            onClick={() => setShowImportModal(true)}
-            className="flex items-center gap-2 rounded-lg bg-black px-5 py-3 text-sm font-semibold text-white hover:bg-gray-800"
-          >
-            <UploadCloud className="h-4 w-4" /> Import Data Sheet
-          </button>
+          <div className="flex gap-3">
+            <button
+              onClick={() => setActiveImport('main')}
+              className="flex items-center gap-2 rounded-lg bg-black px-5 py-3 text-sm font-semibold text-white hover:bg-gray-800"
+            >
+              <UploadCloud className="h-4 w-4" /> Import MAIN Sheet
+            </button>
+            <button
+              onClick={() => setActiveImport('poc')}
+              className="flex items-center gap-2 rounded-lg border border-gray-300 px-5 py-3 text-sm font-semibold text-gray-800 hover:bg-gray-50"
+            >
+              <UploadCloud className="h-4 w-4" /> Import POC
+            </button>
+            <button
+              onClick={() => setActiveImport('reviews')}
+              className="flex items-center gap-2 rounded-lg border border-gray-300 px-5 py-3 text-sm font-semibold text-gray-800 hover:bg-gray-50"
+            >
+              <UploadCloud className="h-4 w-4" /> Import Reviews
+            </button>
+          </div>
         </div>
 
         <AdminUniversityTable refreshKey={tableRefreshKey} />
       </main>
 
-      {showImportModal && (
-        <AdminImportAllModal
-          onClose={() => setShowImportModal(false)}
+      {activeImport === 'main' && (
+        <AdminImportModal
+          title="Import MAIN Sheet"
+          description={
+            <>
+              Upload the data team's <code>Tech_UAE_All_Data.xlsx</code> file. The MAIN tab is
+              imported into the University collection, matched by each row's sheet ID so
+              re-uploads update existing records instead of duplicating them.
+            </>
+          }
+          importFn={importMainSheet}
+          onClose={() => setActiveImport(null)}
+          onImported={() => setTableRefreshKey((k) => k + 1)}
+        />
+      )}
+
+      {activeImport === 'poc' && (
+        <AdminImportModal
+          title="Import POC Sheet"
+          description={
+            <>
+              Upload the same workbook's <code>POC</code> tab. Each row is matched to its
+              university by the shared sheet ID and fills in the area, POC name, address, email,
+              phone, and fax — this only works after the MAIN sheet has been imported first.
+            </>
+          }
+          importFn={importPocSheet}
+          onClose={() => setActiveImport(null)}
+          onImported={() => setTableRefreshKey((k) => k + 1)}
+        />
+      )}
+
+      {activeImport === 'reviews' && (
+        <AdminImportModal
+          title="Import Reviews Sheet"
+          description={
+            <>
+              Upload the same workbook's <code>Reviews</code> tab. Each review is matched to its
+              university by the shared sheet ID, so this only works after the MAIN sheet has been
+              imported first. Re-uploads update existing reviews instead of duplicating them.
+            </>
+          }
+          importFn={importReviewsSheet}
+          onClose={() => setActiveImport(null)}
           onImported={() => setTableRefreshKey((k) => k + 1)}
         />
       )}

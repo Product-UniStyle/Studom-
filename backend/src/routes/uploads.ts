@@ -4,9 +4,11 @@ import { requireAdmin } from '../middleware/adminAuth';
 import { uploadImageToS3, sanitizeFolderSegment } from '../lib/s3';
 
 const router = Router();
+// Kept under 4.5MB — Vercel's serverless request body limit. Larger
+// uploads get rejected by the platform itself before reaching this code.
 const upload = multer({
   storage: multer.memoryStorage(),
-  limits: { fileSize: 10 * 1024 * 1024 },
+  limits: { fileSize: 4 * 1024 * 1024 },
 });
 
 const IMAGE_TYPES = ['logo', 'image', 'gallery'];
