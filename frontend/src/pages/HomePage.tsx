@@ -33,7 +33,7 @@ export default function HomePage() {
       {/* Hero */}
       <section className="mx-auto max-w-[1440px] px-6 pb-10 pt-14 lg:px-10">
         <div className="grid grid-cols-1 items-center gap-10 lg:grid-cols-2">
-          <h1 className="font-script text-4xl leading-tight text-blue-600 sm:text-5xl">
+          <h1 className="font-script text-4xl leading-[3] text-blue-600 sm:text-5xl">
             One platform to discover, plan &amp; apply to institutions while
             building the Middle East's largest student community.
           </h1>
@@ -99,14 +99,14 @@ export default function HomePage() {
 
       {/* Platform inclusions */}
       <section className="mx-auto max-w-[1440px] px-6 pb-16 lg:px-10">
-        <h2 className="mb-8 text-3xl font-medium text-gray-800">
+        <h2 className="mb-8 font-forum text-3xl font-medium text-gray-800">
           Platform inclusions.
         </h2>
         <div className="grid grid-cols-2 gap-x-8 gap-y-8 sm:grid-cols-3 md:grid-cols-5">
           {homeInclusions.map((item) => (
             <div key={item.label} className="flex items-center gap-3">
               <item.icon className="h-6 w-6 shrink-0 text-black" strokeWidth={1.5} />
-              <span className="text-sm text-gray-700">{item.label}</span>
+              <span className="font-forum text-sm text-gray-700">{item.label}</span>
             </div>
           ))}
         </div>
@@ -114,10 +114,10 @@ export default function HomePage() {
 
       {/* Happy Students */}
       <section className="mx-auto max-w-[1440px] px-6 pb-20 lg:px-10">
-        <h2 className="mb-8 text-3xl font-medium text-gray-800">
+        <h2 className="mb-8 font-forum text-3xl font-medium text-gray-800">
           Happy Students!
         </h2>
-        <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid grid-cols-1 gap-8 font-poppins sm:grid-cols-2 lg:grid-cols-3">
           {testimonials.map((t, i) => (
             <div key={i}>
               <div className="flex items-center gap-3">

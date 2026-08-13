@@ -14,6 +14,7 @@ interface DashboardLayoutProps {
   navItems: DashboardNavItem[]
   userName: string
   userRole: string
+  contentClassName?: string
   children: React.ReactNode
 }
 
@@ -21,6 +22,7 @@ export default function DashboardLayout({
   navItems,
   userName,
   userRole,
+  contentClassName,
   children,
 }: DashboardLayoutProps) {
   const location = useLocation()
@@ -76,7 +78,7 @@ export default function DashboardLayout({
           </div>
         </aside>
 
-        <main className="min-w-0 flex-1">{children}</main>
+        <main className={cn('min-w-0 flex-1', contentClassName)}>{children}</main>
       </div>
     </div>
   )

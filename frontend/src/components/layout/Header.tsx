@@ -56,7 +56,7 @@ export default function Header() {
   return (
     <header className="w-full border-b border-gray-200 bg-white">
       <div className="mx-auto flex max-w-[1440px] items-center justify-between px-6 py-4 lg:px-10">
-        <Link to="/" className="font-script text-3xl font-bold text-black shrink-0">
+        <Link to="/" className="font-logo text-3xl text-black shrink-0">
           Studom
         </Link>
 

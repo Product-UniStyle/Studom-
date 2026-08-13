@@ -30,7 +30,7 @@ export default function AdminLoginPage() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gray-50 px-6">
+    <div className="flex min-h-screen items-center justify-center bg-gray-50 px-6 font-admin">
       <form
         onSubmit={handleSubmit}
         className="w-full max-w-sm space-y-6 rounded-2xl border border-gray-100 bg-white p-8 shadow-sm"

@@ -61,7 +61,7 @@ export default function MyProfilePage() {
 
   if (loading || !student || !stats) {
     return (
-      <DashboardLayout navItems={studentNav} userName={student?.fullName || ''} userRole="Student">
+      <DashboardLayout navItems={studentNav} userName={student?.fullName || ''} userRole="Student" contentClassName="font-poppins">
         <p className="mt-10 text-center text-gray-400">{error || 'Loading...'}</p>
       </DashboardLayout>
     )
@@ -74,7 +74,7 @@ export default function MyProfilePage() {
   const preferences = student.preferences
 
   return (
-    <DashboardLayout navItems={studentNav} userName={student.fullName} userRole="Student">
+    <DashboardLayout navItems={studentNav} userName={student.fullName} userRole="Student" contentClassName="font-poppins">
       <h1 className="text-2xl font-bold text-black">My Profile</h1>
       <p className="mt-1 text-sm text-gray-500">
         Manage your personal details, academics and documents.

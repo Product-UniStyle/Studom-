@@ -30,8 +30,8 @@ export default function Footer() {
       <div className="mx-auto max-w-[1440px] px-6 py-14 lg:px-10">
         <div className="flex flex-col justify-between gap-10 md:flex-row">
           <div>
-            <div className="font-script text-3xl font-bold">Studom</div>
-            <div className="mt-4 max-w-xs text-sm leading-relaxed text-gray-300">
+            <div className="font-logo text-3xl">Studom</div>
+            <div className="mt-4 max-w-xs font-footerAddress text-sm leading-relaxed text-gray-300">
               Studom
               <br />
               BIZ Nest Co-Working, Sunteck Kanika Park,
@@ -42,7 +42,7 @@ export default function Footer() {
             </div>
           </div>
 
-          <div className="flex gap-16">
+          <div className="flex gap-16 font-footerNav font-extralight">
             <div className="flex flex-col gap-4 text-sm text-gray-200">
               <span>ABOUT</span>
               <span>CAREER</span>
@@ -58,7 +58,7 @@ export default function Footer() {
       </div>
 
       <div className="border-t border-gray-800">
-        <div className="mx-auto max-w-[1440px] px-6 py-6 text-center lg:px-10">
+        <div className="mx-auto max-w-[1440px] px-6 py-6 text-center font-footerNav font-extralight lg:px-10">
           <p className="text-sm text-gray-300">
             © Copyright 2026-27 STUDOM – All Rights Reserved.
           </p>
@@ -67,7 +67,7 @@ export default function Footer() {
       </div>
 
       <div className="border-t border-gray-800">
-        <div className="mx-auto flex max-w-[1440px] flex-col items-center justify-between gap-4 px-6 py-4 text-xs text-gray-400 lg:flex-row lg:px-10">
+        <div className="mx-auto flex max-w-[1440px] flex-col items-center justify-between gap-4 px-6 py-4 font-footerNav text-xs font-extralight text-gray-400 lg:flex-row lg:px-10">
           <div className="flex items-center gap-4">
             <span>Privacy</span>
             <span>·</span>

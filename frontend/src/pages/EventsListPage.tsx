@@ -71,7 +71,7 @@ export default function EventsListPage() {
         <h1 className="text-3xl font-bold text-blue-600">Events</h1>
 
         <div className="mt-6 flex flex-wrap items-center gap-3">
-          <div className="flex shrink-0 rounded-full bg-gray-100 p-1">
+          <div className="flex shrink-0 rounded-xl bg-gray-100 p-1">
             {(['upcoming', 'past'] as const).map((t) => (
               <button
                 key={t}
@@ -79,7 +79,7 @@ export default function EventsListPage() {
                   setTab(t)
                   setPage(1)
                 }}
-                className={`rounded-full px-4 py-2 text-sm font-medium ${
+                className={`rounded-lg px-4 py-2 text-sm font-medium ${
                   tab === t ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-600 hover:text-black'
                 }`}
               >
@@ -97,7 +97,7 @@ export default function EventsListPage() {
                 setPage(1)
               }}
               placeholder="Search events..."
-              className="w-full rounded-full border border-gray-200 py-2.5 pl-9 pr-4 text-sm focus:border-blue-500 focus:outline-none"
+              className="w-full rounded-xl border border-gray-200 py-2.5 pl-9 pr-4 text-sm focus:border-blue-500 focus:outline-none"
             />
           </div>
 
@@ -108,7 +108,7 @@ export default function EventsListPage() {
                 setCategory(e.target.value)
                 setPage(1)
               }}
-              className="cursor-pointer appearance-none rounded-full border border-gray-200 py-2.5 pl-4 pr-8 text-sm text-gray-700 focus:border-blue-500 focus:outline-none"
+              className="cursor-pointer appearance-none rounded-xl border border-gray-200 py-2.5 pl-4 pr-8 text-sm text-gray-700 focus:border-blue-500 focus:outline-none"
             >
               <option value="">All Categories</option>
               {categories.map((c) => (
@@ -126,7 +126,7 @@ export default function EventsListPage() {
                 <button
                   key={s}
                   onClick={() => setDateSort(s)}
-                  className={`rounded-full border px-3.5 py-2.5 text-xs font-medium ${
+                  className={`rounded-xl border px-3.5 py-2.5 text-xs font-medium ${
                     dateSort === s
                       ? 'border-blue-500 text-blue-600'
                       : 'border-gray-200 text-gray-600 hover:bg-gray-50'

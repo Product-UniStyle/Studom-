@@ -4,6 +4,7 @@ import { UploadCloud, LogOut, Landmark, Newspaper, Users, CalendarDays } from 'l
 import {
   clearAdminToken,
   getAdminToken,
+  getAdminRole,
   importMainSheet,
   importPocSheet,
   importReviewsSheet,
@@ -32,15 +33,17 @@ export default function AdminUploadPage() {
     navigate('/admin/login', { replace: true })
   }
 
+  const isAdmin = getAdminRole() === 'admin'
+
   const tabs: { key: Tab; label: string; icon: typeof Landmark }[] = [
     { key: 'university', label: 'University', icon: Landmark },
     { key: 'articles', label: 'News & Blogs', icon: Newspaper },
     { key: 'events', label: 'Events', icon: CalendarDays },
-    { key: 'users', label: 'Users', icon: Users },
+    ...(isAdmin ? [{ key: 'users' as const, label: 'Users', icon: Users }] : []),
   ]
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 font-admin">
       <header className="border-b border-gray-200 bg-white px-8 py-6">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-6">
@@ -101,7 +104,7 @@ export default function AdminUploadPage() {
 
         {tab === 'articles' && <AdminArticlesTab />}
         {tab === 'events' && <AdminEventsTab />}
-        {tab === 'users' && <AdminUsersTab />}
+        {tab === 'users' && isAdmin && <AdminUsersTab />}
       </main>
 
       {activeImport === 'main' && (

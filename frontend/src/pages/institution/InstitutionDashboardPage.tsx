@@ -68,7 +68,7 @@ export default function InstitutionDashboardPage() {
 
   if (loading || !account || !stats) {
     return (
-      <DashboardLayout navItems={institutionNav} userName={account?.universityName || ''} userRole="Institution">
+      <DashboardLayout navItems={institutionNav} userName={account?.universityName || ''} userRole="Institution" contentClassName="font-poppins">
         <p className="mt-10 text-center text-gray-400">{error || 'Loading...'}</p>
       </DashboardLayout>
     )
@@ -79,6 +79,7 @@ export default function InstitutionDashboardPage() {
       navItems={institutionNav}
       userName={account.universityName}
       userRole="Institution"
+      contentClassName="font-poppins"
     >
       <p className="text-sm text-gray-500">Welcome back,</p>
       <h1 className="text-2xl font-bold text-blue-600">

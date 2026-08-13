@@ -17,6 +17,8 @@ import type {
   PublicUniversityListItem,
   PublicUniversityReview,
 } from '../lib/publicApi'
+import { getStudentToken, getStudentMe } from '../lib/studentApi'
+import type { StudentProfile } from '../lib/studentApi'
 
 export default function UniversityDetailPage() {
   const { id } = useParams<{ id: string }>()
@@ -25,6 +27,7 @@ export default function UniversityDetailPage() {
   const [universityOptions, setUniversityOptions] = useState<PublicUniversityListItem[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [student, setStudent] = useState<StudentProfile | null>(null)
 
   useEffect(() => {
     if (!id) return
@@ -59,10 +62,23 @@ export default function UniversityDetailPage() {
       .catch(() => {})
   }, [])
 
+  useEffect(() => {
+    if (!getStudentToken()) return
+    let cancelled = false
+    getStudentMe()
+      .then((res) => {
+        if (!cancelled) setStudent(res.student)
+      })
+      .catch(() => {})
+    return () => {
+      cancelled = true
+    }
+  }, [])
+
   if (loading) {
     return (
       <PageShell>
-        <div className="py-32 text-center text-gray-400">Loading...</div>
+        <div className="py-32 text-center font-poppins text-gray-400">Loading...</div>
       </PageShell>
     )
   }
@@ -70,7 +86,7 @@ export default function UniversityDetailPage() {
   if (error || !uni) {
     return (
       <PageShell>
-        <div className="py-32 text-center text-gray-400">
+        <div className="py-32 text-center font-poppins text-gray-400">
           {error || 'University not found'}
         </div>
       </PageShell>
@@ -87,7 +103,7 @@ export default function UniversityDetailPage() {
 
   return (
     <PageShell>
-      <div className="mx-auto max-w-[1440px] px-6 py-8 lg:px-10">
+      <div className="mx-auto max-w-[1440px] px-6 py-8 font-poppins lg:px-10">
         {/* Gallery */}
         {gallery.length > 0 && (
           <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
@@ -117,7 +133,7 @@ export default function UniversityDetailPage() {
               alt=""
               className="h-14 w-14 rounded-md border border-gray-100 object-contain p-1"
             />
-            <h1 className="text-2xl font-semibold text-blue-900 sm:text-3xl">
+            <h1 className="font-georgia text-2xl font-semibold text-blue-900 sm:text-3xl">
               {uni.name}
             </h1>
           </div>
@@ -176,23 +192,25 @@ export default function UniversityDetailPage() {
           </div>
 
           <div className="rounded-xl border border-gray-100 p-6 shadow-sm">
-            <TextField label="Full Name" placeholder="Your name" />
+            <TextField label="Full Name" placeholder="Your name" defaultValue={student?.fullName} />
             <TextField
               label="Email"
               type="email"
               placeholder="you@example.com"
+              defaultValue={student?.email}
               className="mt-4"
             />
             <SelectField
               label="Studying in School or University"
               options={['School', 'University']}
-              defaultValue="University"
+              defaultValue={student?.currentStage === 'School Student' ? 'School' : 'University'}
               className="mt-4"
             />
             <SelectField
               label="Select University"
               placeholder="Select a university"
               options={universityOptions.map((u) => u.name)}
+              defaultValue={uni?.name}
               className="mt-4"
             />
             <Link
