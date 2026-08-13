@@ -21,6 +21,15 @@ export function clearAdminToken(): void {
   localStorage.removeItem(ROLE_KEY)
 }
 
+function isUnauthorized(res: Response): boolean {
+  if (res.status !== 401) return false
+  clearAdminToken()
+  if (window.location.pathname !== '/admin/login') {
+    window.location.href = '/admin/login'
+  }
+  return true
+}
+
 export async function adminLogin(email: string, password: string): Promise<void> {
   const res = await fetch(`${API_URL}/api/admin/login`, {
     method: 'POST',
@@ -61,6 +70,7 @@ async function importSheet(path: string, file: File, write: boolean): Promise<Im
     headers: { Authorization: `Bearer ${token}` },
     body: formData,
   })
+  if (isUnauthorized(res)) throw new Error('Session expired. Please log in again.')
   const data = await res.json()
   if (!res.ok) throw new Error(data.error || 'Import failed')
   return data as ImportReport
@@ -109,6 +119,7 @@ async function adminFetch(path: string, init?: RequestInit) {
       ...init?.headers,
     },
   })
+  if (isUnauthorized(res)) throw new Error('Session expired. Please log in again.')
   const data = await res.json()
   if (!res.ok) throw new Error(data.error || 'Request failed')
   return data
@@ -177,6 +188,7 @@ export async function deleteUniversity(id: string): Promise<void> {
     method: 'DELETE',
     headers: { Authorization: `Bearer ${token}` },
   })
+  if (isUnauthorized(res)) throw new Error('Session expired. Please log in again.')
   if (!res.ok) {
     const data = await res.json().catch(() => ({}))
     throw new Error(data.error || 'Delete failed')
@@ -197,6 +209,7 @@ export async function uploadImage(file: File, universityName: string, type: Imag
     headers: { Authorization: `Bearer ${token}` },
     body: formData,
   })
+  if (isUnauthorized(res)) throw new Error('Session expired. Please log in again.')
   const data = await res.json()
   if (!res.ok) throw new Error(data.error || 'Upload failed')
   return data.url as string
@@ -214,6 +227,7 @@ export async function uploadArticleCoverImage(file: File, articleTitle: string):
     headers: { Authorization: `Bearer ${token}` },
     body: formData,
   })
+  if (isUnauthorized(res)) throw new Error('Session expired. Please log in again.')
   const data = await res.json()
   if (!res.ok) throw new Error(data.error || 'Upload failed')
   return data.url as string
@@ -267,6 +281,7 @@ export async function deleteStaffUser(id: string): Promise<void> {
     method: 'DELETE',
     headers: { Authorization: `Bearer ${token}` },
   })
+  if (isUnauthorized(res)) throw new Error('Session expired. Please log in again.')
   if (!res.ok) {
     const data = await res.json().catch(() => ({}))
     throw new Error(data.error || 'Delete failed')
@@ -338,6 +353,7 @@ export async function deleteArticle(kind: ArticleKind, id: string): Promise<void
     method: 'DELETE',
     headers: { Authorization: `Bearer ${token}` },
   })
+  if (isUnauthorized(res)) throw new Error('Session expired. Please log in again.')
   if (!res.ok) {
     const data = await res.json().catch(() => ({}))
     throw new Error(data.error || 'Delete failed')
@@ -411,6 +427,7 @@ export async function deleteEvent(id: string): Promise<void> {
     method: 'DELETE',
     headers: { Authorization: `Bearer ${token}` },
   })
+  if (isUnauthorized(res)) throw new Error('Session expired. Please log in again.')
   if (!res.ok) {
     const data = await res.json().catch(() => ({}))
     throw new Error(data.error || 'Delete failed')
