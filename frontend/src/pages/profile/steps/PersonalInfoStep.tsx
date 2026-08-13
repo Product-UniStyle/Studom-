@@ -20,6 +20,8 @@ export default function PersonalInfoStep({ data, update }: Props) {
           label="Email"
           type="email"
           value={p.email}
+          disabled
+          hint="Contact support to change your login email."
           onChange={(e) => update({ email: e.target.value })}
         />
         <TextField

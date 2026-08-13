@@ -1,6 +1,5 @@
 import { createContext, useContext, useMemo, useState } from 'react'
 import type { ReactNode } from 'react'
-import { universities as ALL_UNIVERSITIES } from '../data/universities'
 
 export interface EssayQuestion {
   id: string
@@ -9,9 +8,17 @@ export interface EssayQuestion {
   answer: string
 }
 
+export interface SelectedUniversity {
+  id: string
+  name: string
+  city?: string
+  country?: string
+  logo?: string
+}
+
 interface ApplyFlowState {
-  selectedIds: string[]
-  toggleUniversity: (id: string) => void
+  selectedUniversities: SelectedUniversity[]
+  toggleUniversity: (university: SelectedUniversity) => void
   essays: EssayQuestion[]
   updateEssay: (id: string, answer: string) => void
   profileCompleted: boolean
@@ -44,26 +51,23 @@ const DEFAULT_ESSAYS: EssayQuestion[] = [
 ]
 
 export function ApplyFlowProvider({ children }: { children: ReactNode }) {
-  const [selectedIds, setSelectedIds] = useState<string[]>([
-    ALL_UNIVERSITIES[0].id,
-    ALL_UNIVERSITIES[1].id,
-    ALL_UNIVERSITIES[2].id,
-    ALL_UNIVERSITIES[3].id,
-  ])
+  const [selectedUniversities, setSelectedUniversities] = useState<SelectedUniversity[]>([])
   const [essays, setEssays] = useState<EssayQuestion[]>(DEFAULT_ESSAYS)
   const [profileCompleted] = useState(true)
 
-  const toggleUniversity = (id: string) =>
-    setSelectedIds((ids) =>
-      ids.includes(id) ? ids.filter((x) => x !== id) : [...ids, id]
+  const toggleUniversity = (university: SelectedUniversity) =>
+    setSelectedUniversities((list) =>
+      list.some((u) => u.id === university.id)
+        ? list.filter((u) => u.id !== university.id)
+        : [...list, university]
     )
 
   const updateEssay = (id: string, answer: string) =>
     setEssays((qs) => qs.map((q) => (q.id === id ? { ...q, answer } : q)))
 
   const value = useMemo(
-    () => ({ selectedIds, toggleUniversity, essays, updateEssay, profileCompleted }),
-    [selectedIds, essays, profileCompleted]
+    () => ({ selectedUniversities, toggleUniversity, essays, updateEssay, profileCompleted }),
+    [selectedUniversities, essays, profileCompleted]
   )
 
   return (

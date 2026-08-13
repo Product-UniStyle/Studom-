@@ -1,18 +1,46 @@
 import { useNavigate } from 'react-router-dom'
 import { Search, ChevronDown, Check } from 'lucide-react'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import PageShell from '../../components/layout/PageShell'
-import { universities } from '../../data/universities'
+import { listPublicUniversities } from '../../lib/publicApi'
+import type { PublicUniversityListItem } from '../../lib/publicApi'
 import { useApplyFlow } from '../../context/ApplyFlowContext'
 
 export default function SelectUniversitiesPage() {
-  const { selectedIds, toggleUniversity } = useApplyFlow()
+  const { selectedUniversities, toggleUniversity } = useApplyFlow()
   const [query, setQuery] = useState('')
+  const [items, setItems] = useState<PublicUniversityListItem[]>([])
+  const [total, setTotal] = useState(0)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
   const navigate = useNavigate()
 
-  const filtered = universities.filter((u) =>
-    u.name.toLowerCase().includes(query.toLowerCase())
-  )
+  useEffect(() => {
+    let cancelled = false
+    setLoading(true)
+    setError(null)
+    const t = setTimeout(() => {
+      listPublicUniversities({ type: 'University', search: query || undefined, limit: 50 })
+        .then((res) => {
+          if (cancelled) return
+          setItems(res.items)
+          setTotal(res.total)
+        })
+        .catch((err) => {
+          if (cancelled) return
+          setError(err instanceof Error ? err.message : 'Failed to load universities')
+        })
+        .finally(() => {
+          if (!cancelled) setLoading(false)
+        })
+    }, 250)
+    return () => {
+      cancelled = true
+      clearTimeout(t)
+    }
+  }, [query])
+
+  const selectedIds = new Set(selectedUniversities.map((u) => u.id))
 
   return (
     <PageShell hideFooter>
@@ -20,7 +48,7 @@ export default function SelectUniversitiesPage() {
         <div className="flex flex-col gap-4 rounded-full border border-black px-6 py-3 md:flex-row md:items-center md:divide-x md:divide-gray-300">
           <StaticFilter label="Country" value="United Arab Emirates" />
           <StaticFilter label="Location" value="All Locations" />
-          <StaticFilter label="Field of Study" value="Business Management" />
+          <StaticFilter label="Field of Study" value="All Fields" />
           <div className="flex justify-center pl-0 md:pl-6">
             <button className="flex h-11 w-11 items-center justify-center rounded-full bg-red-500 text-white">
               <Search className="h-5 w-5" />
@@ -49,53 +77,60 @@ export default function SelectUniversitiesPage() {
               />
             </div>
             <span className="whitespace-nowrap rounded-full bg-blue-50 px-3 py-1.5 text-sm font-medium text-blue-600">
-              {selectedIds.length}/15 selected
+              {selectedUniversities.length} selected
             </span>
           </div>
         </div>
 
-        <div className="mt-6 divide-y divide-gray-100 rounded-2xl border border-gray-100">
-          {filtered.map((u) => {
-            const selected = selectedIds.includes(u.id)
-            return (
-              <div
-                key={u.id}
-                className="flex items-center justify-between gap-4 px-6 py-4"
-              >
-                <div>
-                  <div className="font-semibold text-black">
-                    {u.name}{' '}
-                    <span className="ml-1 text-sm font-normal text-gray-400">
-                      | {u.city}
-                    </span>
-                  </div>
-                  <div className="mt-0.5 text-sm text-gray-500">
-                    {u.course}
-                  </div>
-                </div>
-                <button
-                  onClick={() => toggleUniversity(u.id)}
-                  className={`flex shrink-0 items-center gap-1.5 rounded-lg px-5 py-2 text-sm font-semibold ${
-                    selected
-                      ? 'bg-green-600 text-white'
-                      : 'bg-black text-white hover:bg-gray-800'
-                  }`}
+        {error && <p className="mt-6 text-sm text-red-600">{error}</p>}
+
+        {loading ? (
+          <p className="mt-10 text-center text-gray-400">Loading...</p>
+        ) : items.length === 0 ? (
+          <p className="mt-10 text-center text-gray-400">No universities found.</p>
+        ) : (
+          <div className="mt-6 divide-y divide-gray-100 rounded-2xl border border-gray-100">
+            {items.map((u) => {
+              const selected = selectedIds.has(u._id)
+              return (
+                <div
+                  key={u._id}
+                  className="flex items-center justify-between gap-4 px-6 py-4"
                 >
-                  {selected && <Check className="h-4 w-4" />}
-                  {selected ? 'Selected' : 'Select'}
-                </button>
-              </div>
-            )
-          })}
-        </div>
+                  <div>
+                    <div className="font-semibold text-black">
+                      {u.name}{' '}
+                      <span className="ml-1 text-sm font-normal text-gray-400">
+                        | {u.city}
+                      </span>
+                    </div>
+                  </div>
+                  <button
+                    onClick={() =>
+                      toggleUniversity({ id: u._id, name: u.name, city: u.city, country: u.country, logo: u.logo })
+                    }
+                    className={`flex shrink-0 items-center gap-1.5 rounded-lg px-5 py-2 text-sm font-semibold ${
+                      selected
+                        ? 'bg-green-600 text-white'
+                        : 'bg-black text-white hover:bg-gray-800'
+                    }`}
+                  >
+                    {selected && <Check className="h-4 w-4" />}
+                    {selected ? 'Selected' : 'Select'}
+                  </button>
+                </div>
+              )
+            })}
+          </div>
+        )}
 
         <div className="mt-8 flex items-center justify-between">
           <span className="text-sm text-gray-500">
-            {filtered.length} universities available
+            {total} universities available
           </span>
           <button
             onClick={() => navigate('/apply/essays')}
-            disabled={selectedIds.length === 0}
+            disabled={selectedUniversities.length === 0}
             className="rounded-full bg-black px-8 py-3 text-sm font-semibold text-white hover:bg-gray-800 disabled:opacity-40"
           >
             Proceed

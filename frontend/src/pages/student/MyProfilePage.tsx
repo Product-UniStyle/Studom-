@@ -1,9 +1,17 @@
 import { useEffect, useState } from 'react'
 import { UserCircle2, FileText, ClipboardCheck, Pencil, Check } from 'lucide-react'
 import DashboardLayout from '../../components/layout/DashboardLayout'
+import Modal from '../../components/ui/Modal'
 import { studentNav } from './studentNav'
 import { getStudentMe, listStudentDocuments } from '../../lib/studentApi'
 import type { StudentProfile, StudentStats, StudentDocumentItem } from '../../lib/studentApi'
+import EditPersonalInfoForm from './EditPersonalInfoForm'
+import EditEducationInfoForm from './EditEducationInfoForm'
+import EditActivitiesForm from './EditActivitiesForm'
+import EditDocumentsModal from './EditDocumentsModal'
+import EditPreferencesForm from './EditPreferencesForm'
+
+type EditingSection = 'personal' | 'education' | 'activities' | 'documents' | 'preferences' | null
 
 function fmt(value?: string | number | null): string {
   if (value === undefined || value === null || value === '') return 'Not set'
@@ -21,16 +29,19 @@ export default function MyProfilePage() {
   const [documents, setDocuments] = useState<StudentDocumentItem[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [editingSection, setEditingSection] = useState<EditingSection>(null)
+
+  function reload() {
+    return Promise.all([getStudentMe(), listStudentDocuments()]).then(([me, docs]) => {
+      setStudent(me.student)
+      setStats(me.stats)
+      setDocuments(docs.items)
+    })
+  }
 
   useEffect(() => {
     let cancelled = false
-    Promise.all([getStudentMe(), listStudentDocuments()])
-      .then(([me, docs]) => {
-        if (cancelled) return
-        setStudent(me.student)
-        setStats(me.stats)
-        setDocuments(docs.items)
-      })
+    reload()
       .catch((err) => {
         if (cancelled) return
         setError(err instanceof Error ? err.message : 'Failed to load profile')
@@ -42,6 +53,11 @@ export default function MyProfilePage() {
       cancelled = true
     }
   }, [])
+
+  function handleSaved() {
+    setEditingSection(null)
+    reload().catch((err) => setError(err instanceof Error ? err.message : 'Failed to refresh profile'))
+  }
 
   if (loading || !student || !stats) {
     return (
@@ -70,7 +86,7 @@ export default function MyProfilePage() {
         <StatCard icon={ClipboardCheck} value={String(stats.applicationsCount)} label="Applications Submitted" />
       </div>
 
-      <Section title="Personal Information">
+      <Section title="Personal Information" onEdit={() => setEditingSection('personal')}>
         <InfoGrid
           rows={[
             ['Full Name:', student.fullName],
@@ -83,7 +99,7 @@ export default function MyProfilePage() {
         />
       </Section>
 
-      <Section title="Education Information">
+      <Section title="Education Information" onEdit={() => setEditingSection('education')}>
         <InfoGrid
           rows={[
             ['School Name:', fmt(personal?.schoolName)],
@@ -100,7 +116,10 @@ export default function MyProfilePage() {
         <div className="rounded-2xl border border-gray-200 p-6">
           <div className="mb-4 flex items-center justify-between">
             <h2 className="font-semibold text-black">Activities &amp; Achievements</h2>
-            <button className="flex items-center gap-1.5 rounded-lg border border-gray-200 px-3 py-1.5 text-sm font-medium text-black hover:bg-gray-50">
+            <button
+              onClick={() => setEditingSection('activities')}
+              className="flex items-center gap-1.5 rounded-lg border border-gray-200 px-3 py-1.5 text-sm font-medium text-black hover:bg-gray-50"
+            >
               <Pencil className="h-3.5 w-3.5" /> Edit
             </button>
           </div>
@@ -129,7 +148,10 @@ export default function MyProfilePage() {
         <div className="rounded-2xl border border-gray-200 p-6">
           <div className="mb-4 flex items-center justify-between">
             <h2 className="font-semibold text-black">Documents</h2>
-            <button className="flex items-center gap-1.5 rounded-lg border border-gray-200 px-3 py-1.5 text-sm font-medium text-black hover:bg-gray-50">
+            <button
+              onClick={() => setEditingSection('documents')}
+              className="flex items-center gap-1.5 rounded-lg border border-gray-200 px-3 py-1.5 text-sm font-medium text-black hover:bg-gray-50"
+            >
               <Pencil className="h-3.5 w-3.5" /> Edit
             </button>
           </div>
@@ -155,7 +177,10 @@ export default function MyProfilePage() {
       <div className="mt-6 rounded-2xl border border-gray-200 p-6">
         <div className="mb-4 flex items-center justify-between">
           <h2 className="font-semibold text-black">Account &amp; Preferences</h2>
-          <button className="rounded-lg border border-gray-200 px-4 py-1.5 text-sm font-medium text-black hover:bg-gray-50">
+          <button
+            onClick={() => setEditingSection('preferences')}
+            className="rounded-lg border border-gray-200 px-4 py-1.5 text-sm font-medium text-black hover:bg-gray-50"
+          >
             Edit Preferences
           </button>
         </div>
@@ -178,6 +203,32 @@ export default function MyProfilePage() {
           </div>
         </div>
       </div>
+
+      {editingSection === 'personal' && (
+        <Modal title="Edit Personal Information" onClose={() => setEditingSection(null)}>
+          <EditPersonalInfoForm student={student} onCancel={() => setEditingSection(null)} onSaved={handleSaved} />
+        </Modal>
+      )}
+      {editingSection === 'education' && (
+        <Modal title="Edit Education Information" onClose={() => setEditingSection(null)}>
+          <EditEducationInfoForm student={student} onCancel={() => setEditingSection(null)} onSaved={handleSaved} />
+        </Modal>
+      )}
+      {editingSection === 'activities' && (
+        <Modal title="Edit Activities & Achievements" onClose={() => setEditingSection(null)}>
+          <EditActivitiesForm student={student} onCancel={() => setEditingSection(null)} onSaved={handleSaved} />
+        </Modal>
+      )}
+      {editingSection === 'documents' && (
+        <Modal title="Documents" onClose={() => setEditingSection(null)}>
+          <EditDocumentsModal documents={documents} onCancel={() => setEditingSection(null)} onSaved={handleSaved} />
+        </Modal>
+      )}
+      {editingSection === 'preferences' && (
+        <Modal title="Edit Preferences" onClose={() => setEditingSection(null)}>
+          <EditPreferencesForm student={student} onCancel={() => setEditingSection(null)} onSaved={handleSaved} />
+        </Modal>
+      )}
     </DashboardLayout>
   )
 }
@@ -206,16 +257,21 @@ function StatCard({
 
 function Section({
   title,
+  onEdit,
   children,
 }: {
   title: string
+  onEdit: () => void
   children: React.ReactNode
 }) {
   return (
     <div className="mt-6 rounded-2xl border border-gray-200 p-6">
       <div className="mb-4 flex items-center justify-between">
         <h2 className="font-semibold text-black">{title}</h2>
-        <button className="flex items-center gap-1.5 rounded-lg border border-gray-200 px-3 py-1.5 text-sm font-medium text-black hover:bg-gray-50">
+        <button
+          onClick={onEdit}
+          className="flex items-center gap-1.5 rounded-lg border border-gray-200 px-3 py-1.5 text-sm font-medium text-black hover:bg-gray-50"
+        >
           <Pencil className="h-3.5 w-3.5" /> Edit
         </button>
       </div>

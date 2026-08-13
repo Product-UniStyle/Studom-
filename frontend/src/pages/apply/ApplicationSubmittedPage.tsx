@@ -12,7 +12,6 @@ import {
 import PageShell from '../../components/layout/PageShell'
 import SafeImage from '../../components/ui/SafeImage'
 import { useApplyFlow } from '../../context/ApplyFlowContext'
-import { universities } from '../../data/universities'
 
 const NEXT_STEPS = [
   {
@@ -38,8 +37,8 @@ const NEXT_STEPS = [
 ]
 
 export default function ApplicationSubmittedPage() {
-  const { selectedIds, essays } = useApplyFlow()
-  const selectedUnis = universities.filter((u) => selectedIds.includes(u.id))
+  const { selectedUniversities, essays } = useApplyFlow()
+  const selectedUnis = selectedUniversities
 
   return (
     <PageShell hideFooter>

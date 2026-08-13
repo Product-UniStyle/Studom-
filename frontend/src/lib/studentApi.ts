@@ -130,6 +130,25 @@ export async function getStudentMe(): Promise<{ student: StudentProfile; stats: 
   return studentFetch('/api/student/me')
 }
 
+export interface StudentProfilePatch {
+  fullName?: string
+  birthdate?: string
+  nationality?: string
+  currentLocation?: string
+  personal?: Partial<StudentProfile['profile']['personal']>
+  education?: Partial<StudentProfile['profile']['education']>
+  activities?: StudentActivity[]
+  achievements?: StudentAchievement[]
+  preferences?: Partial<StudentProfile['preferences']>
+}
+
+export async function updateStudentMe(patch: StudentProfilePatch): Promise<{ student: StudentProfile }> {
+  return studentFetch('/api/student/me', {
+    method: 'PATCH',
+    body: JSON.stringify(patch),
+  })
+}
+
 export type ApplicationStatus = 'Submitted' | 'Under Review' | 'Shortlisted' | 'Offer Received' | 'Rejected'
 
 export interface StudentApplicationItem {

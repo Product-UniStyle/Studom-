@@ -1,13 +1,12 @@
 import { useNavigate } from 'react-router-dom'
 import PageShell from '../../components/layout/PageShell'
 import { useApplyFlow } from '../../context/ApplyFlowContext'
-import { universities } from '../../data/universities'
 
 export default function ReviewApplicationPage() {
-  const { selectedIds, essays } = useApplyFlow()
+  const { selectedUniversities, essays } = useApplyFlow()
   const navigate = useNavigate()
 
-  const selectedUnis = universities.filter((u) => selectedIds.includes(u.id))
+  const selectedUnis = selectedUniversities
 
   return (
     <PageShell hideFooter>

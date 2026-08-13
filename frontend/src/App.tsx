@@ -40,19 +40,21 @@ function App() {
       <Route path="/search" element={<UniversitySearchPage />} />
       <Route path="/universities/:id" element={<UniversityDetailPage />} />
 
-      <Route path="/profile/build" element={<BuildProfilePage />} />
+      <Route path="/profile/build" element={<RequireStudentAuth><BuildProfilePage /></RequireStudentAuth>} />
 
       <Route
         path="/apply/*"
         element={
-          <ApplyFlowProvider>
-            <Routes>
-              <Route path="select" element={<SelectUniversitiesPage />} />
-              <Route path="essays" element={<EssayQuestionsPage />} />
-              <Route path="review" element={<ReviewApplicationPage />} />
-              <Route path="submitted" element={<ApplicationSubmittedPage />} />
-            </Routes>
-          </ApplyFlowProvider>
+          <RequireStudentAuth>
+            <ApplyFlowProvider>
+              <Routes>
+                <Route path="select" element={<SelectUniversitiesPage />} />
+                <Route path="essays" element={<EssayQuestionsPage />} />
+                <Route path="review" element={<ReviewApplicationPage />} />
+                <Route path="submitted" element={<ApplicationSubmittedPage />} />
+              </Routes>
+            </ApplyFlowProvider>
+          </RequireStudentAuth>
         }
       />
 

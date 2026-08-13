@@ -16,6 +16,20 @@ const upload = multer({
   limits: { fileSize: 10 * 1024 * 1024 },
 });
 
+// Mongoose's `minimize: true` default strips embedded objects that end up
+// fully empty (e.g. a brand-new student's `preferences`), so restore them
+// here to keep the response shape consistent for the frontend.
+function serializeStudent(student: InstanceType<typeof Student>) {
+  const { password: _password, __v: _v, ...studentObj } = student.toObject();
+  studentObj.preferences = studentObj.preferences || {};
+  studentObj.profile = studentObj.profile || {};
+  studentObj.profile.personal = studentObj.profile.personal || {};
+  studentObj.profile.education = studentObj.profile.education || {};
+  studentObj.profile.activities = studentObj.profile.activities || [];
+  studentObj.profile.achievements = studentObj.profile.achievements || [];
+  return studentObj;
+}
+
 function computeProfileCompletion(student: InstanceType<typeof Student>): number {
   const fields = [
     student.birthdate,
@@ -102,25 +116,86 @@ router.get('/me', requireStudent, async (req: StudentAuthedRequest, res) => {
     StudentDocument.countDocuments({ ownerId: student._id }),
   ]);
 
-  // Mongoose's `minimize: true` default strips embedded objects that end up
-  // fully empty (e.g. a brand-new student's `preferences`), so restore them
-  // here to keep the response shape consistent for the frontend.
-  const studentObj = student.toObject();
-  studentObj.preferences = studentObj.preferences || {};
-  studentObj.profile = studentObj.profile || {};
-  studentObj.profile.personal = studentObj.profile.personal || {};
-  studentObj.profile.education = studentObj.profile.education || {};
-  studentObj.profile.activities = studentObj.profile.activities || [];
-  studentObj.profile.achievements = studentObj.profile.achievements || [];
-
   res.json({
-    student: studentObj,
+    student: serializeStudent(student),
     stats: {
       applicationsCount,
       documentsCount,
       profileCompletion: computeProfileCompletion(student),
     },
   });
+});
+
+interface PersonalPatch {
+  mobile?: string;
+  countryOfResidence?: string;
+  schoolName?: string;
+  currentGrade?: string;
+  confirmed?: boolean;
+  gender?: string;
+}
+
+interface EducationPatch {
+  curriculum?: string;
+  gradYear?: string;
+  subjects?: string[];
+  latestGrades?: string;
+  predictedGrades?: string;
+  englishTest?: string;
+  standardizedTest?: string;
+  intendedCourse?: string;
+}
+
+interface ActivityPatch {
+  name: string;
+  role?: string;
+  year?: string;
+  description?: string;
+}
+
+interface AchievementPatch {
+  title: string;
+  level?: string;
+  year?: string;
+  description?: string;
+}
+
+router.patch('/me', requireStudent, async (req: StudentAuthedRequest, res) => {
+  const { fullName, birthdate, nationality, currentLocation, personal, education, activities, achievements, preferences } =
+    req.body as {
+      fullName?: string;
+      birthdate?: string;
+      nationality?: string;
+      currentLocation?: string;
+      personal?: PersonalPatch;
+      education?: EducationPatch;
+      activities?: ActivityPatch[];
+      achievements?: AchievementPatch[];
+      preferences?: {
+        preferredIntake?: string;
+        preferredCountry?: string;
+        preferredCity?: string;
+        notificationPreference?: string;
+      };
+    };
+
+  const student = await Student.findById(req.student!.id).select('-password -__v');
+  if (!student) return res.status(404).json({ error: 'Student not found' });
+
+  if (fullName) student.fullName = fullName;
+  if (birthdate) student.birthdate = new Date(birthdate);
+  if (nationality !== undefined) student.nationality = nationality;
+  if (currentLocation !== undefined) student.currentLocation = currentLocation;
+
+  if (personal) Object.assign(student.profile.personal, personal);
+  if (education) Object.assign(student.profile.education, education);
+  if (activities) student.profile.activities = activities;
+  if (achievements) student.profile.achievements = achievements;
+  if (preferences) Object.assign(student.preferences, preferences);
+
+  await student.save();
+
+  res.json({ student: serializeStudent(student) });
 });
 
 router.get('/applications', requireStudent, async (req: StudentAuthedRequest, res) => {
