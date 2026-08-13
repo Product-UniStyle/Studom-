@@ -32,10 +32,13 @@ import AdminLoginPage from './pages/admin/AdminLoginPage'
 import AdminUploadPage from './pages/admin/AdminUploadPage'
 import RequireStudentAuth from './components/auth/RequireStudentAuth'
 import RequireInstitutionAuth from './components/auth/RequireInstitutionAuth'
+import ScrollToTop from './components/ScrollToTop'
 
 function App() {
   return (
-    <Routes>
+    <>
+      <ScrollToTop />
+      <Routes>
       <Route path="/" element={<HomePage />} />
 
       <Route path="/student/signup" element={<StudentSignup />} />
@@ -85,7 +88,8 @@ function App() {
 
       <Route path="/admin/login" element={<AdminLoginPage />} />
       <Route path="/admin" element={<AdminUploadPage />} />
-    </Routes>
+      </Routes>
+    </>
   )
 }
 

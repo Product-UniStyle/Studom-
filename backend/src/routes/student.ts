@@ -2,6 +2,7 @@ import { Router } from 'express';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import multer from 'multer';
+import { randomInt } from 'crypto';
 import Student, { CURRENT_STAGE_VALUES, CurrentStage } from '../models/Student';
 import Application from '../models/Application';
 import Task from '../models/Task';
@@ -45,6 +46,10 @@ function computeProfileCompletion(student: InstanceType<typeof Student>): number
   ];
   const filled = fields.filter(Boolean).length;
   return Math.round((filled / fields.length) * 100);
+}
+
+function generateApplicationRef(): string {
+  return `STDM-${new Date().getFullYear()}-${randomInt(100000, 999999)}`;
 }
 
 router.post('/signup', async (req, res) => {
@@ -196,6 +201,58 @@ router.patch('/me', requireStudent, async (req: StudentAuthedRequest, res) => {
   await student.save();
 
   res.json({ student: serializeStudent(student) });
+});
+
+router.post('/applications', requireStudent, async (req: StudentAuthedRequest, res) => {
+  const { universityIds, course } = req.body as { universityIds?: string[]; course?: string };
+  if (!Array.isArray(universityIds) || universityIds.length === 0) {
+    return res.status(400).json({ error: 'At least one university must be selected' });
+  }
+
+  const uniqueIds = [...new Set(universityIds.filter((id) => typeof id === 'string'))];
+  const universities = await University.find({ _id: { $in: uniqueIds } }).select('_id').lean();
+  const validIds = new Set(universities.map((u) => u._id.toString()));
+  const targetIds = uniqueIds.filter((id) => validIds.has(id));
+  if (targetIds.length === 0) {
+    return res.status(400).json({ error: 'No valid universities selected' });
+  }
+
+  const existing = await Application.find({ studentId: req.student!.id, universityId: { $in: targetIds } })
+    .select('universityId')
+    .lean();
+  const alreadyApplied = new Set(existing.map((a) => a.universityId.toString()));
+  const newIds = targetIds.filter((id) => !alreadyApplied.has(id));
+
+  let resolvedCourse = course;
+  if (!resolvedCourse) {
+    const student = await Student.findById(req.student!.id).select('profile.education.intendedCourse');
+    resolvedCourse = student?.profile?.education?.intendedCourse;
+  }
+
+  for (const universityId of newIds) {
+    for (let attempt = 0; attempt < 5; attempt++) {
+      try {
+        await Application.create({
+          studentId: req.student!.id,
+          universityId,
+          applicationRef: generateApplicationRef(),
+          course: resolvedCourse,
+        });
+        break;
+      } catch (err) {
+        const isDuplicateRef = (err as { code?: number })?.code === 11000;
+        if (isDuplicateRef && attempt < 4) continue;
+        throw err;
+      }
+    }
+  }
+
+  const applications = await Application.find({ studentId: req.student!.id, universityId: { $in: targetIds } })
+    .populate('universityId', 'name city country logo slug')
+    .sort({ appliedOn: -1 })
+    .lean();
+
+  res.status(201).json({ items: applications, createdCount: newIds.length });
 });
 
 router.get('/applications', requireStudent, async (req: StudentAuthedRequest, res) => {

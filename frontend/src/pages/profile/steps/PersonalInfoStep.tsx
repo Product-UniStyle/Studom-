@@ -13,6 +13,7 @@ export default function PersonalInfoStep({ data, update }: Props) {
       <div className="grid grid-cols-1 gap-x-8 gap-y-6 sm:grid-cols-2">
         <TextField
           label="Full Name"
+          required
           value={p.fullName}
           onChange={(e) => update({ fullName: e.target.value })}
         />
@@ -26,21 +27,25 @@ export default function PersonalInfoStep({ data, update }: Props) {
         />
         <TextField
           label="Mobile Number"
+          required
           value={p.mobile}
           onChange={(e) => update({ mobile: e.target.value })}
         />
         <TextField
           label="Country of Residence"
+          required
           value={p.countryOfResidence}
           onChange={(e) => update({ countryOfResidence: e.target.value })}
         />
         <TextField
           label="School Name"
+          required
           value={p.schoolName}
           onChange={(e) => update({ schoolName: e.target.value })}
         />
         <TextField
           label="Current Grade / Year"
+          required
           value={p.currentGrade}
           onChange={(e) => update({ currentGrade: e.target.value })}
         />

@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import {
   CheckCircle2,
@@ -12,6 +13,8 @@ import {
 import PageShell from '../../components/layout/PageShell'
 import SafeImage from '../../components/ui/SafeImage'
 import { useApplyFlow } from '../../context/ApplyFlowContext'
+import { getStudentMe, listStudentApplications } from '../../lib/studentApi'
+import type { StudentProfile, StudentStats, StudentApplicationItem } from '../../lib/studentApi'
 
 const NEXT_STEPS = [
   {
@@ -36,9 +39,52 @@ const NEXT_STEPS = [
   },
 ]
 
+function fmtDate(value: string): string {
+  return new Date(value).toLocaleString('en-GB', {
+    day: '2-digit',
+    month: 'short',
+    year: 'numeric',
+    hour: 'numeric',
+    minute: '2-digit',
+  })
+}
+
 export default function ApplicationSubmittedPage() {
   const { selectedUniversities, essays } = useApplyFlow()
-  const selectedUnis = selectedUniversities
+
+  const [student, setStudent] = useState<StudentProfile | null>(null)
+  const [stats, setStats] = useState<StudentStats | null>(null)
+  const [applications, setApplications] = useState<StudentApplicationItem[]>([])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    let cancelled = false
+    Promise.all([getStudentMe(), listStudentApplications()])
+      .then(([me, apps]) => {
+        if (cancelled) return
+        setStudent(me.student)
+        setStats(me.stats)
+        setApplications(apps.items)
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false)
+      })
+    return () => {
+      cancelled = true
+    }
+  }, [])
+
+  const selectedIds = new Set(selectedUniversities.map((u) => u.id))
+  const submittedApplications = applications.filter((a) => selectedIds.has(a.universityId._id))
+  const latestSubmission = submittedApplications[0]
+
+  if (loading || !student || !stats) {
+    return (
+      <PageShell hideFooter>
+        <p className="mx-auto max-w-5xl px-6 py-20 text-center text-gray-400">Loading...</p>
+      </PageShell>
+    )
+  }
 
   return (
     <PageShell hideFooter>
@@ -52,10 +98,7 @@ export default function ApplicationSubmittedPage() {
         <p className="mx-auto mt-3 max-w-xl text-sm text-gray-500">
           Thank you for applying through Studom. We've received your
           application and sent a confirmation email to{' '}
-          <span className="font-medium text-blue-600">
-            kabir.shaikh@gmail.com
-          </span>
-          .
+          <span className="font-medium text-blue-600">{student.email}</span>.
         </p>
 
         <div className="mt-8 flex flex-col items-center justify-center gap-4 sm:flex-row">
@@ -95,15 +138,19 @@ export default function ApplicationSubmittedPage() {
             <div className="mb-4 font-semibold text-black">
               Submission Summary
             </div>
-            <SummaryRow label="Application ID" value="STDM-2025-000482" link />
-            <SummaryRow label="Date of Submission" value="02 May 2025, 04:20 PM" link />
+            {latestSubmission && (
+              <SummaryRow label="Latest Application Ref" value={latestSubmission.applicationRef} link />
+            )}
+            {latestSubmission && (
+              <SummaryRow label="Date of Submission" value={fmtDate(latestSubmission.appliedOn)} />
+            )}
             <SummaryRow
               label="Universities Applied"
-              value={String(selectedUnis.length)}
+              value={String(submittedApplications.length)}
             />
             <SummaryRow label="Essay Responses" value={String(essays.length)} />
-            <SummaryRow label="Documents Uploaded" value="7" />
-            <SummaryRow label="Profile Completion" value="100%" />
+            <SummaryRow label="Documents Uploaded" value={String(stats.documentsCount)} />
+            <SummaryRow label="Profile Completion" value={`${stats.profileCompletion}%`} />
             <div className="mt-4 rounded-lg bg-blue-50 px-3 py-2.5 text-xs text-blue-700">
               You can track the status of your application anytime from your
               dashboard.
@@ -114,33 +161,39 @@ export default function ApplicationSubmittedPage() {
             <div className="mb-4 font-semibold text-black">
               Universities Applied To
             </div>
-            <div className="space-y-4">
-              {selectedUnis.map((u) => (
-                <div key={u.id} className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <SafeImage
-                      src={u.logo}
-                      alt=""
-                      className="h-9 w-9 rounded-md border border-gray-100 object-contain p-1"
-                    />
-                    <div>
-                      <div className="text-sm font-medium text-black">
-                        {u.name}
-                      </div>
-                      <div className="text-xs text-gray-400">
-                        {u.city}, UAE
+            {submittedApplications.length === 0 ? (
+              <p className="text-sm text-gray-400">No applications found for this submission.</p>
+            ) : (
+              <div className="space-y-4">
+                {submittedApplications.map((a) => (
+                  <div key={a._id} className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <SafeImage
+                        src={a.universityId.logo}
+                        alt=""
+                        className="h-9 w-9 rounded-md border border-gray-100 object-contain p-1"
+                      />
+                      <div>
+                        <div className="text-sm font-medium text-black">
+                          {a.universityId.name}
+                        </div>
+                        <div className="text-xs text-gray-400">
+                          {a.universityId.city}
+                          {a.universityId.city && a.universityId.country ? ', ' : ''}
+                          {a.universityId.country}
+                        </div>
                       </div>
                     </div>
+                    <Link
+                      to={`/universities/${a.universityId.slug || a.universityId._id}`}
+                      className="rounded-lg border border-gray-200 px-3 py-1.5 text-xs font-medium text-black hover:bg-gray-50"
+                    >
+                      View
+                    </Link>
                   </div>
-                  <Link
-                    to={`/universities/${u.slug || u.id}`}
-                    className="rounded-lg border border-gray-200 px-3 py-1.5 text-xs font-medium text-black hover:bg-gray-50"
-                  >
-                    View
-                  </Link>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            )}
             <Link
               to="/student/applications"
               className="mt-4 inline-block text-sm font-medium text-blue-600"

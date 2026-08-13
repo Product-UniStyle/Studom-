@@ -165,6 +165,16 @@ export async function listStudentApplications(): Promise<{ items: StudentApplica
   return studentFetch('/api/student/applications')
 }
 
+export async function createStudentApplications(
+  universityIds: string[],
+  course?: string
+): Promise<{ items: StudentApplicationItem[]; createdCount: number }> {
+  return studentFetch('/api/student/applications', {
+    method: 'POST',
+    body: JSON.stringify({ universityIds, course }),
+  })
+}
+
 export interface StudentTaskItem {
   _id: string
   title: string

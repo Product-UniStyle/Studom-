@@ -15,11 +15,16 @@ const NAV_LINKS = [
 export default function Header() {
   const location = useLocation()
   const navigate = useNavigate()
+  // Read synchronously at mount so the header never has to guess "logged
+  // out" while the name is still loading — that guess was flashing the
+  // Login button for a moment on every page even when a token exists.
+  const [hasStudentToken, setHasStudentToken] = useState(() => Boolean(getStudentToken()))
+  const [hasInstitutionToken, setHasInstitutionToken] = useState(() => Boolean(getInstitutionToken()))
   const [studentName, setStudentName] = useState<string | null>(null)
   const [institutionName, setInstitutionName] = useState<string | null>(null)
 
   useEffect(() => {
-    if (!getStudentToken()) return
+    if (!hasStudentToken) return
     let cancelled = false
     getStudentMe()
       .then((res) => {
@@ -31,10 +36,10 @@ export default function Header() {
     return () => {
       cancelled = true
     }
-  }, [])
+  }, [hasStudentToken])
 
   useEffect(() => {
-    if (!getInstitutionToken()) return
+    if (!hasInstitutionToken) return
     let cancelled = false
     getInstitutionMe()
       .then((res) => {
@@ -46,7 +51,7 @@ export default function Header() {
     return () => {
       cancelled = true
     }
-  }, [])
+  }, [hasInstitutionToken])
 
   return (
     <header className="w-full border-b border-gray-200 bg-white">
@@ -73,9 +78,9 @@ export default function Header() {
         <div className="flex items-center gap-4">
           <div className="hidden h-6 w-px bg-gray-300 lg:block" />
 
-          {studentName ? (
+          {hasStudentToken ? (
             <AccountMenu
-              name={studentName}
+              name={studentName || ''}
               profileTo="/student/profile"
               icon={<User className="h-4 w-4" />}
               iconBg="bg-blue-50"
@@ -83,10 +88,11 @@ export default function Header() {
               onLogout={() => {
                 clearStudentToken()
                 setStudentName(null)
+                setHasStudentToken(false)
                 navigate('/')
               }}
             />
-          ) : !institutionName ? (
+          ) : !hasInstitutionToken ? (
             <Link
               to="/student/login"
               className="flex items-center gap-1.5 rounded-full border border-gray-300 px-4 py-2 text-sm font-medium text-black hover:bg-gray-50"
@@ -96,9 +102,9 @@ export default function Header() {
             </Link>
           ) : null}
 
-          {institutionName ? (
+          {hasInstitutionToken ? (
             <AccountMenu
-              name={institutionName}
+              name={institutionName || ''}
               profileTo="/institution/settings"
               icon={<Landmark className="h-4 w-4" />}
               iconBg="bg-black"
@@ -106,10 +112,11 @@ export default function Header() {
               onLogout={() => {
                 clearInstitutionToken()
                 setInstitutionName(null)
+                setHasInstitutionToken(false)
                 navigate('/')
               }}
             />
-          ) : !studentName ? (
+          ) : !hasStudentToken ? (
             <Link
               to="/institution/login"
               className="flex items-center gap-1.5 rounded-full bg-black px-4 py-2 text-sm font-medium text-white hover:bg-gray-800"

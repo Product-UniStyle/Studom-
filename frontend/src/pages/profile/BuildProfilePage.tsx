@@ -56,6 +56,28 @@ function toProfileData(student: StudentProfile): ProfileData {
   }
 }
 
+function validateStep(step: number, data: ProfileData): string | null {
+  if (step === 1) {
+    const p = data.personal
+    if (!p.fullName.trim()) return 'Full Name is required.'
+    if (!p.mobile.trim()) return 'Mobile Number is required.'
+    if (!p.countryOfResidence.trim()) return 'Country of Residence is required.'
+    if (!p.schoolName.trim()) return 'School Name is required.'
+    if (!p.currentGrade.trim()) return 'Current Grade / Year is required.'
+    if (!p.confirmed) return 'Please confirm that the information provided is accurate.'
+  }
+  if (step === 2) {
+    const e = data.education
+    if (!e.curriculum.trim()) return 'Curriculum / Board is required.'
+    if (!e.gradYear.trim()) return 'Expected Graduation Year is required.'
+    if (!e.subjects.trim()) return 'Subjects Currently Studying is required.'
+    if (!e.latestGrades.trim()) return 'Latest Grades / GPA / Percentage is required.'
+    if (!e.predictedGrades.trim()) return 'Predicted Final Grades is required.'
+    if (!e.intendedCourse.trim()) return 'Intended Course / Field of Study is required.'
+  }
+  return null
+}
+
 function toPatch(data: ProfileData): StudentProfilePatch {
   return {
     fullName: data.personal.fullName || undefined,
@@ -95,6 +117,7 @@ export default function BuildProfilePage() {
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [savedNotice, setSavedNotice] = useState(false)
+  const [validationError, setValidationError] = useState<string | null>(null)
   const navigate = useNavigate()
 
   useEffect(() => {
@@ -120,7 +143,25 @@ export default function BuildProfilePage() {
   }
 
   const next = () => goToStep(Math.min(5, step + 1))
-  const back = () => goToStep(Math.max(1, step - 1))
+  const back = () => {
+    setValidationError(null)
+    goToStep(Math.max(1, step - 1))
+  }
+
+  function handleContinue() {
+    const validationMessage = validateStep(step, data)
+    if (validationMessage) {
+      setValidationError(validationMessage)
+      return
+    }
+    setValidationError(null)
+    next()
+  }
+
+  function handleSkip() {
+    setValidationError(null)
+    next()
+  }
 
   const updatePersonal = (patch: Partial<ProfileData['personal']>) =>
     setData((d) => ({ ...d, personal: { ...d.personal, ...patch } }))
@@ -199,6 +240,7 @@ export default function BuildProfilePage() {
           )}
           {step === 5 && <ReviewStep data={data} goToStep={goToStep} />}
 
+          {validationError && <p className="mt-6 text-sm text-red-600">{validationError}</p>}
           {error && <p className="mt-6 text-sm text-red-600">{error}</p>}
           {savedNotice && <p className="mt-6 text-sm text-green-600">Draft saved.</p>}
 
@@ -225,7 +267,7 @@ export default function BuildProfilePage() {
               )}
               {(step === 3 || step === 4) && (
                 <button
-                  onClick={next}
+                  onClick={handleSkip}
                   className="text-sm font-medium text-gray-500 underline"
                 >
                   Skip for now
@@ -233,7 +275,7 @@ export default function BuildProfilePage() {
               )}
               {step < 5 ? (
                 <button
-                  onClick={next}
+                  onClick={handleContinue}
                   className="flex items-center gap-2 rounded-full bg-black px-6 py-2.5 text-sm font-semibold text-white hover:bg-gray-800"
                 >
                   {step === 1 ? 'Continue' : 'Next'}
