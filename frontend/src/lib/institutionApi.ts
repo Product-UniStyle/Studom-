@@ -78,6 +78,7 @@ export interface InstitutionAccount {
 
 export interface InstitutionUniversity {
   _id: string
+  slug?: string
   name: string
   city?: string
   country?: string

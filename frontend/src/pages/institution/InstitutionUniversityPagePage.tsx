@@ -143,7 +143,7 @@ export default function InstitutionUniversityPagePage() {
                 </div>
               )}
               <Link
-                to={`/universities/${university._id}`}
+                to={`/universities/${university.slug || university._id}`}
                 className="mt-4 flex items-center justify-center gap-2 rounded-lg bg-blue-600 py-3 text-sm font-semibold text-white hover:bg-blue-700"
               >
                 <Eye className="h-4 w-4" /> View Public Page

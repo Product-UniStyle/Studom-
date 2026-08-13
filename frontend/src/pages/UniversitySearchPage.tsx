@@ -208,7 +208,7 @@ export default function UniversitySearchPage() {
               <div className="mt-8 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
                 {items.map((u, idx) => (
                   <Link
-                    to={`/universities/${u._id}`}
+                    to={`/universities/${u.slug || u._id}`}
                     key={u._id}
                     className="group relative overflow-hidden rounded-xl"
                   >

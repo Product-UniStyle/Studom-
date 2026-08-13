@@ -2,6 +2,7 @@ import { Schema, model, Document, Types } from 'mongoose';
 import { articleSectionSchema, IArticleSection } from './NewsArticle';
 
 export interface IBlogPost extends Document {
+  slug?: string;
   title: string;
   content: string;
   coverImage?: string;
@@ -17,6 +18,7 @@ export interface IBlogPost extends Document {
 
 const blogPostSchema = new Schema<IBlogPost>(
   {
+    slug: { type: String, unique: true, sparse: true },
     title: { type: String, required: true },
     content: { type: String, required: true },
     coverImage: String,

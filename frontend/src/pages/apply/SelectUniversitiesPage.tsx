@@ -107,7 +107,7 @@ export default function SelectUniversitiesPage() {
                   </div>
                   <button
                     onClick={() =>
-                      toggleUniversity({ id: u._id, name: u.name, city: u.city, country: u.country, logo: u.logo })
+                      toggleUniversity({ id: u._id, slug: u.slug, name: u.name, city: u.city, country: u.country, logo: u.logo })
                     }
                     className={`flex shrink-0 items-center gap-1.5 rounded-lg px-5 py-2 text-sm font-semibold ${
                       selected

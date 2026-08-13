@@ -5,6 +5,7 @@ export const UNIVERSITY_TYPE_VALUES: UniversityType[] = ['School', 'College', 'U
 
 export interface IUniversity extends Document {
   sourceId?: string;
+  slug?: string;
   name: string;
   city: string;
   country: string;
@@ -52,6 +53,7 @@ export interface IUniversity extends Document {
 const universitySchema = new Schema<IUniversity>(
   {
     sourceId: { type: String, unique: true, sparse: true },
+    slug: { type: String, unique: true, sparse: true },
     name: { type: String, required: true },
     city: { type: String, required: true },
     country: { type: String, required: true },

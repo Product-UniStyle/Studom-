@@ -152,7 +152,7 @@ export default function EventsListPage() {
               return (
                 <Link
                   key={e._id}
-                  to={`/events/${e._id}`}
+                  to={`/events/${e.slug || e._id}`}
                   className="group overflow-hidden rounded-xl bg-[#101322] transition-shadow hover:shadow-lg"
                 >
                   <div className="relative">

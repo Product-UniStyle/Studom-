@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { requireEditorOrAdmin } from '../middleware/adminAuth';
 import { escapeRegex } from '../lib/inclusions';
+import { uniqueSlug } from '../lib/slugify';
 import Event, { EVENT_MODE_VALUES, EventMode } from '../models/Event';
 
 const router = Router();
@@ -49,7 +50,10 @@ router.post('/', requireEditorOrAdmin, async (req, res) => {
     return res.status(400).json({ error: `Mode must be one of: ${EVENT_MODE_VALUES.join(', ')}` });
   }
 
-  const event = await Event.create(buildEventPayload(body));
+  const takenSlugs = new Set((await Event.distinct('slug')).filter((s): s is string => Boolean(s)));
+  const slug = uniqueSlug(body.title, takenSlugs);
+
+  const event = await Event.create({ ...buildEventPayload(body), slug });
   await event.populate('universityId', 'name');
   res.status(201).json(event);
 });

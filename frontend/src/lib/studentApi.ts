@@ -153,7 +153,7 @@ export type ApplicationStatus = 'Submitted' | 'Under Review' | 'Shortlisted' | '
 
 export interface StudentApplicationItem {
   _id: string
-  universityId: { _id: string; name: string; city?: string; country?: string; logo?: string }
+  universityId: { _id: string; slug?: string; name: string; city?: string; country?: string; logo?: string }
   applicationRef: string
   appliedOn: string
   status: ApplicationStatus

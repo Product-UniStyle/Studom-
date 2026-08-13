@@ -200,7 +200,7 @@ router.patch('/me', requireStudent, async (req: StudentAuthedRequest, res) => {
 
 router.get('/applications', requireStudent, async (req: StudentAuthedRequest, res) => {
   const applications = await Application.find({ studentId: req.student!.id })
-    .populate('universityId', 'name city country logo')
+    .populate('universityId', 'name city country logo slug')
     .sort({ appliedOn: -1 })
     .lean();
   res.json({ items: applications, total: applications.length });

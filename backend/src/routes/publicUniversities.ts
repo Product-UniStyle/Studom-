@@ -2,12 +2,13 @@ import { Router } from 'express';
 import University, { UNIVERSITY_TYPE_VALUES } from '../models/University';
 import Review from '../models/Review';
 import { escapeRegex } from '../lib/inclusions';
+import { bySlugOrId } from '../lib/slugify';
 
 const router = Router();
 
-const LIST_FIELDS = 'name city country type image logo qsRank origin aggregateRating aggregateReviewCount';
+const LIST_FIELDS = 'slug name city country type image logo qsRank origin aggregateRating aggregateReviewCount';
 const DETAIL_FIELDS =
-  'name city country area type image logo origin course qsRank uaeRank uaeScore overallScore ' +
+  'slug name city country area type image logo origin course qsRank uaeRank uaeScore overallScore ' +
   'latitude longitude googleMapLink costOfLiving studentPopulation aggregateRating aggregateReviewCount ' +
   'fieldsOfStudy board grade subjects performance locality mode detail inclusions';
 
@@ -64,7 +65,7 @@ router.get('/facets', async (req, res) => {
 });
 
 router.get('/:id', async (req, res) => {
-  const university = await University.findById(req.params.id)
+  const university = await University.findOne(bySlugOrId(req.params.id))
     .select(DETAIL_FIELDS)
     .populate('inclusions', 'label icon')
     .lean();
@@ -73,7 +74,10 @@ router.get('/:id', async (req, res) => {
 });
 
 router.get('/:id/reviews', async (req, res) => {
-  const reviews = await Review.find({ universityId: req.params.id })
+  const university = await University.findOne(bySlugOrId(req.params.id)).select('_id').lean();
+  if (!university) return res.status(404).json({ error: 'University not found' });
+
+  const reviews = await Review.find({ universityId: university._id })
     .select('reviewerName text date rating platform reviewerMeta reviewerAvatar')
     .sort({ date: -1 })
     .limit(50)

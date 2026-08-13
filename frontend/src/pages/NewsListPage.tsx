@@ -131,13 +131,13 @@ export default function NewsListPage() {
                         <span className="text-gray-400">{fmtDate(n.publishedDate)}</span>
                       </div>
                       <Link
-                        to={`/news/${n._id}`}
+                        to={`/news/${n.slug || n._id}`}
                         className="mt-1.5 block text-lg font-semibold text-blue-700 hover:underline"
                       >
                         {n.title}
                       </Link>
                       <div className="mt-2 flex items-center justify-between gap-3">
-                        <Link to={`/news/${n._id}`} className="text-sm font-medium text-blue-600 hover:underline">
+                        <Link to={`/news/${n.slug || n._id}`} className="text-sm font-medium text-blue-600 hover:underline">
                           Read more →
                         </Link>
                         <button

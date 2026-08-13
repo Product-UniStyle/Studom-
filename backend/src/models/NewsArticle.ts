@@ -8,6 +8,7 @@ export interface IArticleSection {
 }
 
 export interface INewsArticle extends Document {
+  slug?: string;
   title: string;
   content: string;
   coverImage?: string;
@@ -33,6 +34,7 @@ export const articleSectionSchema = new Schema<IArticleSection>(
 
 const newsArticleSchema = new Schema<INewsArticle>(
   {
+    slug: { type: String, unique: true, sparse: true },
     title: { type: String, required: true },
     content: { type: String, required: true },
     coverImage: String,

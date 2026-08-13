@@ -88,7 +88,7 @@ export default function EventDetailPage() {
             {event.universityId && (
               <p className="mt-1 text-sm text-gray-500">
                 Hosted by{' '}
-                <Link to={`/universities/${event.universityId._id}`} className="font-medium text-blue-600 hover:underline">
+                <Link to={`/universities/${event.universityId.slug || event.universityId._id}`} className="font-medium text-blue-600 hover:underline">
                   {event.universityId.name}
                 </Link>
               </p>

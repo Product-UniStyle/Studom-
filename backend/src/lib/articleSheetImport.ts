@@ -2,6 +2,7 @@ import * as XLSX from 'xlsx';
 import { Model } from 'mongoose';
 import { ImportReport } from './mainSheetImport';
 import { IArticleSection } from '../models/NewsArticle';
+import { uniqueSlug } from './slugify';
 
 interface ArticleSheetRow {
   Link?: string;
@@ -120,13 +121,23 @@ export async function importArticleSheet(
   const existingSet = new Set(existingDocs.map((d) => (d as unknown as { sourceLink: string }).sourceLink));
 
   if (opts.write) {
-    const ops = validRows.map((r) => ({
-      updateOne: {
-        filter: { sourceLink: r.sourceLink },
-        update: { $set: r.payload },
-        upsert: true,
-      },
-    }));
+    const takenSlugs = new Set(
+      (await model.distinct('slug')).filter((s): s is string => Boolean(s))
+    );
+
+    const ops = validRows.map((r) => {
+      const update: Record<string, unknown> = { $set: r.payload };
+      if (!existingSet.has(r.sourceLink)) {
+        update.$setOnInsert = { slug: uniqueSlug(r.title, takenSlugs) };
+      }
+      return {
+        updateOne: {
+          filter: { sourceLink: r.sourceLink },
+          update,
+          upsert: true,
+        },
+      };
+    });
     await model.bulkWrite(ops, { ordered: false });
   }
 

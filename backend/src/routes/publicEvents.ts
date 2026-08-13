@@ -1,10 +1,11 @@
 import { Router } from 'express';
 import { escapeRegex } from '../lib/inclusions';
+import { bySlugOrId } from '../lib/slugify';
 import Event from '../models/Event';
 
 const router = Router();
 
-const LIST_FIELDS = 'title coverImage date time mode category venue registrationDeadline';
+const LIST_FIELDS = 'slug title coverImage date time mode category venue registrationDeadline';
 
 router.get('/', async (req, res) => {
   const search = typeof req.query.search === 'string' ? req.query.search.trim() : '';
@@ -25,7 +26,7 @@ router.get('/', async (req, res) => {
   const [items, total] = await Promise.all([
     Event.find(filter)
       .select(LIST_FIELDS)
-      .populate('universityId', 'name')
+      .populate('universityId', 'name slug')
       .sort({ date: status === 'past' ? -1 : sort })
       .skip((page - 1) * limit)
       .limit(limit)
@@ -42,7 +43,9 @@ router.get('/categories', async (_req, res) => {
 });
 
 router.get('/:id', async (req, res) => {
-  const event = await Event.findById(req.params.id).populate('universityId', 'name city country').lean();
+  const event = await Event.findOne(bySlugOrId(req.params.id))
+    .populate('universityId', 'name city country slug')
+    .lean();
   if (!event) return res.status(404).json({ error: 'Event not found' });
   res.json(event);
 });

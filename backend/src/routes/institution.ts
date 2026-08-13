@@ -84,7 +84,7 @@ router.get('/me', requireInstitution, async (req: InstitutionAuthedRequest, res)
   if (!account) return res.status(404).json({ error: 'Institution account not found' });
 
   const university = await University.findById(req.institution!.universityId).select(
-    'name city country logo image overallScore'
+    'name city country logo image overallScore slug'
   );
 
   const universityId = req.institution!.universityId;

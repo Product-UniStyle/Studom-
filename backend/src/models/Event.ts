@@ -10,6 +10,7 @@ export interface IEventExpectation {
 
 export interface IEvent extends Document {
   universityId: Types.ObjectId;
+  slug?: string;
   title: string;
   coverImage?: string;
   date: Date;
@@ -44,6 +45,7 @@ const eventExpectationSchema = new Schema<IEventExpectation>(
 const eventSchema = new Schema<IEvent>(
   {
     universityId: { type: Schema.Types.ObjectId, ref: 'University', required: true },
+    slug: { type: String, unique: true, sparse: true },
     title: { type: String, required: true },
     coverImage: String,
     date: { type: Date, required: true },

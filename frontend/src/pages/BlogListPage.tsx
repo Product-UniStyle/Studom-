@@ -108,7 +108,7 @@ export default function BlogListPage() {
             {items.map((b) => (
               <Link
                 key={b._id}
-                to={`/blog/${b._id}`}
+                to={`/blog/${b.slug || b._id}`}
                 className="group overflow-hidden rounded-xl border border-gray-100 hover:shadow-md"
               >
                 <div className="relative">

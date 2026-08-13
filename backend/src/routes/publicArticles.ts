@@ -1,8 +1,9 @@
 import { Router } from 'express';
 import { Model } from 'mongoose';
 import { escapeRegex } from '../lib/inclusions';
+import { bySlugOrId } from '../lib/slugify';
 
-const LIST_FIELDS = 'title coverImage author source destination publishedDate type content';
+const LIST_FIELDS = 'slug title coverImage author source destination publishedDate type content';
 const WORDS_PER_MINUTE = 200;
 
 /**
@@ -51,7 +52,7 @@ export function buildPublicArticleRouter<T>(model: Model<T>): Router {
   });
 
   router.get('/:id', async (req, res) => {
-    const doc = await model.findById(req.params.id).populate('universityIds', 'name').lean();
+    const doc = await model.findOne(bySlugOrId(req.params.id)).populate('universityIds', 'name').lean();
     if (!doc) return res.status(404).json({ error: 'Not found' });
     res.json(doc);
   });

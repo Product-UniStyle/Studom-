@@ -10,6 +10,7 @@ export interface EssayQuestion {
 
 export interface SelectedUniversity {
   id: string
+  slug?: string
   name: string
   city?: string
   country?: string

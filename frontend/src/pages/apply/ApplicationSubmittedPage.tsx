@@ -133,7 +133,7 @@ export default function ApplicationSubmittedPage() {
                     </div>
                   </div>
                   <Link
-                    to={`/universities/${u.id}`}
+                    to={`/universities/${u.slug || u.id}`}
                     className="rounded-lg border border-gray-200 px-3 py-1.5 text-xs font-medium text-black hover:bg-gray-50"
                   >
                     View

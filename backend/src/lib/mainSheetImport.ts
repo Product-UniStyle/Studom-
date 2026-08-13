@@ -2,6 +2,7 @@ import * as XLSX from 'xlsx';
 import University, { UNIVERSITY_TYPE_VALUES, UniversityType } from '../models/University';
 import { resolveInclusionIdsMap } from './inclusions';
 import { parseGradeField } from './parseGradeField';
+import { uniqueSlug } from './slugify';
 
 interface MainSheetRow {
   ID?: string;
@@ -179,21 +180,30 @@ export async function importMainSheet(buffer: Buffer, opts: { write: boolean }):
     // pass instead of one round-trip per label per row.
     const allLabels = validRows.flatMap((r) => r.inclusionLabels);
     const inclusionMap = await resolveInclusionIdsMap(allLabels);
+    const takenSlugs = new Set(
+      (await University.distinct('slug')).filter((s): s is string => Boolean(s))
+    );
 
-    const ops = validRows.map((r) => ({
-      updateOne: {
-        filter: { sourceId: r.sourceId },
-        update: {
-          $set: {
-            ...r.payload,
-            inclusions: r.inclusionLabels
-              .map((l) => inclusionMap.get(l.toLowerCase()))
-              .filter((id): id is NonNullable<typeof id> => Boolean(id)),
-          },
+    const ops = validRows.map((r) => {
+      const update: Record<string, unknown> = {
+        $set: {
+          ...r.payload,
+          inclusions: r.inclusionLabels
+            .map((l) => inclusionMap.get(l.toLowerCase()))
+            .filter((id): id is NonNullable<typeof id> => Boolean(id)),
         },
-        upsert: true,
-      },
-    }));
+      };
+      if (!existingSet.has(r.sourceId)) {
+        update.$setOnInsert = { slug: uniqueSlug(r.name, takenSlugs) };
+      }
+      return {
+        updateOne: {
+          filter: { sourceId: r.sourceId },
+          update,
+          upsert: true,
+        },
+      };
+    });
 
     await University.bulkWrite(ops, { ordered: false });
   }

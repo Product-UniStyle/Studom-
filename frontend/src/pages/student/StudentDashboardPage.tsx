@@ -102,7 +102,7 @@ export default function StudentDashboardPage() {
                     {a.status}
                   </span>
                   <Link
-                    to={`/universities/${a.universityId._id}`}
+                    to={`/universities/${a.universityId.slug || a.universityId._id}`}
                     className="shrink-0 rounded-lg border border-gray-200 px-3 py-1.5 text-xs font-medium text-black hover:bg-gray-50"
                   >
                     View

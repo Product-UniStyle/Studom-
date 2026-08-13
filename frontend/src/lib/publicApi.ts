@@ -9,6 +9,7 @@ async function publicFetch(path: string) {
 
 export interface PublicUniversityListItem {
   _id: string
+  slug?: string
   name: string
   city?: string
   country?: string
@@ -114,6 +115,7 @@ export async function listPublicUniversityReviews(
 
 export interface PublicArticleListItem {
   _id: string
+  slug?: string
   title: string
   coverImage?: string
   author?: string
@@ -191,6 +193,7 @@ export type PublicEventMode = 'In-person' | 'Online'
 
 export interface PublicEventListItem {
   _id: string
+  slug?: string
   title: string
   coverImage?: string
   date: string
@@ -199,7 +202,7 @@ export interface PublicEventListItem {
   category?: string
   venue?: string
   registrationDeadline?: string
-  universityId?: { _id: string; name: string }
+  universityId?: { _id: string; slug?: string; name: string }
 }
 
 export interface PublicEventListResponse {
@@ -228,7 +231,7 @@ export interface PublicEventDetail extends PublicEventListItem {
   registrationInfo?: string
   organiserContactEmail?: string
   organiserContactPhone?: string
-  universityId?: { _id: string; name: string; city?: string; country?: string }
+  universityId?: { _id: string; slug?: string; name: string; city?: string; country?: string }
 }
 
 export function listPublicEvents(params: {
