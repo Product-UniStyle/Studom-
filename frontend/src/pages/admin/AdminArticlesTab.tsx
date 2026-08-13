@@ -80,7 +80,7 @@ export default function AdminArticlesTab() {
 
   return (
     <div>
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
         <div className="flex gap-2">
           <button
             onClick={() => setKind('news')}

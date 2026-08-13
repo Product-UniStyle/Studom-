@@ -95,7 +95,7 @@ export default function AdminUsersTab() {
 
   return (
     <div>
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
         <h2 className="text-lg font-semibold text-black">Staff Users</h2>
         <button
           onClick={() => setFormOpen(true)}

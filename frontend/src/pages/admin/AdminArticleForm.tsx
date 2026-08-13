@@ -1,8 +1,9 @@
 import { useState } from 'react'
+import { Plus, Trash2, ArrowUp, ArrowDown, ExternalLink } from 'lucide-react'
 import TextField from '../../components/form/TextField'
 import ImageUploadField from './ImageUploadField'
 import { updateArticle, uploadArticleCoverImage } from '../../lib/adminApi'
-import type { ArticleDetail, ArticleKind } from '../../lib/adminApi'
+import type { ArticleDetail, ArticleKind, ArticleSection } from '../../lib/adminApi'
 
 interface AdminArticleFormProps {
   kind: ArticleKind
@@ -14,6 +15,31 @@ interface AdminArticleFormProps {
 export default function AdminArticleForm({ kind, article, onSaved, onCancel }: AdminArticleFormProps) {
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [sections, setSections] = useState<ArticleSection[]>(
+    article.sections.map((s) => ({ ...s }))
+  )
+
+  function updateSection(index: number, patch: Partial<ArticleSection>) {
+    setSections((list) => list.map((s, i) => (i === index ? { ...s, ...patch } : s)))
+  }
+
+  function addSection() {
+    setSections((list) => [...list, { order: list.length + 1, title: '', image: '', content: '' }])
+  }
+
+  function removeSection(index: number) {
+    setSections((list) => list.filter((_, i) => i !== index))
+  }
+
+  function moveSection(index: number, direction: -1 | 1) {
+    setSections((list) => {
+      const target = index + direction
+      if (target < 0 || target >= list.length) return list
+      const next = [...list]
+      ;[next[index], next[target]] = [next[target], next[index]]
+      return next
+    })
+  }
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
@@ -32,6 +58,10 @@ export default function AdminArticleForm({ kind, article, onSaved, onCancel }: A
       destination: str('destination'),
       type: str('type'),
       publishedDate: str('publishedDate'),
+      sourceLink: str('sourceLink'),
+      sections: sections
+        .filter((s) => s.title?.trim() || s.content.trim())
+        .map((s, i) => ({ ...s, order: i + 1 })),
     }
 
     try {
@@ -82,32 +112,97 @@ export default function AdminArticleForm({ kind, article, onSaved, onCancel }: A
         />
       </div>
 
-      {article.sections.length > 0 && (
-        <div>
-          <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-gray-400">
-            Sections ({article.sections.length}, from sheet import — read-only for now)
+      <div>
+        <div className="mb-2 flex items-center justify-between">
+          <p className="text-xs font-semibold uppercase tracking-wide text-gray-400">
+            Sections ({sections.length})
           </p>
-          <div className="max-h-48 space-y-2 overflow-y-auto rounded-lg border border-gray-100 p-3">
-            {article.sections.map((s) => (
-              <div key={s.order} className="border-b border-gray-50 pb-2 text-xs last:border-0">
-                <span className="font-medium text-gray-800">
-                  {s.order}. {s.title || '(untitled)'}
-                </span>
-                <p className="mt-0.5 line-clamp-2 text-gray-500">{s.content}</p>
+          <button
+            type="button"
+            onClick={addSection}
+            className="flex items-center gap-1 text-xs font-medium text-blue-600 hover:text-blue-700"
+          >
+            <Plus className="h-3.5 w-3.5" /> Add Section
+          </button>
+        </div>
+
+        {sections.length === 0 ? (
+          <p className="rounded-lg border border-dashed border-gray-200 p-4 text-center text-xs text-gray-400">
+            No sections yet.
+          </p>
+        ) : (
+          <div className="max-h-[28rem] space-y-3 overflow-y-auto rounded-lg border border-gray-100 p-3">
+            {sections.map((s, i) => (
+              <div key={i} className="rounded-lg border border-gray-100 p-3">
+                <div className="mb-2 flex items-center justify-between">
+                  <span className="text-xs font-semibold text-gray-500">Section {i + 1}</span>
+                  <div className="flex items-center gap-1">
+                    <button
+                      type="button"
+                      onClick={() => moveSection(i, -1)}
+                      disabled={i === 0}
+                      className="rounded p-1 text-gray-400 hover:text-black disabled:opacity-30"
+                    >
+                      <ArrowUp className="h-3.5 w-3.5" />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => moveSection(i, 1)}
+                      disabled={i === sections.length - 1}
+                      className="rounded p-1 text-gray-400 hover:text-black disabled:opacity-30"
+                    >
+                      <ArrowDown className="h-3.5 w-3.5" />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => removeSection(i)}
+                      className="rounded p-1 text-red-400 hover:text-red-600"
+                    >
+                      <Trash2 className="h-3.5 w-3.5" />
+                    </button>
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <input
+                    value={s.title || ''}
+                    onChange={(e) => updateSection(i, { title: e.target.value })}
+                    placeholder="Section title (optional)"
+                    className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm text-gray-800 focus:border-blue-500 focus:outline-none"
+                  />
+                  <input
+                    value={s.image || ''}
+                    onChange={(e) => updateSection(i, { image: e.target.value })}
+                    placeholder="Section image URL (optional)"
+                    className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm text-gray-800 focus:border-blue-500 focus:outline-none"
+                  />
+                  <textarea
+                    value={s.content}
+                    onChange={(e) => updateSection(i, { content: e.target.value })}
+                    rows={3}
+                    placeholder="Section content"
+                    className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm text-gray-800 focus:border-blue-500 focus:outline-none"
+                  />
+                </div>
               </div>
             ))}
           </div>
-        </div>
-      )}
+        )}
+      </div>
 
-      {article.sourceLink && (
-        <p className="text-xs text-gray-400">
-          Source:{' '}
-          <a href={article.sourceLink} target="_blank" rel="noreferrer" className="text-blue-600">
-            {article.sourceLink}
-          </a>
-        </p>
-      )}
+      <TextField
+        label="Source Link"
+        name="sourceLink"
+        type="url"
+        defaultValue={article.sourceLink}
+        hint="Original article URL."
+        rightIcon={
+          article.sourceLink ? (
+            <a href={article.sourceLink} target="_blank" rel="noreferrer" title="Open source link">
+              <ExternalLink className="h-4 w-4 hover:text-black" />
+            </a>
+          ) : undefined
+        }
+      />
 
       {error && <p className="text-sm text-red-600">{error}</p>}
 
