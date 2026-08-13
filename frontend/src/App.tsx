@@ -6,6 +6,12 @@ import InstitutionSignup from './pages/auth/InstitutionSignup'
 import InstitutionLogin from './pages/auth/InstitutionLogin'
 import UniversitySearchPage from './pages/UniversitySearchPage'
 import UniversityDetailPage from './pages/UniversityDetailPage'
+import NewsListPage from './pages/NewsListPage'
+import NewsDetailPage from './pages/NewsDetailPage'
+import BlogListPage from './pages/BlogListPage'
+import BlogDetailPage from './pages/BlogDetailPage'
+import EventsListPage from './pages/EventsListPage'
+import EventDetailPage from './pages/EventDetailPage'
 import BuildProfilePage from './pages/profile/BuildProfilePage'
 import { ApplyFlowProvider } from './context/ApplyFlowContext'
 import SelectUniversitiesPage from './pages/apply/SelectUniversitiesPage'
@@ -39,6 +45,13 @@ function App() {
 
       <Route path="/search" element={<UniversitySearchPage />} />
       <Route path="/universities/:id" element={<UniversityDetailPage />} />
+
+      <Route path="/news" element={<NewsListPage />} />
+      <Route path="/news/:id" element={<NewsDetailPage />} />
+      <Route path="/blog" element={<BlogListPage />} />
+      <Route path="/blog/:id" element={<BlogDetailPage />} />
+      <Route path="/events" element={<EventsListPage />} />
+      <Route path="/events/:id" element={<EventDetailPage />} />
 
       <Route path="/profile/build" element={<RequireStudentAuth><BuildProfilePage /></RequireStudentAuth>} />
 

@@ -6,9 +6,11 @@ import uploadsRouter from './routes/uploads';
 import importsRouter from './routes/imports';
 import publicUniversitiesRouter from './routes/publicUniversities';
 import { buildArticleAdminRouter } from './routes/articles';
+import { buildPublicArticleRouter } from './routes/publicArticles';
 import NewsArticle from './models/NewsArticle';
 import BlogPost from './models/BlogPost';
 import eventsRouter from './routes/events';
+import publicEventsRouter from './routes/publicEvents';
 import studentRouter from './routes/student';
 import institutionRouter from './routes/institution';
 
@@ -32,6 +34,9 @@ app.use('/api/public/universities', publicUniversitiesRouter);
 app.use('/api/news', buildArticleAdminRouter(NewsArticle));
 app.use('/api/blogs', buildArticleAdminRouter(BlogPost));
 app.use('/api/events', eventsRouter);
+app.use('/api/public/news', buildPublicArticleRouter(NewsArticle));
+app.use('/api/public/blogs', buildPublicArticleRouter(BlogPost));
+app.use('/api/public/events', publicEventsRouter);
 app.use('/api/student', studentRouter);
 app.use('/api/institution', institutionRouter);
 
