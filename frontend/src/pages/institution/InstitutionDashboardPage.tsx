@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import {
   FileText,
@@ -13,7 +14,17 @@ import {
 } from 'lucide-react'
 import DashboardLayout from '../../components/layout/DashboardLayout'
 import { institutionNav } from './institutionNav'
-import { institutionApplicants, contributors } from '../../data/institutionData'
+import {
+  getInstitutionMe,
+  listInstitutionApplications,
+  listInstitutionContributors,
+} from '../../lib/institutionApi'
+import type {
+  InstitutionAccount,
+  InstitutionStats,
+  InstitutionApplicationItem,
+  InstitutionContributorItem,
+} from '../../lib/institutionApi'
 import { statusBadgeClass } from '../student/statusBadge'
 
 const MANAGE_SECTIONS = [
@@ -26,25 +37,62 @@ const MANAGE_SECTIONS = [
 ]
 
 export default function InstitutionDashboardPage() {
+  const [account, setAccount] = useState<InstitutionAccount | null>(null)
+  const [stats, setStats] = useState<InstitutionStats | null>(null)
+  const [applications, setApplications] = useState<InstitutionApplicationItem[]>([])
+  const [contributors, setContributors] = useState<InstitutionContributorItem[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+
+  useEffect(() => {
+    let cancelled = false
+    Promise.all([getInstitutionMe(), listInstitutionApplications(), listInstitutionContributors()])
+      .then(([me, apps, contribs]) => {
+        if (cancelled) return
+        setAccount(me.account)
+        setStats(me.stats)
+        setApplications(apps.items)
+        setContributors(contribs.items)
+      })
+      .catch((err) => {
+        if (cancelled) return
+        setError(err instanceof Error ? err.message : 'Failed to load dashboard')
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false)
+      })
+    return () => {
+      cancelled = true
+    }
+  }, [])
+
+  if (loading || !account || !stats) {
+    return (
+      <DashboardLayout navItems={institutionNav} userName={account?.universityName || ''} userRole="Institution">
+        <p className="mt-10 text-center text-gray-400">{error || 'Loading...'}</p>
+      </DashboardLayout>
+    )
+  }
+
   return (
     <DashboardLayout
       navItems={institutionNav}
-      userName="University of Birmingham Dubai"
+      userName={account.universityName}
       userRole="Institution"
     >
       <p className="text-sm text-gray-500">Welcome back,</p>
       <h1 className="text-2xl font-bold text-blue-600">
-        University of Birmingham Dubai
+        {account.universityName}
       </h1>
       <p className="mt-1 text-sm text-gray-500">
         Here's what's happening with your university on Studom.
       </p>
 
       <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <StatCard icon={FileText} value="248" label="Applications Received" linkLabel="View all applications" to="/institution/applications" color="blue" />
-        <StatCard icon={Clock} value="68" label="Pending Review" linkLabel="Review now" to="/institution/applications" color="orange" />
-        <StatCard icon={Users} value="12" label="Contributor Requests" linkLabel="View requests" to="/institution/contributors" color="green" />
-        <StatCard icon={PenSquare} value="1,256" label="University Page Views" linkLabel="View analytics" to="/institution/university-page" color="purple" />
+        <StatCard icon={FileText} value={String(stats.totalApplications)} label="Applications Received" linkLabel="View all applications" to="/institution/applications" color="blue" />
+        <StatCard icon={Clock} value={String(stats.pendingApplications)} label="Pending Review" linkLabel="Review now" to="/institution/applications" color="orange" />
+        <StatCard icon={Users} value={String(stats.pendingContributors)} label="Contributor Requests" linkLabel="View requests" to="/institution/contributors" color="green" />
+        <StatCard icon={PenSquare} value="—" label="University Page Views" linkLabel="View analytics" to="/institution/university-page" color="purple" />
       </div>
 
       <div className="mt-8 grid grid-cols-1 gap-6 lg:grid-cols-2">
@@ -55,24 +103,28 @@ export default function InstitutionDashboardPage() {
               View all applications →
             </Link>
           </div>
-          <div className="divide-y divide-gray-100">
-            {institutionApplicants.slice(0, 5).map((a) => (
-              <div key={a.email} className="flex items-center justify-between gap-3 py-3">
-                <div>
-                  <div className="text-sm font-medium text-black">{a.name}</div>
-                  <div className="text-xs text-gray-400">{a.course}</div>
+          {applications.length === 0 ? (
+            <p className="py-6 text-center text-sm text-gray-400">No applications received yet.</p>
+          ) : (
+            <div className="divide-y divide-gray-100">
+              {applications.slice(0, 5).map((a) => (
+                <div key={a._id} className="flex items-center justify-between gap-3 py-3">
+                  <div>
+                    <div className="text-sm font-medium text-black">{a.studentId.fullName}</div>
+                    <div className="text-xs text-gray-400">{a.course || '-'}</div>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <span className={`whitespace-nowrap rounded-full px-2.5 py-1 text-xs font-medium ${statusBadgeClass(a.status)}`}>
+                      {a.status}
+                    </span>
+                    <button className="rounded-lg border border-gray-200 px-3 py-1.5 text-xs font-medium text-black hover:bg-gray-50">
+                      View
+                    </button>
+                  </div>
                 </div>
-                <div className="flex items-center gap-3">
-                  <span className={`whitespace-nowrap rounded-full px-2.5 py-1 text-xs font-medium ${statusBadgeClass(a.status)}`}>
-                    {a.status}
-                  </span>
-                  <button className="rounded-lg border border-gray-200 px-3 py-1.5 text-xs font-medium text-black hover:bg-gray-50">
-                    View
-                  </button>
-                </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </div>
 
         <div className="rounded-2xl border border-gray-200 p-6">
@@ -82,24 +134,28 @@ export default function InstitutionDashboardPage() {
               View all requests →
             </Link>
           </div>
-          <div className="divide-y divide-gray-100">
-            {contributors.slice(0, 5).map((c) => (
-              <div key={c.name} className="flex items-center justify-between gap-3 py-3">
-                <div>
-                  <div className="text-sm font-medium text-black">{c.name}</div>
-                  <div className="text-xs text-gray-400">{c.type}</div>
+          {contributors.length === 0 ? (
+            <p className="py-6 text-center text-sm text-gray-400">No contributor requests yet.</p>
+          ) : (
+            <div className="divide-y divide-gray-100">
+              {contributors.slice(0, 5).map((c) => (
+                <div key={c._id} className="flex items-center justify-between gap-3 py-3">
+                  <div>
+                    <div className="text-sm font-medium text-black">{c.name}</div>
+                    <div className="text-xs text-gray-400">{c.type || '-'}</div>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <span className={`whitespace-nowrap rounded-full px-2.5 py-1 text-xs font-medium ${statusBadgeClass(c.status)}`}>
+                      {c.status}
+                    </span>
+                    <button className="rounded-lg border border-gray-200 px-3 py-1.5 text-xs font-medium text-black hover:bg-gray-50">
+                      Review
+                    </button>
+                  </div>
                 </div>
-                <div className="flex items-center gap-3">
-                  <span className={`whitespace-nowrap rounded-full px-2.5 py-1 text-xs font-medium ${statusBadgeClass(c.status)}`}>
-                    {c.status}
-                  </span>
-                  <button className="rounded-lg border border-gray-200 px-3 py-1.5 text-xs font-medium text-black hover:bg-gray-50">
-                    Review
-                  </button>
-                </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </div>
       </div>
 

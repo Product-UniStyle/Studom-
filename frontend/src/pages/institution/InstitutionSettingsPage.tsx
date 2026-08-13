@@ -1,6 +1,10 @@
+import { useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { User, ShieldCheck, Bell, Languages, FileLock2, Users, LogOut, ChevronRight } from 'lucide-react'
 import DashboardLayout from '../../components/layout/DashboardLayout'
 import { institutionNav } from './institutionNav'
+import { getInstitutionMe, clearInstitutionToken } from '../../lib/institutionApi'
+import type { InstitutionAccount } from '../../lib/institutionApi'
 
 const SECTIONS = [
   { icon: User, title: 'Account Details', sub: 'Update your university name, administrator details, email, phone number and other account information.' },
@@ -12,10 +16,45 @@ const SECTIONS = [
 ]
 
 export default function InstitutionSettingsPage() {
+  const navigate = useNavigate()
+  const [account, setAccount] = useState<InstitutionAccount | null>(null)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+
+  useEffect(() => {
+    let cancelled = false
+    getInstitutionMe()
+      .then((me) => {
+        if (!cancelled) setAccount(me.account)
+      })
+      .catch((err) => {
+        if (!cancelled) setError(err instanceof Error ? err.message : 'Failed to load settings')
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false)
+      })
+    return () => {
+      cancelled = true
+    }
+  }, [])
+
+  function handleLogout() {
+    clearInstitutionToken()
+    navigate('/institution/login', { replace: true })
+  }
+
+  if (loading || !account) {
+    return (
+      <DashboardLayout navItems={institutionNav} userName={account?.universityName || ''} userRole="Institution">
+        <p className="mt-10 text-center text-gray-400">{error || 'Loading...'}</p>
+      </DashboardLayout>
+    )
+  }
+
   return (
     <DashboardLayout
       navItems={institutionNav}
-      userName="University of Birmingham Dubai"
+      userName={account.universityName}
       userRole="Institution"
     >
       <h1 className="text-2xl font-bold text-black">Settings</h1>
@@ -43,7 +82,10 @@ export default function InstitutionSettingsPage() {
         ))}
       </div>
 
-      <button className="mt-4 flex w-full items-center justify-between gap-4 rounded-2xl border border-red-200 p-6 text-left hover:bg-red-50">
+      <button
+        onClick={handleLogout}
+        className="mt-4 flex w-full items-center justify-between gap-4 rounded-2xl border border-red-200 p-6 text-left hover:bg-red-50"
+      >
         <div className="flex items-center gap-4">
           <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-red-50 text-red-500">
             <LogOut className="h-5 w-5" />

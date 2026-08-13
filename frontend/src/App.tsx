@@ -24,6 +24,8 @@ import InstitutionUniversityPagePage from './pages/institution/InstitutionUniver
 import InstitutionSettingsPage from './pages/institution/InstitutionSettingsPage'
 import AdminLoginPage from './pages/admin/AdminLoginPage'
 import AdminUploadPage from './pages/admin/AdminUploadPage'
+import RequireStudentAuth from './components/auth/RequireStudentAuth'
+import RequireInstitutionAuth from './components/auth/RequireInstitutionAuth'
 
 function App() {
   return (
@@ -54,17 +56,17 @@ function App() {
         }
       />
 
-      <Route path="/student/dashboard" element={<StudentDashboardPage />} />
-      <Route path="/student/profile" element={<MyProfilePage />} />
-      <Route path="/student/applications" element={<MyApplicationsPage />} />
-      <Route path="/student/documents" element={<DocumentsPage />} />
-      <Route path="/student/settings" element={<SettingsPage />} />
+      <Route path="/student/dashboard" element={<RequireStudentAuth><StudentDashboardPage /></RequireStudentAuth>} />
+      <Route path="/student/profile" element={<RequireStudentAuth><MyProfilePage /></RequireStudentAuth>} />
+      <Route path="/student/applications" element={<RequireStudentAuth><MyApplicationsPage /></RequireStudentAuth>} />
+      <Route path="/student/documents" element={<RequireStudentAuth><DocumentsPage /></RequireStudentAuth>} />
+      <Route path="/student/settings" element={<RequireStudentAuth><SettingsPage /></RequireStudentAuth>} />
 
-      <Route path="/institution/dashboard" element={<InstitutionDashboardPage />} />
-      <Route path="/institution/applications" element={<InstitutionApplicationsPage />} />
-      <Route path="/institution/contributors" element={<InstitutionContributorsPage />} />
-      <Route path="/institution/university-page" element={<InstitutionUniversityPagePage />} />
-      <Route path="/institution/settings" element={<InstitutionSettingsPage />} />
+      <Route path="/institution/dashboard" element={<RequireInstitutionAuth><InstitutionDashboardPage /></RequireInstitutionAuth>} />
+      <Route path="/institution/applications" element={<RequireInstitutionAuth><InstitutionApplicationsPage /></RequireInstitutionAuth>} />
+      <Route path="/institution/contributors" element={<RequireInstitutionAuth><InstitutionContributorsPage /></RequireInstitutionAuth>} />
+      <Route path="/institution/university-page" element={<RequireInstitutionAuth><InstitutionUniversityPagePage /></RequireInstitutionAuth>} />
+      <Route path="/institution/settings" element={<RequireInstitutionAuth><InstitutionSettingsPage /></RequireInstitutionAuth>} />
 
       <Route path="/admin/login" element={<AdminLoginPage />} />
       <Route path="/admin" element={<AdminUploadPage />} />

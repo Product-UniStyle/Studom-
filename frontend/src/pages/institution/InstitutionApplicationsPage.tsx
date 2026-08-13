@@ -1,21 +1,60 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Search, ChevronDown, SlidersHorizontal, MoreVertical } from 'lucide-react'
 import DashboardLayout from '../../components/layout/DashboardLayout'
 import { institutionNav } from './institutionNav'
-import { institutionApplicants } from '../../data/institutionData'
+import { getInstitutionMe, listInstitutionApplications } from '../../lib/institutionApi'
+import type { InstitutionAccount, InstitutionApplicationItem } from '../../lib/institutionApi'
 import { statusBadgeClass } from '../student/statusBadge'
 import { FileText, Clock, CheckCircle2, XCircle } from 'lucide-react'
 
 export default function InstitutionApplicationsPage() {
+  const [account, setAccount] = useState<InstitutionAccount | null>(null)
+  const [applications, setApplications] = useState<InstitutionApplicationItem[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
   const [query, setQuery] = useState('')
-  const filtered = institutionApplicants.filter((a) =>
-    a.name.toLowerCase().includes(query.toLowerCase())
+
+  useEffect(() => {
+    let cancelled = false
+    Promise.all([getInstitutionMe(), listInstitutionApplications()])
+      .then(([me, apps]) => {
+        if (cancelled) return
+        setAccount(me.account)
+        setApplications(apps.items)
+      })
+      .catch((err) => {
+        if (cancelled) return
+        setError(err instanceof Error ? err.message : 'Failed to load applications')
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false)
+      })
+    return () => {
+      cancelled = true
+    }
+  }, [])
+
+  const filtered = applications.filter(
+    (a) =>
+      a.studentId.fullName.toLowerCase().includes(query.toLowerCase()) ||
+      a.studentId.email.toLowerCase().includes(query.toLowerCase())
   )
+
+  const acceptedCount = applications.filter((a) => a.status === 'Offer Received').length
+  const rejectedCount = applications.filter((a) => a.status === 'Rejected').length
+
+  if (loading || !account) {
+    return (
+      <DashboardLayout navItems={institutionNav} userName={account?.universityName || ''} userRole="Institution">
+        <p className="mt-10 text-center text-gray-400">{error || 'Loading...'}</p>
+      </DashboardLayout>
+    )
+  }
 
   return (
     <DashboardLayout
       navItems={institutionNav}
-      userName="University of Birmingham Dubai"
+      userName={account.universityName}
       userRole="Institution"
     >
       <h1 className="text-2xl font-bold text-black">Applications</h1>
@@ -24,10 +63,10 @@ export default function InstitutionApplicationsPage() {
       </p>
 
       <div className="mt-8 grid grid-cols-2 gap-4 sm:grid-cols-4">
-        <StatCard icon={FileText} value="248" label="Total Applications" sub="All time" color="blue" />
-        <StatCard icon={Clock} value="68" label="Pending Review" sub="Require your attention" color="orange" />
-        <StatCard icon={CheckCircle2} value="112" label="Accepted" sub="Successful admits" color="green" />
-        <StatCard icon={XCircle} value="38" label="Rejected" sub="Unsuccessful admits" color="red" />
+        <StatCard icon={FileText} value={String(applications.length)} label="Total Applications" sub="All time" color="blue" />
+        <StatCard icon={Clock} value={String(applications.length - acceptedCount - rejectedCount)} label="Pending Review" sub="Require your attention" color="orange" />
+        <StatCard icon={CheckCircle2} value={String(acceptedCount)} label="Accepted" sub="Successful admits" color="green" />
+        <StatCard icon={XCircle} value={String(rejectedCount)} label="Rejected" sub="Unsuccessful admits" color="red" />
       </div>
 
       <div className="mt-6 flex flex-col gap-3 lg:flex-row lg:items-center">
@@ -46,77 +85,65 @@ export default function InstitutionApplicationsPage() {
         <button className="flex items-center gap-2 rounded-lg border border-gray-200 px-4 py-2.5 text-sm text-gray-600">
           <SlidersHorizontal className="h-4 w-4" /> More Filters
         </button>
-        <button className="text-sm font-medium text-blue-600">Clear</button>
+        <button onClick={() => setQuery('')} className="text-sm font-medium text-blue-600">
+          Clear
+        </button>
       </div>
 
       <div className="mt-4 flex items-center justify-between text-sm text-gray-500">
-        <span>Showing 1 to {filtered.length} of 248 applications</span>
+        <span>Showing {filtered.length} of {applications.length} applications</span>
         <FakeSelect label="Latest First" />
       </div>
 
-      <div className="mt-3 overflow-x-auto rounded-2xl border border-gray-200">
-        <table className="w-full text-left text-sm">
-          <thead>
-            <tr className="border-b border-gray-100 text-xs uppercase text-gray-400">
-              <th className="px-5 py-3 font-medium">Student Name</th>
-              <th className="px-5 py-3 font-medium">Email</th>
-              <th className="px-5 py-3 font-medium">Course Applied For</th>
-              <th className="px-5 py-3 font-medium">Date Applied</th>
-              <th className="px-5 py-3 font-medium">Status</th>
-              <th className="px-5 py-3 font-medium">Last Viewed</th>
-              <th className="px-5 py-3 font-medium">Action</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-gray-100">
-            {filtered.map((a) => (
-              <tr key={a.email}>
-                <td className="px-5 py-4 font-medium text-black">{a.name}</td>
-                <td className="px-5 py-4 text-gray-500">{a.email}</td>
-                <td className="px-5 py-4 text-gray-500">{a.course}</td>
-                <td className="px-5 py-4 text-gray-500">{a.date}</td>
-                <td className="px-5 py-4">
-                  <span className={`rounded-full px-2.5 py-1 text-xs font-medium ${statusBadgeClass(a.status)}`}>
-                    {a.status}
-                  </span>
-                </td>
-                <td className="px-5 py-4 text-gray-500">{a.lastViewed}</td>
-                <td className="px-5 py-4">
-                  <div className="flex items-center gap-2">
-                    <button className="text-sm font-medium text-blue-600">
-                      View Application →
-                    </button>
-                    <MoreVertical className="h-4 w-4 text-gray-300" />
-                  </div>
-                </td>
+      {filtered.length === 0 ? (
+        <p className="mt-10 text-center text-gray-400">
+          {applications.length === 0 ? 'No applications received yet.' : 'No applications match your search.'}
+        </p>
+      ) : (
+        <div className="mt-3 overflow-x-auto rounded-2xl border border-gray-200">
+          <table className="w-full text-left text-sm">
+            <thead>
+              <tr className="border-b border-gray-100 text-xs uppercase text-gray-400">
+                <th className="px-5 py-3 font-medium">Student Name</th>
+                <th className="px-5 py-3 font-medium">Email</th>
+                <th className="px-5 py-3 font-medium">Course Applied For</th>
+                <th className="px-5 py-3 font-medium">Date Applied</th>
+                <th className="px-5 py-3 font-medium">Status</th>
+                <th className="px-5 py-3 font-medium">Last Viewed</th>
+                <th className="px-5 py-3 font-medium">Action</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-
-      <div className="mt-6 flex items-center justify-between text-sm text-gray-500">
-        <div className="flex items-center gap-2">
-          Show
-          <FakeSelect label="10" />
-          per page
+            </thead>
+            <tbody className="divide-y divide-gray-100">
+              {filtered.map((a) => (
+                <tr key={a._id}>
+                  <td className="px-5 py-4 font-medium text-black">{a.studentId.fullName}</td>
+                  <td className="px-5 py-4 text-gray-500">{a.studentId.email}</td>
+                  <td className="px-5 py-4 text-gray-500">{a.course || '-'}</td>
+                  <td className="px-5 py-4 text-gray-500">
+                    {new Date(a.appliedOn).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}
+                  </td>
+                  <td className="px-5 py-4">
+                    <span className={`rounded-full px-2.5 py-1 text-xs font-medium ${statusBadgeClass(a.status)}`}>
+                      {a.status}
+                    </span>
+                  </td>
+                  <td className="px-5 py-4 text-gray-500">
+                    {a.lastViewed ? new Date(a.lastViewed).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) : '-'}
+                  </td>
+                  <td className="px-5 py-4">
+                    <div className="flex items-center gap-2">
+                      <button className="text-sm font-medium text-blue-600">
+                        View Application →
+                      </button>
+                      <MoreVertical className="h-4 w-4 text-gray-300" />
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
-        <div className="flex items-center gap-2">
-          {[1, 2, 3, 4, 5].map((n) => (
-            <button
-              key={n}
-              className={`flex h-8 w-8 items-center justify-center rounded-full text-sm font-medium ${
-                n === 1 ? 'bg-blue-600 text-white' : 'border border-gray-200 text-gray-600'
-              }`}
-            >
-              {n}
-            </button>
-          ))}
-          <span>...</span>
-          <button className="flex h-8 w-8 items-center justify-center rounded-full border border-gray-200 text-gray-600">
-            25
-          </button>
-        </div>
-      </div>
+      )}
     </DashboardLayout>
   )
 }

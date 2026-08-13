@@ -1,9 +1,31 @@
-import { Link } from 'react-router-dom'
+import { useState } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
 import { Mail, Lock } from 'lucide-react'
 import PageShell from '../../components/layout/PageShell'
 import TextField from '../../components/form/TextField'
+import { studentLogin } from '../../lib/studentApi'
 
 export default function StudentLogin() {
+  const navigate = useNavigate()
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [error, setError] = useState<string | null>(null)
+  const [submitting, setSubmitting] = useState(false)
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault()
+    setError(null)
+    setSubmitting(true)
+    try {
+      await studentLogin(email, password)
+      navigate('/student/dashboard')
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Login failed')
+    } finally {
+      setSubmitting(false)
+    }
+  }
+
   return (
     <PageShell hideFooter>
       <div className="mx-auto max-w-2xl px-6 py-16">
@@ -11,10 +33,13 @@ export default function StudentLogin() {
           Login to Your Studom Account
         </h1>
 
-        <form className="mt-10 space-y-6 rounded-2xl border border-gray-100 p-8 shadow-sm">
+        <form onSubmit={handleSubmit} className="mt-10 space-y-6 rounded-2xl border border-gray-100 p-8 shadow-sm">
           <TextField
             label="Email"
             type="email"
+            required
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
             placeholder="Enter your email address"
             icon={<Mail className="h-4 w-4" />}
           />
@@ -22,6 +47,9 @@ export default function StudentLogin() {
             <TextField
               label="Password"
               type="password"
+              required
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
               placeholder="Enter your password"
               icon={<Lock className="h-4 w-4" />}
             />
@@ -32,12 +60,15 @@ export default function StudentLogin() {
             </div>
           </div>
 
-          <Link
-            to="/student/dashboard"
-            className="block w-full rounded-lg bg-black py-3.5 text-center text-sm font-semibold text-white underline hover:bg-gray-800"
+          {error && <p className="text-sm text-red-600">{error}</p>}
+
+          <button
+            type="submit"
+            disabled={submitting}
+            className="block w-full rounded-lg bg-black py-3.5 text-center text-sm font-semibold text-white hover:bg-gray-800 disabled:opacity-50"
           >
-            Login
-          </Link>
+            {submitting ? 'Logging in...' : 'Login'}
+          </button>
 
           <p className="text-center text-sm text-gray-600">
             Don't have an account?{' '}

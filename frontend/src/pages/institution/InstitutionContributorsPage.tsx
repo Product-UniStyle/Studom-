@@ -1,21 +1,58 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Search, ChevronDown } from 'lucide-react'
 import DashboardLayout from '../../components/layout/DashboardLayout'
 import { institutionNav } from './institutionNav'
-import { contributors } from '../../data/institutionData'
+import { getInstitutionMe, listInstitutionContributors } from '../../lib/institutionApi'
+import type { InstitutionAccount, InstitutionContributorItem } from '../../lib/institutionApi'
 import { statusBadgeClass } from '../student/statusBadge'
 import { FileText, Clock, CheckCircle2, XCircle } from 'lucide-react'
 
 export default function InstitutionContributorsPage() {
+  const [account, setAccount] = useState<InstitutionAccount | null>(null)
+  const [contributors, setContributors] = useState<InstitutionContributorItem[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
   const [query, setQuery] = useState('')
+
+  useEffect(() => {
+    let cancelled = false
+    Promise.all([getInstitutionMe(), listInstitutionContributors()])
+      .then(([me, contribs]) => {
+        if (cancelled) return
+        setAccount(me.account)
+        setContributors(contribs.items)
+      })
+      .catch((err) => {
+        if (cancelled) return
+        setError(err instanceof Error ? err.message : 'Failed to load contributors')
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false)
+      })
+    return () => {
+      cancelled = true
+    }
+  }, [])
+
   const filtered = contributors.filter((c) =>
     c.name.toLowerCase().includes(query.toLowerCase())
   )
+  const pendingCount = contributors.filter((c) => c.status === 'Pending Review').length
+  const approvedCount = contributors.filter((c) => c.status === 'Approved').length
+  const rejectedCount = contributors.filter((c) => c.status === 'Rejected').length
+
+  if (loading || !account) {
+    return (
+      <DashboardLayout navItems={institutionNav} userName={account?.universityName || ''} userRole="Institution">
+        <p className="mt-10 text-center text-gray-400">{error || 'Loading...'}</p>
+      </DashboardLayout>
+    )
+  }
 
   return (
     <DashboardLayout
       navItems={institutionNav}
-      userName="University of Birmingham Dubai"
+      userName={account.universityName}
       userRole="Institution"
     >
       <h1 className="text-2xl font-bold text-black">Contributors</h1>
@@ -24,10 +61,10 @@ export default function InstitutionContributorsPage() {
       </p>
 
       <div className="mt-8 grid grid-cols-2 gap-4 sm:grid-cols-4">
-        <StatCard icon={FileText} value="48" label="Total Requests" color="blue" />
-        <StatCard icon={Clock} value="12" label="Pending Review" color="orange" />
-        <StatCard icon={CheckCircle2} value="26" label="Approved" color="green" />
-        <StatCard icon={XCircle} value="10" label="Rejected" color="red" />
+        <StatCard icon={FileText} value={String(contributors.length)} label="Total Requests" color="blue" />
+        <StatCard icon={Clock} value={String(pendingCount)} label="Pending Review" color="orange" />
+        <StatCard icon={CheckCircle2} value={String(approvedCount)} label="Approved" color="green" />
+        <StatCard icon={XCircle} value={String(rejectedCount)} label="Rejected" color="red" />
       </div>
 
       <div className="mt-8 rounded-2xl border border-gray-200 p-6">
@@ -49,56 +86,44 @@ export default function InstitutionContributorsPage() {
           </div>
         </div>
 
-        <table className="w-full text-left text-sm">
-          <thead>
-            <tr className="border-b border-gray-100 text-xs uppercase text-gray-400">
-              <th className="py-3 font-medium">Name</th>
-              <th className="py-3 font-medium">Contributor Type</th>
-              <th className="py-3 font-medium">Submitted On</th>
-              <th className="py-3 font-medium">Status</th>
-              <th className="py-3 font-medium">Action</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-gray-100">
-            {filtered.map((c) => (
-              <tr key={c.name}>
-                <td className="py-4 font-medium text-black">{c.name}</td>
-                <td className="py-4 text-gray-500">{c.type}</td>
-                <td className="py-4 text-gray-500">{c.date}</td>
-                <td className="py-4">
-                  <span className={`rounded-full px-2.5 py-1 text-xs font-medium ${statusBadgeClass(c.status)}`}>
-                    {c.status}
-                  </span>
-                </td>
-                <td className="py-4">
-                  <button className="rounded-lg border border-gray-200 px-3 py-1.5 text-sm font-medium text-black hover:bg-gray-50">
-                    View Request
-                  </button>
-                </td>
+        {filtered.length === 0 ? (
+          <p className="py-10 text-center text-gray-400">
+            {contributors.length === 0 ? 'No contributor requests yet.' : 'No contributors match your search.'}
+          </p>
+        ) : (
+          <table className="w-full text-left text-sm">
+            <thead>
+              <tr className="border-b border-gray-100 text-xs uppercase text-gray-400">
+                <th className="py-3 font-medium">Name</th>
+                <th className="py-3 font-medium">Contributor Type</th>
+                <th className="py-3 font-medium">Submitted On</th>
+                <th className="py-3 font-medium">Status</th>
+                <th className="py-3 font-medium">Action</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
-
-        <div className="mt-6 flex items-center justify-between text-sm text-gray-500">
-          <span>Showing 1 to {filtered.length} of 48 entries</span>
-          <div className="flex items-center gap-2">
-            {[1, 2, 3].map((n) => (
-              <button
-                key={n}
-                className={`flex h-8 w-8 items-center justify-center rounded-full text-sm font-medium ${
-                  n === 1 ? 'bg-blue-600 text-white' : 'border border-gray-200 text-gray-600'
-                }`}
-              >
-                {n}
-              </button>
-            ))}
-            <span>...</span>
-            <button className="flex h-8 w-8 items-center justify-center rounded-full border border-gray-200 text-gray-600">
-              8
-            </button>
-          </div>
-        </div>
+            </thead>
+            <tbody className="divide-y divide-gray-100">
+              {filtered.map((c) => (
+                <tr key={c._id}>
+                  <td className="py-4 font-medium text-black">{c.name}</td>
+                  <td className="py-4 text-gray-500">{c.type || '-'}</td>
+                  <td className="py-4 text-gray-500">
+                    {new Date(c.date).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}
+                  </td>
+                  <td className="py-4">
+                    <span className={`rounded-full px-2.5 py-1 text-xs font-medium ${statusBadgeClass(c.status)}`}>
+                      {c.status}
+                    </span>
+                  </td>
+                  <td className="py-4">
+                    <button className="rounded-lg border border-gray-200 px-3 py-1.5 text-sm font-medium text-black hover:bg-gray-50">
+                      View Request
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
       </div>
     </DashboardLayout>
   )

@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import {
   Eye,
@@ -16,7 +17,8 @@ import {
 import DashboardLayout from '../../components/layout/DashboardLayout'
 import SafeImage from '../../components/ui/SafeImage'
 import { institutionNav } from './institutionNav'
-import { getUniversityById } from '../../data/universities'
+import { getInstitutionMe } from '../../lib/institutionApi'
+import type { InstitutionAccount, InstitutionUniversity, InstitutionStats } from '../../lib/institutionApi'
 
 const SECTIONS = [
   { icon: Image, title: 'Hero Images & Gallery', sub: 'Manage hero image and gallery photos.', action: 'Edit' },
@@ -32,12 +34,44 @@ const SECTIONS = [
 ]
 
 export default function InstitutionUniversityPagePage() {
-  const uni = getUniversityById('university-of-birmingham-dubai')!
+  const [account, setAccount] = useState<InstitutionAccount | null>(null)
+  const [university, setUniversity] = useState<InstitutionUniversity | null>(null)
+  const [stats, setStats] = useState<InstitutionStats | null>(null)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+
+  useEffect(() => {
+    let cancelled = false
+    getInstitutionMe()
+      .then((me) => {
+        if (cancelled) return
+        setAccount(me.account)
+        setUniversity(me.university)
+        setStats(me.stats)
+      })
+      .catch((err) => {
+        if (!cancelled) setError(err instanceof Error ? err.message : 'Failed to load university page')
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false)
+      })
+    return () => {
+      cancelled = true
+    }
+  }, [])
+
+  if (loading || !account || !stats) {
+    return (
+      <DashboardLayout navItems={institutionNav} userName={account?.universityName || ''} userRole="Institution">
+        <p className="mt-10 text-center text-gray-400">{error || 'Loading...'}</p>
+      </DashboardLayout>
+    )
+  }
 
   return (
     <DashboardLayout
       navItems={institutionNav}
-      userName="University of Birmingham Dubai"
+      userName={account.universityName}
       userRole="Institution"
     >
       <h1 className="text-2xl font-bold text-black">University Page</h1>
@@ -46,10 +80,10 @@ export default function InstitutionUniversityPagePage() {
       </p>
 
       <div className="mt-8 grid grid-cols-2 gap-4 sm:grid-cols-4">
-        <StatCard icon={Eye} value="12,450" label="Page Views" sub="This month" />
-        <StatCard icon={Mail} value="238" label="Contact Enquiries" sub="This month" />
-        <StatCard icon={Star} value="98" label="Reviews" sub="Total" />
-        <StatCard icon={UserPlus} value="15" label="Contributor Requests" sub="Pending" />
+        <StatCard icon={Eye} value="—" label="Page Views" sub="Not yet tracked" />
+        <StatCard icon={Mail} value={String(stats.contactEnquiries)} label="Contact Enquiries" sub="All time" />
+        <StatCard icon={Star} value={String(stats.totalReviews)} label="Reviews" sub="Total" />
+        <StatCard icon={UserPlus} value={String(stats.pendingContributors)} label="Contributor Requests" sub="Pending" />
       </div>
 
       <div className="mt-8 grid grid-cols-1 gap-6 lg:grid-cols-3">
@@ -85,28 +119,39 @@ export default function InstitutionUniversityPagePage() {
           <p className="mb-4 text-sm text-gray-500">
             See how your university appears to students.
           </p>
-          <SafeImage
-            src="https://images.unsplash.com/photo-1562774053-701939374585?auto=format&fit=crop&w=600&q=80"
-            alt=""
-            className="h-40 w-full rounded-xl object-cover"
-          />
-          <div className="mt-4 flex items-center gap-3">
-            <SafeImage src={uni.logo} alt="" className="h-10 w-10 rounded-md border border-gray-100 object-contain p-1" />
-            <div className="font-semibold text-black">{uni.name}</div>
-          </div>
-          <div className="mt-2 flex items-center gap-1 text-sm text-gray-500">
-            <MapPin className="h-4 w-4" /> Dubai, United Arab Emirates
-          </div>
-          <div className="mt-2 flex items-center gap-1 text-sm font-semibold text-black">
-            <Star className="h-4 w-4 fill-yellow-500 text-yellow-500" /> 98.9 / 100{' '}
-            <span className="font-normal text-gray-400">Overall Score</span>
-          </div>
-          <Link
-            to={`/universities/${uni.id}`}
-            className="mt-4 flex items-center justify-center gap-2 rounded-lg bg-blue-600 py-3 text-sm font-semibold text-white hover:bg-blue-700"
-          >
-            <Eye className="h-4 w-4" /> View Public Page
-          </Link>
+          {university ? (
+            <>
+              <SafeImage
+                src={university.image}
+                alt=""
+                className="h-40 w-full rounded-xl object-cover"
+              />
+              <div className="mt-4 flex items-center gap-3">
+                <SafeImage src={university.logo} alt="" className="h-10 w-10 rounded-md border border-gray-100 object-contain p-1" />
+                <div className="font-semibold text-black">{university.name}</div>
+              </div>
+              <div className="mt-2 flex items-center gap-1 text-sm text-gray-500">
+                <MapPin className="h-4 w-4" />
+                {university.city}
+                {university.city && university.country ? ', ' : ''}
+                {university.country}
+              </div>
+              {university.overallScore != null && (
+                <div className="mt-2 flex items-center gap-1 text-sm font-semibold text-black">
+                  <Star className="h-4 w-4 fill-yellow-500 text-yellow-500" /> {university.overallScore} / 100{' '}
+                  <span className="font-normal text-gray-400">Overall Score</span>
+                </div>
+              )}
+              <Link
+                to={`/universities/${university._id}`}
+                className="mt-4 flex items-center justify-center gap-2 rounded-lg bg-blue-600 py-3 text-sm font-semibold text-white hover:bg-blue-700"
+              >
+                <Eye className="h-4 w-4" /> View Public Page
+              </Link>
+            </>
+          ) : (
+            <p className="text-sm text-gray-400">University details not found.</p>
+          )}
         </div>
       </div>
     </DashboardLayout>

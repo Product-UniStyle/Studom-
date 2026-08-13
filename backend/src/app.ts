@@ -9,6 +9,8 @@ import { buildArticleAdminRouter } from './routes/articles';
 import NewsArticle from './models/NewsArticle';
 import BlogPost from './models/BlogPost';
 import eventsRouter from './routes/events';
+import studentRouter from './routes/student';
+import institutionRouter from './routes/institution';
 
 const allowedOrigins = [process.env.CLIENT_URL, 'http://localhost:5173'].filter(
   (origin): origin is string => Boolean(origin)
@@ -30,5 +32,7 @@ app.use('/api/public/universities', publicUniversitiesRouter);
 app.use('/api/news', buildArticleAdminRouter(NewsArticle));
 app.use('/api/blogs', buildArticleAdminRouter(BlogPost));
 app.use('/api/events', eventsRouter);
+app.use('/api/student', studentRouter);
+app.use('/api/institution', institutionRouter);
 
 export default app;
