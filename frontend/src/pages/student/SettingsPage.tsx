@@ -16,15 +16,22 @@ import {
   ChevronRight,
 } from 'lucide-react'
 import DashboardLayout from '../../components/layout/DashboardLayout'
+import Modal from '../../components/ui/Modal'
 import { studentNav } from './studentNav'
 import { getStudentMe, clearStudentToken } from '../../lib/studentApi'
 import type { StudentProfile } from '../../lib/studentApi'
+import EditPersonalInfoForm from './EditPersonalInfoForm'
+import EditEmailForm from './EditEmailForm'
+import EditPhoneForm from './EditPhoneForm'
+import ChangePasswordForm from './ChangePasswordForm'
 
 export default function SettingsPage() {
   const navigate = useNavigate()
   const [student, setStudent] = useState<StudentProfile | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [openModal, setOpenModal] = useState<'personal' | 'email' | 'phone' | 'password' | null>(null)
+  const [successMessage, setSuccessMessage] = useState<string | null>(null)
 
   useEffect(() => {
     let cancelled = false
@@ -48,6 +55,12 @@ export default function SettingsPage() {
     navigate('/student/login', { replace: true })
   }
 
+  function refreshStudent() {
+    getStudentMe()
+      .then((me) => setStudent(me.student))
+      .catch(() => {})
+  }
+
   if (loading || !student) {
     return (
       <DashboardLayout navItems={studentNav} userName={student?.fullName || ''} userRole="Student">
@@ -57,9 +70,9 @@ export default function SettingsPage() {
   }
 
   const ACCOUNT_ROWS = [
-    { icon: User, title: 'Personal Information', sub: 'Update your name, email, phone number and personal details.', value: student.fullName },
-    { icon: Mail, title: 'Email Address', sub: 'Update your email address.', value: student.email },
-    { icon: Phone, title: 'Phone Number', sub: 'Update your phone number.', value: student.profile?.personal?.mobile || 'Not set' },
+    { icon: User, title: 'Personal Information', sub: 'Update your name, email, phone number and personal details.', value: student.fullName, onClick: () => { setSuccessMessage(null); setOpenModal('personal') } },
+    { icon: Mail, title: 'Email Address', sub: 'Update your email address.', value: student.email, onClick: () => { setSuccessMessage(null); setOpenModal('email') } },
+    { icon: Phone, title: 'Phone Number', sub: 'Update your phone number.', value: student.profile?.personal?.mobile || 'Not set', onClick: () => { setSuccessMessage(null); setOpenModal('phone') } },
   ]
 
   const PREFERENCE_ROWS = [
@@ -69,7 +82,7 @@ export default function SettingsPage() {
   ]
 
   const SECURITY_ROWS = [
-    { icon: Lock, title: 'Password', sub: 'Change your account password.', value: '••••••••' },
+    { icon: Lock, title: 'Password', sub: 'Change your account password.', value: '••••••••', onClick: () => { setSuccessMessage(null); setOpenModal('password') } },
     { icon: ShieldCheck, title: 'Two-Factor Authentication', sub: 'Add an extra layer of security to your account.', value: 'Off' },
   ]
 
@@ -84,6 +97,12 @@ export default function SettingsPage() {
       <p className="mt-1 text-sm text-gray-500">
         Manage your account, preferences and security settings.
       </p>
+
+      {successMessage && (
+        <p className="mt-4 rounded-lg bg-green-50 px-4 py-2.5 text-sm font-medium text-green-700">
+          {successMessage}
+        </p>
+      )}
 
       <div className="mt-8 flex items-center justify-between rounded-2xl border border-gray-200 p-6">
         <div>
@@ -107,6 +126,60 @@ export default function SettingsPage() {
         </span>
       </button>
       <p className="mt-2 text-sm text-gray-400">Sign out from your account.</p>
+
+      {openModal === 'personal' && (
+        <Modal title="Personal Information" onClose={() => setOpenModal(null)}>
+          <EditPersonalInfoForm
+            student={student}
+            onCancel={() => setOpenModal(null)}
+            onSaved={() => {
+              setOpenModal(null)
+              refreshStudent()
+              setSuccessMessage('Personal information updated.')
+            }}
+          />
+        </Modal>
+      )}
+
+      {openModal === 'email' && (
+        <Modal title="Email Address" onClose={() => setOpenModal(null)}>
+          <EditEmailForm
+            currentEmail={student.email}
+            onCancel={() => setOpenModal(null)}
+            onSaved={() => {
+              setOpenModal(null)
+              refreshStudent()
+              setSuccessMessage('Email address updated.')
+            }}
+          />
+        </Modal>
+      )}
+
+      {openModal === 'phone' && (
+        <Modal title="Phone Number" onClose={() => setOpenModal(null)}>
+          <EditPhoneForm
+            currentMobile={student.profile?.personal?.mobile || ''}
+            onCancel={() => setOpenModal(null)}
+            onSaved={() => {
+              setOpenModal(null)
+              refreshStudent()
+              setSuccessMessage('Phone number updated.')
+            }}
+          />
+        </Modal>
+      )}
+
+      {openModal === 'password' && (
+        <Modal title="Change Password" onClose={() => setOpenModal(null)}>
+          <ChangePasswordForm
+            onCancel={() => setOpenModal(null)}
+            onSaved={() => {
+              setOpenModal(null)
+              setSuccessMessage('Password updated successfully.')
+            }}
+          />
+        </Modal>
+      )}
     </DashboardLayout>
   )
 }
@@ -116,6 +189,7 @@ interface Row {
   title: string
   sub: string
   value: string
+  onClick?: () => void
 }
 
 function SettingsSection({ title, rows }: { title: string; rows: Row[] }) {
@@ -126,7 +200,10 @@ function SettingsSection({ title, rows }: { title: string; rows: Row[] }) {
         {rows.map((r) => (
           <div
             key={r.title}
-            className="flex items-center justify-between rounded-2xl border border-gray-200 p-5"
+            onClick={r.onClick}
+            className={`flex items-center justify-between rounded-2xl border border-gray-200 p-5 ${
+              r.onClick ? 'cursor-pointer hover:bg-gray-50' : ''
+            }`}
           >
             <div className="flex items-start gap-3">
               <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-blue-50 text-blue-600">

@@ -8,6 +8,7 @@ import {
   importMainSheet,
   importPocSheet,
   importReviewsSheet,
+  importEssayQuestionsSheet,
 } from '../../lib/adminApi'
 import AdminUniversityTable from './AdminUniversityTable'
 import AdminImportModal from './AdminImportModal'
@@ -15,7 +16,7 @@ import AdminArticlesTab from './AdminArticlesTab'
 import AdminEventsTab from './AdminEventsTab'
 import AdminUsersTab from './AdminUsersTab'
 
-type ImportKind = 'main' | 'poc' | 'reviews'
+type ImportKind = 'main' | 'poc' | 'reviews' | 'essayQuestions'
 type Tab = 'university' | 'articles' | 'events' | 'users'
 
 export default function AdminUploadPage() {
@@ -95,6 +96,12 @@ export default function AdminUploadPage() {
                 >
                   <UploadCloud className="h-3.5 w-3.5" /> Import Reviews
                 </button>
+                <button
+                  onClick={() => setActiveImport('essayQuestions')}
+                  className="flex items-center gap-1.5 rounded-lg border border-gray-300 px-3.5 py-2 text-xs font-semibold text-gray-800 hover:bg-gray-50"
+                >
+                  <UploadCloud className="h-3.5 w-3.5" /> Import Essay Questions
+                </button>
               </div>
             </div>
 
@@ -150,6 +157,26 @@ export default function AdminUploadPage() {
             </>
           }
           importFn={importReviewsSheet}
+          onClose={() => setActiveImport(null)}
+          onImported={() => setTableRefreshKey((k) => k + 1)}
+        />
+      )}
+
+      {activeImport === 'essayQuestions' && (
+        <AdminImportModal
+          title="Import Essay Questions Sheet"
+          description={
+            <>
+              Upload a workbook containing an <code>Essay Questions</code> tab (columns: <code>ID</code>,{' '}
+              <code>Question ID</code>, <code>Question</code> — one row per question, multiple rows per
+              university). Matched to its university by the shared sheet ID, so this only works after a MAIN
+              sheet has been imported first. <code>Question ID</code> just needs to be unique within that
+              university's own rows (e.g. 1, 2, 3) — re-uploads use it to update that question in place
+              instead of duplicating it, and never touch questions added manually in the university edit
+              form.
+            </>
+          }
+          importFn={importEssayQuestionsSheet}
           onClose={() => setActiveImport(null)}
           onImported={() => setTableRefreshKey((k) => k + 1)}
         />

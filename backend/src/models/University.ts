@@ -48,7 +48,11 @@ export interface IUniversity extends Document {
   locality?: string;
   mode?: string;
   inclusions: Types.ObjectId[];
-  essayQuestions?: { question: string }[];
+  // sourceRowId is set only for questions that came from the Essay
+  // Questions sheet import (its per-row "Question ID") — untagged entries
+  // were added manually via the admin form. This lets a sheet re-import
+  // replace only the rows it owns without ever touching admin-added ones.
+  essayQuestions?: { question: string; sourceRowId?: string }[];
   pageViews: number;
 }
 
@@ -97,7 +101,7 @@ const universitySchema = new Schema<IUniversity>(
     mode: String,
     inclusions: [{ type: Schema.Types.ObjectId, ref: 'Inclusion' }],
     essayQuestions: {
-      type: [{ question: { type: String, required: true } }],
+      type: [{ question: { type: String, required: true }, sourceRowId: String }],
       default: [],
     },
     pageViews: { type: Number, default: 0 },

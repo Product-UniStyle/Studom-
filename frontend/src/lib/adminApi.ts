@@ -88,6 +88,10 @@ export function importReviewsSheet(file: File, write: boolean): Promise<ImportRe
   return importSheet('/api/imports/reviews-sheet', file, write)
 }
 
+export function importEssayQuestionsSheet(file: File, write: boolean): Promise<ImportReport> {
+  return importSheet('/api/imports/essay-questions-sheet', file, write)
+}
+
 export interface UniversityListItem {
   _id: string
   sourceId?: string
@@ -166,7 +170,7 @@ export interface UniversityDetail extends UniversityListItem {
     poc?: { name?: string; address?: string; email?: string; phone?: string; fax?: string }
   }
   inclusions?: { _id: string; label: string }[]
-  essayQuestions?: { question: string }[]
+  essayQuestions?: { question: string; sourceRowId?: string }[]
 }
 
 export async function getUniversity(id: string): Promise<UniversityDetail> {

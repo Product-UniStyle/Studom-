@@ -132,6 +132,7 @@ export async function getStudentMe(): Promise<{ student: StudentProfile; stats: 
 
 export interface StudentProfilePatch {
   fullName?: string
+  email?: string
   birthdate?: string
   nationality?: string
   currentLocation?: string
@@ -146,6 +147,16 @@ export async function updateStudentMe(patch: StudentProfilePatch): Promise<{ stu
   return studentFetch('/api/student/me', {
     method: 'PATCH',
     body: JSON.stringify(patch),
+  })
+}
+
+export async function changeStudentPassword(
+  currentPassword: string,
+  newPassword: string
+): Promise<{ success: boolean }> {
+  return studentFetch('/api/student/me/password', {
+    method: 'PATCH',
+    body: JSON.stringify({ currentPassword, newPassword }),
   })
 }
 
@@ -174,6 +185,29 @@ export async function createStudentApplications(
     method: 'POST',
     body: JSON.stringify({ universityIds, course, essays }),
   })
+}
+
+export interface StudentApplicationEssay {
+  _id: string
+  question: string
+  answer?: string
+}
+
+export interface StudentApplicationDocument {
+  _id: string
+  name: string
+  fileUrl: string
+  category?: string
+  status?: string
+  date?: string
+}
+
+export async function getStudentApplication(id: string): Promise<{
+  application: StudentApplicationItem
+  essays: StudentApplicationEssay[]
+  documents: StudentApplicationDocument[]
+}> {
+  return studentFetch(`/api/student/applications/${id}`)
 }
 
 export interface StudentTaskItem {

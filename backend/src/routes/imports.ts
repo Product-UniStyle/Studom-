@@ -4,6 +4,7 @@ import { requireEditorOrAdmin } from '../middleware/adminAuth';
 import { importMainSheet } from '../lib/mainSheetImport';
 import { importPocSheet } from '../lib/pocSheetImport';
 import { importReviewsSheet } from '../lib/reviewSheetImport';
+import { importEssayQuestionsSheet } from '../lib/essayQuestionSheetImport';
 import { importArticleSheet } from '../lib/articleSheetImport';
 import NewsArticle from '../models/NewsArticle';
 import BlogPost from '../models/BlogPost';
@@ -31,6 +32,7 @@ function importRoute(path: string, importFn: (buffer: Buffer, opts: { write: boo
 importRoute('/main-sheet', importMainSheet);
 importRoute('/poc-sheet', importPocSheet);
 importRoute('/reviews-sheet', importReviewsSheet);
+importRoute('/essay-questions-sheet', importEssayQuestionsSheet);
 importRoute('/news-sheet', (buffer, opts) => importArticleSheet(NewsArticle, 'News', buffer, opts));
 importRoute('/blog-sheet', (buffer, opts) => importArticleSheet(BlogPost, 'Blogs', buffer, opts));
 

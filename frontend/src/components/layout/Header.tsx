@@ -55,12 +55,12 @@ export default function Header() {
 
   return (
     <header className="w-full border-b border-gray-200 bg-white">
-      <div className="mx-auto flex max-w-[1440px] items-center justify-between px-6 py-4 lg:px-10">
-        <Link to="/" className="font-logo text-3xl text-black shrink-0">
+      <div className="mx-auto grid max-w-[1440px] grid-cols-[1fr_auto_1fr] items-center px-6 py-4 lg:px-10">
+        <Link to="/" className="justify-self-start font-logo text-3xl text-black shrink-0">
           Studom
         </Link>
 
-        <nav className="hidden items-center gap-8 md:flex">
+        <nav className="hidden items-center gap-8 justify-self-center md:flex">
           {NAV_LINKS.map((link) => (
             <Link
               key={link.to}
@@ -75,7 +75,7 @@ export default function Header() {
           ))}
         </nav>
 
-        <div className="flex items-center gap-4">
+        <div className="flex items-center justify-self-end gap-4">
           <div className="hidden h-6 w-px bg-gray-300 lg:block" />
 
           {hasStudentToken ? (

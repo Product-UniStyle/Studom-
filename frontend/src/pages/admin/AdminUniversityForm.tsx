@@ -32,6 +32,9 @@ export default function AdminUniversityForm({ university, onSaved, onCancel }: A
   const [reviews, setReviews] = useState<UniversityReview[]>([])
   const [reviewsLoading, setReviewsLoading] = useState(true)
 
+  const sheetEssayQuestions = (university.essayQuestions || []).filter((q) => q.sourceRowId)
+  const manualEssayQuestions = (university.essayQuestions || []).filter((q) => !q.sourceRowId)
+
   useEffect(() => {
     listUniversityReviews(university._id)
       .then((res) => setReviews(res.items))
@@ -201,12 +204,28 @@ export default function AdminUniversityForm({ university, onSaved, onCancel }: A
 
       <GalleryUploadField name="gallery" defaultValue={university.detail?.gallery} universityName={university.name} />
 
+      {sheetEssayQuestions.length > 0 && (
+        <div>
+          <label className="mb-1.5 block text-sm font-medium text-gray-900">
+            Essay Questions from Sheet Import
+          </label>
+          <ul className="space-y-1 rounded-lg border border-gray-100 bg-gray-50 px-4 py-3 text-sm text-gray-700">
+            {sheetEssayQuestions.map((q, i) => (
+              <li key={i}>{q.question}</li>
+            ))}
+          </ul>
+          <p className="mt-1 text-xs text-gray-400">
+            Managed by the Essay Questions sheet import — edit via the sheet, not here.
+          </p>
+        </div>
+      )}
+
       <div>
         <label className="mb-1.5 block text-sm font-medium text-gray-900">Additional Essay Questions (one per line)</label>
         <textarea
           name="essayQuestions"
           rows={4}
-          defaultValue={university.essayQuestions?.map((q) => q.question).join('\n')}
+          defaultValue={manualEssayQuestions.map((q) => q.question).join('\n')}
           placeholder="e.g. Who are you?&#10;What are your interests?"
           className="w-full rounded-lg border border-gray-200 px-4 py-3 text-sm text-gray-800 focus:border-blue-500 focus:outline-none"
         />

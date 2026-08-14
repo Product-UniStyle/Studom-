@@ -76,10 +76,18 @@ router.patch('/:id', requireEditorOrAdmin, async (req, res) => {
     update.subjects = body.subjects.filter((v): v is string => typeof v === 'string');
   }
   if (Array.isArray(body.essayQuestions)) {
-    update.essayQuestions = body.essayQuestions
+    // The admin form only ever edits manually-added questions (no
+    // sourceRowId) — sheet-imported ones are shown read-only there — so
+    // this must merge with, not replace, whatever the sheet import already
+    // owns. Otherwise saving this form would silently strip the sheet's
+    // questions down to "manual" ones, breaking future sheet re-imports.
+    const manualQuestions = body.essayQuestions
       .filter((v): v is Record<string, unknown> => typeof v === 'object' && v !== null && typeof (v as Record<string, unknown>).question === 'string')
       .map((v) => ({ question: (v.question as string).trim() }))
       .filter((v) => v.question.length > 0);
+    const existing = await University.findById(req.params.id).select('essayQuestions').lean();
+    const sheetQuestions = (existing?.essayQuestions || []).filter((q) => q.sourceRowId);
+    update.essayQuestions = [...sheetQuestions, ...manualQuestions];
   }
   if (body.detail && typeof body.detail === 'object') {
     const detail = body.detail as Record<string, unknown>;

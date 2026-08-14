@@ -169,9 +169,10 @@ interface AchievementPatch {
 }
 
 router.patch('/me', requireStudent, async (req: StudentAuthedRequest, res) => {
-  const { fullName, birthdate, nationality, currentLocation, personal, education, activities, achievements, preferences } =
+  const { fullName, email, birthdate, nationality, currentLocation, personal, education, activities, achievements, preferences } =
     req.body as {
       fullName?: string;
+      email?: string;
       birthdate?: string;
       nationality?: string;
       currentLocation?: string;
@@ -191,6 +192,14 @@ router.patch('/me', requireStudent, async (req: StudentAuthedRequest, res) => {
   if (!student) return res.status(404).json({ error: 'Student not found' });
 
   if (fullName) student.fullName = fullName;
+  if (email && email.trim()) {
+    const normalizedEmail = email.trim().toLowerCase();
+    if (normalizedEmail !== student.email) {
+      const existing = await Student.findOne({ email: normalizedEmail, _id: { $ne: student._id } }).select('_id');
+      if (existing) return res.status(409).json({ error: 'An account with this email already exists' });
+      student.email = normalizedEmail;
+    }
+  }
   if (birthdate) student.birthdate = new Date(birthdate);
   if (nationality !== undefined) student.nationality = nationality;
   if (currentLocation !== undefined) student.currentLocation = currentLocation;
@@ -204,6 +213,27 @@ router.patch('/me', requireStudent, async (req: StudentAuthedRequest, res) => {
   await student.save();
 
   res.json({ student: serializeStudent(student) });
+});
+
+router.patch('/me/password', requireStudent, async (req: StudentAuthedRequest, res) => {
+  const { currentPassword, newPassword } = req.body as { currentPassword?: string; newPassword?: string };
+  if (!currentPassword || !newPassword) {
+    return res.status(400).json({ error: 'Current and new password are required' });
+  }
+  if (newPassword.length < 8) {
+    return res.status(400).json({ error: 'New password must be at least 8 characters' });
+  }
+
+  const student = await Student.findById(req.student!.id);
+  if (!student) return res.status(404).json({ error: 'Student not found' });
+
+  const valid = await bcrypt.compare(currentPassword, student.password);
+  if (!valid) return res.status(401).json({ error: 'Current password is incorrect' });
+
+  student.password = await bcrypt.hash(newPassword, 10);
+  await student.save();
+
+  res.json({ success: true });
 });
 
 router.post('/applications', requireStudent, async (req: StudentAuthedRequest, res) => {
@@ -286,6 +316,23 @@ router.get('/applications', requireStudent, async (req: StudentAuthedRequest, re
     .sort({ appliedOn: -1 })
     .lean();
   res.json({ items: applications, total: applications.length });
+});
+
+router.get('/applications/:id', requireStudent, async (req: StudentAuthedRequest, res) => {
+  const application = await Application.findOne({
+    _id: req.params.id,
+    studentId: req.student!.id,
+  })
+    .populate('universityId', 'name city country logo slug')
+    .lean();
+  if (!application) return res.status(404).json({ error: 'Application not found' });
+
+  const [essays, documents] = await Promise.all([
+    EssayQuestion.find({ applicationId: application._id }).select('question answer').lean(),
+    StudentDocument.find({ ownerId: req.student!.id }).select('name fileUrl category status date').lean(),
+  ]);
+
+  res.json({ application, essays, documents });
 });
 
 router.get('/tasks', requireStudent, async (req: StudentAuthedRequest, res) => {
