@@ -80,7 +80,7 @@ export default function InstitutionUniversityPagePage() {
       </p>
 
       <div className="mt-8 grid grid-cols-2 gap-4 sm:grid-cols-4">
-        <StatCard icon={Eye} value="—" label="Page Views" sub="Not yet tracked" />
+        <StatCard icon={Eye} value={String(stats.pageViews)} label="Page Views" sub="All time" />
         <StatCard icon={Mail} value={String(stats.contactEnquiries)} label="Contact Enquiries" sub="All time" />
         <StatCard icon={Star} value={String(stats.totalReviews)} label="Reviews" sub="Total" />
         <StatCard icon={UserPlus} value={String(stats.pendingContributors)} label="Contributor Requests" sub="Pending" />

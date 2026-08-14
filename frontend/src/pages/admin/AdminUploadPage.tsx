@@ -112,9 +112,9 @@ export default function AdminUploadPage() {
           title="Import MAIN Sheet"
           description={
             <>
-              Upload the data team's <code>Tech_UAE_All_Data.xlsx</code> file. The MAIN tab is
-              imported into the University collection, matched by each row's sheet ID so
-              re-uploads update existing records instead of duplicating them.
+              Upload a workbook containing a <code>MAIN</code> tab. Its rows are imported into
+              the University collection, matched by each row's sheet ID so re-uploads update
+              existing records instead of duplicating them.
             </>
           }
           importFn={importMainSheet}
@@ -128,9 +128,9 @@ export default function AdminUploadPage() {
           title="Import POC Sheet"
           description={
             <>
-              Upload the same workbook's <code>POC</code> tab. Each row is matched to its
+              Upload a workbook containing a <code>POC</code> tab. Each row is matched to its
               university by the shared sheet ID and fills in the area, POC name, address, email,
-              phone, and fax — this only works after the MAIN sheet has been imported first.
+              phone, and fax — this only works after a MAIN sheet has been imported first.
             </>
           }
           importFn={importPocSheet}
@@ -144,9 +144,9 @@ export default function AdminUploadPage() {
           title="Import Reviews Sheet"
           description={
             <>
-              Upload the same workbook's <code>Reviews</code> tab. Each review is matched to its
-              university by the shared sheet ID, so this only works after the MAIN sheet has been
-              imported first. Re-uploads update existing reviews instead of duplicating them.
+              Upload a workbook containing a <code>Reviews</code> tab. Each review is matched to
+              its university by the shared sheet ID, so this only works after a MAIN sheet has
+              been imported first. Re-uploads update existing reviews instead of duplicating them.
             </>
           }
           importFn={importReviewsSheet}

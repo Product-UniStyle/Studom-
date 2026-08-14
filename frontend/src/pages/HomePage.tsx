@@ -33,7 +33,7 @@ export default function HomePage() {
       {/* Hero */}
       <section className="mx-auto max-w-[1440px] px-6 pb-10 pt-14 lg:px-10">
         <div className="grid grid-cols-1 items-center gap-10 lg:grid-cols-2">
-          <h1 className="font-script text-4xl leading-[3] text-blue-600 sm:text-5xl">
+          <h1 className="font-script text-4xl leading-[1.5] text-blue-600 sm:text-5xl sm:leading-[1.5]">
             One platform to discover, plan &amp; apply to institutions while
             building the Middle East's largest student community.
           </h1>
@@ -55,17 +55,17 @@ export default function HomePage() {
               className="rounded-2xl border border-gray-100 p-6 shadow-sm transition hover:shadow-md"
             >
               <cat.icon className="h-8 w-8 text-black" strokeWidth={1.5} />
-              <div className="mt-4 text-xl font-semibold text-black">
+              <div className="mt-4 font-script text-xl font-semibold text-black">
                 {cat.label}
               </div>
-              <div className="mt-1 text-sm text-gray-500">{cat.sub}</div>
+              <div className="mt-1 font-script text-sm text-gray-500">{cat.sub}</div>
               <ArrowRight className="mt-4 h-5 w-5 text-black" />
             </Link>
           ))}
         </div>
       </section>
 
-      <p className="mx-auto max-w-2xl px-6 pb-14 text-center text-sm text-blue-600 lg:px-10">
+      <p className="mx-auto whitespace-nowrap px-6 pb-14 text-center font-script text-sm text-blue-600 lg:px-10">
         Of the students, by the students, for the students. All information
         has been obtained from open sources.
       </p>

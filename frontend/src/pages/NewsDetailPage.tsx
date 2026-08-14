@@ -39,7 +39,7 @@ export default function NewsDetailPage() {
 
   return (
     <PageShell>
-      <div className="mx-auto max-w-4xl px-6 py-10 lg:px-10">
+      <div className="mx-auto max-w-[1440px] px-6 py-10 lg:px-10">
         <h1 className="text-3xl font-bold text-blue-600">News</h1>
 
         {loading ? (

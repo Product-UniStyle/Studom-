@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react'
 import { Search, ChevronDown } from 'lucide-react'
 import DashboardLayout from '../../components/layout/DashboardLayout'
+import Modal from '../../components/ui/Modal'
 import { institutionNav } from './institutionNav'
-import { getInstitutionMe, listInstitutionContributors } from '../../lib/institutionApi'
+import { getInstitutionMe, listInstitutionContributors, updateContributorStatus } from '../../lib/institutionApi'
 import type { InstitutionAccount, InstitutionContributorItem } from '../../lib/institutionApi'
 import { statusBadgeClass } from '../student/statusBadge'
 import { FileText, Clock, CheckCircle2, XCircle } from 'lucide-react'
@@ -13,6 +14,9 @@ export default function InstitutionContributorsPage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [query, setQuery] = useState('')
+  const [selected, setSelected] = useState<InstitutionContributorItem | null>(null)
+  const [actionLoading, setActionLoading] = useState(false)
+  const [actionError, setActionError] = useState<string | null>(null)
 
   useEffect(() => {
     let cancelled = false
@@ -37,6 +41,20 @@ export default function InstitutionContributorsPage() {
   const filtered = contributors.filter((c) =>
     c.name.toLowerCase().includes(query.toLowerCase())
   )
+  async function handleAction(id: string, status: 'Approved' | 'Rejected') {
+    setActionLoading(true)
+    setActionError(null)
+    try {
+      const res = await updateContributorStatus(id, status)
+      setContributors((prev) => prev.map((c) => (c._id === id ? res.item : c)))
+      setSelected(res.item)
+    } catch (err) {
+      setActionError(err instanceof Error ? err.message : 'Failed to update status')
+    } finally {
+      setActionLoading(false)
+    }
+  }
+
   const pendingCount = contributors.filter((c) => c.status === 'Pending Review').length
   const approvedCount = contributors.filter((c) => c.status === 'Approved').length
   const rejectedCount = contributors.filter((c) => c.status === 'Rejected').length
@@ -115,7 +133,13 @@ export default function InstitutionContributorsPage() {
                     </span>
                   </td>
                   <td className="py-4">
-                    <button className="rounded-lg border border-gray-200 px-3 py-1.5 text-sm font-medium text-black hover:bg-gray-50">
+                    <button
+                      onClick={() => {
+                        setActionError(null)
+                        setSelected(c)
+                      }}
+                      className="rounded-lg border border-gray-200 px-3 py-1.5 text-sm font-medium text-black hover:bg-gray-50"
+                    >
                       View Request
                     </button>
                   </td>
@@ -125,7 +149,87 @@ export default function InstitutionContributorsPage() {
           </table>
         )}
       </div>
+
+      {selected && (
+        <Modal title="Contributor Request" onClose={() => setSelected(null)}>
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <div className="text-lg font-semibold text-black">{selected.name}</div>
+                {selected.email && <div className="text-sm text-gray-500">{selected.email}</div>}
+              </div>
+              <span className={`rounded-full px-2.5 py-1 text-xs font-medium ${statusBadgeClass(selected.status)}`}>
+                {selected.status}
+              </span>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4 text-sm">
+              <DetailField label="Course / Programme" value={selected.courseOfStudy} />
+              <DetailField label="Year of Study" value={selected.yearOfStudy} />
+              <DetailField label="Expected Graduation" value={selected.expectedGraduationYear} />
+              <DetailField
+                label="Submitted On"
+                value={new Date(selected.date).toLocaleDateString('en-GB', {
+                  day: '2-digit',
+                  month: 'short',
+                  year: 'numeric',
+                })}
+              />
+            </div>
+
+            {selected.reason && (
+              <div>
+                <div className="mb-1 text-xs font-medium uppercase tracking-wide text-gray-400">
+                  Why they want to contribute
+                </div>
+                <p className="text-sm text-gray-700">{selected.reason}</p>
+              </div>
+            )}
+
+            {selected.proofUrl && (
+              <a
+                href={selected.proofUrl}
+                target="_blank"
+                rel="noreferrer"
+                className="inline-block text-sm font-medium text-blue-600 hover:underline"
+              >
+                View uploaded proof →
+              </a>
+            )}
+
+            {actionError && <p className="text-sm text-red-600">{actionError}</p>}
+
+            {selected.status === 'Pending Review' && (
+              <div className="flex justify-end gap-3 pt-2">
+                <button
+                  onClick={() => handleAction(selected._id, 'Rejected')}
+                  disabled={actionLoading}
+                  className="rounded-lg border border-red-200 px-5 py-2.5 text-sm font-semibold text-red-600 hover:bg-red-50 disabled:opacity-50"
+                >
+                  Reject
+                </button>
+                <button
+                  onClick={() => handleAction(selected._id, 'Approved')}
+                  disabled={actionLoading}
+                  className="rounded-lg bg-green-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-green-700 disabled:opacity-50"
+                >
+                  {actionLoading ? 'Saving...' : 'Approve'}
+                </button>
+              </div>
+            )}
+          </div>
+        </Modal>
+      )}
     </DashboardLayout>
+  )
+}
+
+function DetailField({ label, value }: { label: string; value?: string }) {
+  return (
+    <div>
+      <div className="mb-1 text-xs font-medium uppercase tracking-wide text-gray-400">{label}</div>
+      <div className="text-gray-700">{value || 'Not provided'}</div>
+    </div>
   )
 }
 

@@ -10,7 +10,7 @@ const LIST_FIELDS = 'slug name city country type image logo qsRank origin aggreg
 const DETAIL_FIELDS =
   'slug name city country area type image logo origin course qsRank uaeRank uaeScore overallScore ' +
   'latitude longitude googleMapLink costOfLiving studentPopulation aggregateRating aggregateReviewCount ' +
-  'fieldsOfStudy board grade subjects performance locality mode detail inclusions';
+  'fieldsOfStudy board grade subjects performance locality mode detail inclusions essayQuestions';
 
 router.get('/', async (req, res) => {
   const search = typeof req.query.search === 'string' ? req.query.search.trim() : '';
@@ -65,7 +65,14 @@ router.get('/facets', async (req, res) => {
 });
 
 router.get('/:id', async (req, res) => {
-  const university = await University.findOne(bySlugOrId(req.params.id))
+  // Every real detail-page load counts as one page view, tracked via an
+  // atomic increment on the same lookup (rather than a separate call) so
+  // the frontend doesn't need a second round-trip just to record a visit.
+  const university = await University.findOneAndUpdate(
+    bySlugOrId(req.params.id),
+    { $inc: { pageViews: 1 } },
+    { new: true }
+  )
     .select(DETAIL_FIELDS)
     .populate('inclusions', 'label icon')
     .lean();

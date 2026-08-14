@@ -52,7 +52,7 @@ export default function EventDetailPage() {
   if (loading) {
     return (
       <PageShell>
-        <p className="mx-auto max-w-6xl px-6 py-20 text-center text-gray-400">Loading...</p>
+        <p className="mx-auto max-w-[1440px] px-6 py-20 text-center text-gray-400">Loading...</p>
       </PageShell>
     )
   }
@@ -60,7 +60,7 @@ export default function EventDetailPage() {
   if (error || !event) {
     return (
       <PageShell>
-        <p className="mx-auto max-w-6xl px-6 py-20 text-center text-red-600">{error || 'Event not found.'}</p>
+        <p className="mx-auto max-w-[1440px] px-6 py-20 text-center text-red-600">{error || 'Event not found.'}</p>
       </PageShell>
     )
   }
@@ -72,7 +72,7 @@ export default function EventDetailPage() {
 
   return (
     <PageShell>
-      <div className="mx-auto max-w-6xl px-6 py-8 lg:px-10">
+      <div className="mx-auto max-w-[1440px] px-6 py-8 lg:px-10">
         <div className="text-sm text-gray-500">
           <Link to="/events" className="text-blue-600 hover:underline">
             Events

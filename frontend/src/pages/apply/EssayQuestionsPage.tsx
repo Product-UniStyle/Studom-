@@ -4,7 +4,7 @@ import PageShell from '../../components/layout/PageShell'
 import { useApplyFlow } from '../../context/ApplyFlowContext'
 
 export default function EssayQuestionsPage() {
-  const { essays, updateEssay, profileCompleted } = useApplyFlow()
+  const { essays, essaysLoading, updateEssay, profileCompleted } = useApplyFlow()
   const navigate = useNavigate()
 
   return (
@@ -26,22 +26,30 @@ export default function EssayQuestionsPage() {
         </div>
 
         <div className="mt-8 space-y-8 rounded-2xl border border-gray-200 p-8">
-          {essays.map((q) => (
-            <div key={q.id}>
-              <label className="text-sm font-semibold text-black">
-                {q.question}{' '}
-                <span className="font-normal text-blue-500">
-                  ({q.universities.join(', ')})
-                </span>
-              </label>
-              <textarea
-                rows={4}
-                value={q.answer}
-                onChange={(e) => updateEssay(q.id, e.target.value)}
-                className="mt-2 w-full rounded-lg border border-gray-200 px-4 py-3 text-sm focus:border-blue-500 focus:outline-none"
-              />
-            </div>
-          ))}
+          {essaysLoading ? (
+            <p className="text-sm text-gray-400">Loading essay questions...</p>
+          ) : essays.length === 0 ? (
+            <p className="text-sm text-gray-400">
+              None of your selected universities require additional essay questions.
+            </p>
+          ) : (
+            essays.map((q) => (
+              <div key={q.id}>
+                <label className="text-sm font-semibold text-black">
+                  {q.question}{' '}
+                  <span className="font-normal text-blue-500">
+                    ({q.universityName})
+                  </span>
+                </label>
+                <textarea
+                  rows={4}
+                  value={q.answer}
+                  onChange={(e) => updateEssay(q.id, e.target.value)}
+                  className="mt-2 w-full rounded-lg border border-gray-200 px-4 py-3 text-sm focus:border-blue-500 focus:outline-none"
+                />
+              </div>
+            ))
+          )}
         </div>
 
         <div className="mt-6 rounded-2xl border border-gray-200 p-6">

@@ -90,6 +90,7 @@ export interface PublicUniversityDetail extends PublicUniversityListItem {
     poc?: { name?: string; address?: string; email?: string; phone?: string; fax?: string }
   }
   inclusions?: { _id: string; label: string; icon?: string }[]
+  essayQuestions?: { _id?: string; question: string }[]
 }
 
 export async function getPublicUniversity(id: string): Promise<PublicUniversityDetail> {
@@ -187,6 +188,36 @@ export function getPublicBlogCategories(): Promise<{ categories: string[] }> {
 
 export function getPublicBlogPost(id: string): Promise<PublicArticleDetail> {
   return publicFetch(`/api/public/blogs/${id}`)
+}
+
+export interface ContributorApplicationInput {
+  universityId: string
+  name: string
+  email: string
+  courseOfStudy?: string
+  yearOfStudy?: string
+  expectedGraduationYear?: string
+  reason?: string
+  proof?: File
+}
+
+export async function submitContributorApplication(input: ContributorApplicationInput): Promise<void> {
+  const formData = new FormData()
+  formData.append('universityId', input.universityId)
+  formData.append('name', input.name)
+  formData.append('email', input.email)
+  if (input.courseOfStudy) formData.append('courseOfStudy', input.courseOfStudy)
+  if (input.yearOfStudy) formData.append('yearOfStudy', input.yearOfStudy)
+  if (input.expectedGraduationYear) formData.append('expectedGraduationYear', input.expectedGraduationYear)
+  if (input.reason) formData.append('reason', input.reason)
+  if (input.proof) formData.append('proof', input.proof)
+
+  const res = await fetch(`${API_URL}/api/public/contributors`, {
+    method: 'POST',
+    body: formData,
+  })
+  const data = await res.json()
+  if (!res.ok) throw new Error(data.error || 'Submission failed')
 }
 
 export type PublicEventMode = 'In-person' | 'Online'

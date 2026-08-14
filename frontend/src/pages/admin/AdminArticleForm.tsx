@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { Plus, Trash2, ArrowUp, ArrowDown, ExternalLink } from 'lucide-react'
 import TextField from '../../components/form/TextField'
 import ImageUploadField from './ImageUploadField'
-import { updateArticle, uploadArticleCoverImage } from '../../lib/adminApi'
+import { updateArticle, uploadArticleCoverImage, uploadArticleSectionImage } from '../../lib/adminApi'
 import type { ArticleDetail, ArticleKind, ArticleSection } from '../../lib/adminApi'
 
 interface AdminArticleFormProps {
@@ -83,7 +83,7 @@ export default function AdminArticleForm({ kind, article, onSaved, onCancel }: A
           label="Cover Image"
           name="coverImage"
           defaultValue={article.coverImage}
-          onUpload={(file) => uploadArticleCoverImage(file, article.title)}
+          onUpload={(file) => uploadArticleCoverImage(file, article.title, kind)}
         />
         <div className="space-y-4">
           <TextField label="Author" name="author" defaultValue={article.author} />
@@ -169,11 +169,12 @@ export default function AdminArticleForm({ kind, article, onSaved, onCancel }: A
                     placeholder="Section title (optional)"
                     className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm text-gray-800 focus:border-blue-500 focus:outline-none"
                   />
-                  <input
-                    value={s.image || ''}
-                    onChange={(e) => updateSection(i, { image: e.target.value })}
-                    placeholder="Section image URL (optional)"
-                    className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm text-gray-800 focus:border-blue-500 focus:outline-none"
+                  <ImageUploadField
+                    label="Section Image (optional)"
+                    name={`section-image-${i}`}
+                    defaultValue={s.image}
+                    onUpload={(file) => uploadArticleSectionImage(file, article.title, kind)}
+                    onChange={(url) => updateSection(i, { image: url })}
                   />
                   <textarea
                     value={s.content}

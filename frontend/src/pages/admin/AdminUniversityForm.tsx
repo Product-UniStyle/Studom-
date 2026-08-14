@@ -22,6 +22,10 @@ function splitParagraphs(v: string): string[] {
   return v.split(/\n\s*\n/).map((s) => s.trim()).filter(Boolean)
 }
 
+function splitLines(v: string): string[] {
+  return v.split('\n').map((s) => s.trim()).filter(Boolean)
+}
+
 export default function AdminUniversityForm({ university, onSaved, onCancel }: AdminUniversityFormProps) {
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -76,6 +80,7 @@ export default function AdminUniversityForm({ university, onSaved, onCancel }: A
       fieldsOfStudy: splitCommaList((fd.get('fieldsOfStudy') as string) || ''),
       subjects: splitCommaList((fd.get('subjects') as string) || ''),
       inclusionLabels: splitCommaList((fd.get('inclusionLabels') as string) || ''),
+      essayQuestions: splitLines((fd.get('essayQuestions') as string) || '').map((question) => ({ question })),
       detail: {
         website: str('website'),
         about: splitParagraphs((fd.get('about') as string) || ''),
@@ -195,6 +200,20 @@ export default function AdminUniversityForm({ university, onSaved, onCancel }: A
       </div>
 
       <GalleryUploadField name="gallery" defaultValue={university.detail?.gallery} universityName={university.name} />
+
+      <div>
+        <label className="mb-1.5 block text-sm font-medium text-gray-900">Additional Essay Questions (one per line)</label>
+        <textarea
+          name="essayQuestions"
+          rows={4}
+          defaultValue={university.essayQuestions?.map((q) => q.question).join('\n')}
+          placeholder="e.g. Who are you?&#10;What are your interests?"
+          className="w-full rounded-lg border border-gray-200 px-4 py-3 text-sm text-gray-800 focus:border-blue-500 focus:outline-none"
+        />
+        <p className="mt-1 text-xs text-gray-400">
+          Shown to students applying to this university in the apply flow&apos;s Essay Questions step.
+        </p>
+      </div>
 
       <hr className="border-gray-100" />
 

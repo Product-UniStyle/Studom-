@@ -167,11 +167,12 @@ export async function listStudentApplications(): Promise<{ items: StudentApplica
 
 export async function createStudentApplications(
   universityIds: string[],
-  course?: string
+  course?: string,
+  essays?: { universityId: string; question: string; answer: string }[]
 ): Promise<{ items: StudentApplicationItem[]; createdCount: number }> {
   return studentFetch('/api/student/applications', {
     method: 'POST',
-    body: JSON.stringify({ universityIds, course }),
+    body: JSON.stringify({ universityIds, course, essays }),
   })
 }
 
@@ -200,6 +201,27 @@ export interface StudentDocumentItem {
 
 export async function listStudentDocuments(): Promise<{ items: StudentDocumentItem[]; total: number }> {
   return studentFetch('/api/student/documents')
+}
+
+export interface SubmittedReview {
+  _id: string
+  reviewerName: string
+  reviewerAvatar?: string
+  text: string
+  rating: number
+  date: string
+  platform: string
+}
+
+export async function submitReview(
+  universityId: string,
+  rating: number,
+  text: string
+): Promise<{ review: SubmittedReview }> {
+  return studentFetch('/api/student/reviews', {
+    method: 'POST',
+    body: JSON.stringify({ universityId, rating, text }),
+  })
 }
 
 export async function uploadStudentDocument(

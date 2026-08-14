@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
-import { Search, Pencil, Trash2, UploadCloud } from 'lucide-react'
+import { Search, Pencil, Trash2, UploadCloud, Image as ImageIcon } from 'lucide-react'
 import {
   deleteArticle,
   getArticle,
@@ -132,6 +132,7 @@ export default function AdminArticlesTab() {
           <table className="w-full text-left text-sm">
             <thead>
               <tr className="border-b border-gray-100 text-gray-500">
+                <th className="pb-3 pr-4 font-medium">Cover</th>
                 <th className="pb-3 pr-4 font-medium">Title</th>
                 <th className="pb-3 pr-4 font-medium">Author</th>
                 <th className="pb-3 pr-4 font-medium">Destination</th>
@@ -142,19 +143,28 @@ export default function AdminArticlesTab() {
             <tbody>
               {loading ? (
                 <tr>
-                  <td colSpan={5} className="py-6 text-center text-gray-400">
+                  <td colSpan={6} className="py-6 text-center text-gray-400">
                     Loading...
                   </td>
                 </tr>
               ) : items.length === 0 ? (
                 <tr>
-                  <td colSpan={5} className="py-6 text-center text-gray-400">
+                  <td colSpan={6} className="py-6 text-center text-gray-400">
                     No {kindLabel.toLowerCase()} found.
                   </td>
                 </tr>
               ) : (
                 items.map((a) => (
                   <tr key={a._id} className="border-b border-gray-50 text-gray-800">
+                    <td className="py-3 pr-4">
+                      {a.coverImage ? (
+                        <img src={a.coverImage} alt="" className="h-12 w-16 rounded-md object-cover" />
+                      ) : (
+                        <div className="flex h-12 w-16 items-center justify-center rounded-md bg-gray-100 text-gray-300">
+                          <ImageIcon className="h-4 w-4" />
+                        </div>
+                      )}
+                    </td>
                     <td className="py-3 pr-4 font-medium">{a.title}</td>
                     <td className="py-3 pr-4">{a.author || '-'}</td>
                     <td className="py-3 pr-4">{a.destination || '-'}</td>
@@ -247,9 +257,9 @@ export default function AdminArticlesTab() {
           title={`Import ${kindLabel} Sheet`}
           description={
             <>
-              Upload the data team's <code>News&Blogs.xlsx</code> file. The <code>{kind === 'news' ? 'News' : 'Blogs'}</code>{' '}
-              tab is imported, matched by each row's article Link so re-uploads update existing articles instead of
-              duplicating them.
+              Upload a workbook containing a <code>{kind === 'news' ? 'News' : 'Blogs'}</code> tab.
+              Rows are matched by each article's Link so re-uploads update existing articles instead
+              of duplicating them.
             </>
           }
           importFn={kind === 'news' ? importNewsSheet : importBlogSheet}

@@ -95,7 +95,7 @@ export default function Header() {
           ) : !hasInstitutionToken ? (
             <Link
               to="/student/login"
-              className="flex items-center gap-1.5 rounded-full border border-gray-300 px-4 py-2 text-sm font-medium text-black hover:bg-gray-50"
+              className="flex items-center gap-1.5 rounded-full border border-gray-300 px-4 py-2 font-script text-sm font-medium text-black hover:bg-gray-50"
             >
               <User className="h-4 w-4" />
               <span className="hidden sm:inline">Student Login</span>
@@ -119,7 +119,7 @@ export default function Header() {
           ) : !hasStudentToken ? (
             <Link
               to="/institution/login"
-              className="flex items-center gap-1.5 rounded-full bg-black px-4 py-2 text-sm font-medium text-white hover:bg-gray-800"
+              className="flex items-center gap-1.5 rounded-full bg-black px-4 py-2 font-script text-sm font-medium text-white hover:bg-gray-800"
             >
               <Landmark className="h-4 w-4" />
               <span className="hidden sm:inline">Institution Login</span>

@@ -93,7 +93,7 @@ export default function InstitutionDashboardPage() {
         <StatCard icon={FileText} value={String(stats.totalApplications)} label="Applications Received" linkLabel="View all applications" to="/institution/applications" color="blue" />
         <StatCard icon={Clock} value={String(stats.pendingApplications)} label="Pending Review" linkLabel="Review now" to="/institution/applications" color="orange" />
         <StatCard icon={Users} value={String(stats.pendingContributors)} label="Contributor Requests" linkLabel="View requests" to="/institution/contributors" color="green" />
-        <StatCard icon={PenSquare} value="—" label="University Page Views" linkLabel="View analytics" to="/institution/university-page" color="purple" />
+        <StatCard icon={PenSquare} value={String(stats.pageViews)} label="University Page Views" linkLabel="View analytics" to="/institution/university-page" color="purple" />
       </div>
 
       <div className="mt-8 grid grid-cols-1 gap-6 lg:grid-cols-2">

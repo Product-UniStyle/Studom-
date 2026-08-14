@@ -1,13 +1,16 @@
 import { Router } from 'express';
+import { Types } from 'mongoose';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import multer from 'multer';
 import { randomInt } from 'crypto';
 import Student, { CURRENT_STAGE_VALUES, CurrentStage } from '../models/Student';
 import Application from '../models/Application';
+import EssayQuestion from '../models/EssayQuestion';
 import Task from '../models/Task';
 import StudentDocument from '../models/Document';
 import University from '../models/University';
+import Review from '../models/Review';
 import { requireStudent, StudentAuthedRequest } from '../middleware/studentAuth';
 import { uploadImageToS3 } from '../lib/s3';
 
@@ -204,7 +207,11 @@ router.patch('/me', requireStudent, async (req: StudentAuthedRequest, res) => {
 });
 
 router.post('/applications', requireStudent, async (req: StudentAuthedRequest, res) => {
-  const { universityIds, course } = req.body as { universityIds?: string[]; course?: string };
+  const { universityIds, course, essays } = req.body as {
+    universityIds?: string[];
+    course?: string;
+    essays?: { universityId: string; question: string; answer: string }[];
+  };
   if (!Array.isArray(universityIds) || universityIds.length === 0) {
     return res.status(400).json({ error: 'At least one university must be selected' });
   }
@@ -229,15 +236,17 @@ router.post('/applications', requireStudent, async (req: StudentAuthedRequest, r
     resolvedCourse = student?.profile?.education?.intendedCourse;
   }
 
+  const createdApplicationIds = new Map<string, Types.ObjectId>();
   for (const universityId of newIds) {
     for (let attempt = 0; attempt < 5; attempt++) {
       try {
-        await Application.create({
+        const application = await Application.create({
           studentId: req.student!.id,
           universityId,
           applicationRef: generateApplicationRef(),
           course: resolvedCourse,
         });
+        createdApplicationIds.set(universityId, application._id);
         break;
       } catch (err) {
         const isDuplicateRef = (err as { code?: number })?.code === 11000;
@@ -245,6 +254,22 @@ router.post('/applications', requireStudent, async (req: StudentAuthedRequest, r
         throw err;
       }
     }
+  }
+
+  if (Array.isArray(essays) && essays.length > 0) {
+    const essayDocs = essays
+      .filter(
+        (e): e is { universityId: string; question: string; answer: string } =>
+          e && typeof e.universityId === 'string' && typeof e.question === 'string' && typeof e.answer === 'string' && e.answer.trim().length > 0
+      )
+      .filter((e) => createdApplicationIds.has(e.universityId))
+      .map((e) => ({
+        applicationId: createdApplicationIds.get(e.universityId),
+        question: e.question,
+        answer: e.answer,
+        universities: [e.universityId],
+      }));
+    if (essayDocs.length > 0) await EssayQuestion.insertMany(essayDocs);
   }
 
   const applications = await Application.find({ studentId: req.student!.id, universityId: { $in: targetIds } })
@@ -320,6 +345,53 @@ router.post('/documents', requireStudent, upload.single('file'), async (req: Stu
   } catch (err) {
     res.status(500).json({ error: err instanceof Error ? err.message : 'Upload failed' });
   }
+});
+
+router.post('/reviews', requireStudent, async (req: StudentAuthedRequest, res) => {
+  const { universityId, rating, text } = req.body as {
+    universityId?: string;
+    rating?: number;
+    text?: string;
+  };
+
+  if (!universityId || !text?.trim()) {
+    return res.status(400).json({ error: 'University and review text are required' });
+  }
+  const numericRating = Number(rating);
+  if (!Number.isFinite(numericRating) || numericRating < 1 || numericRating > 5) {
+    return res.status(400).json({ error: 'Rating must be between 1 and 5' });
+  }
+
+  const [student, university] = await Promise.all([
+    Student.findById(req.student!.id).select('fullName avatar'),
+    University.findById(universityId).select('aggregateRating aggregateReviewCount'),
+  ]);
+  if (!student) return res.status(404).json({ error: 'Student not found' });
+  if (!university) return res.status(400).json({ error: 'Selected university not found' });
+
+  const review = await Review.create({
+    universityId,
+    reviewerName: student.fullName,
+    reviewerAvatar: student.avatar,
+    text: text.trim(),
+    rating: numericRating,
+    date: new Date(),
+    platform: 'Studom',
+  });
+
+  // Sheet-imported universities already carry a precomputed aggregateRating
+  // / aggregateReviewCount, so a new review has to fold into that weighted
+  // average rather than just recounting from the Review collection (the
+  // detail page prefers these precomputed fields over reviews.length).
+  const previousCount = university.aggregateReviewCount || 0;
+  const previousAvg = university.aggregateRating || 0;
+  const newCount = previousCount + 1;
+  const newAvg = Math.round(((previousAvg * previousCount + numericRating) / newCount) * 10) / 10;
+  university.aggregateReviewCount = newCount;
+  university.aggregateRating = newAvg;
+  await university.save();
+
+  res.status(201).json({ review });
 });
 
 export default router;

@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
-import { Search, Pencil, Trash2, Plus } from 'lucide-react'
+import { Search, Pencil, Trash2, Plus, Image as ImageIcon } from 'lucide-react'
 import { deleteEvent, getEvent, listEvents } from '../../lib/adminApi'
 import type { EventDetail, EventListItem } from '../../lib/adminApi'
 import Modal from '../../components/ui/Modal'
@@ -102,6 +102,7 @@ export default function AdminEventsTab() {
           <table className="w-full text-left text-sm">
             <thead>
               <tr className="border-b border-gray-100 text-gray-500">
+                <th className="pb-3 pr-4 font-medium">Cover</th>
                 <th className="pb-3 pr-4 font-medium">Title</th>
                 <th className="pb-3 pr-4 font-medium">Host University</th>
                 <th className="pb-3 pr-4 font-medium">Date</th>
@@ -113,19 +114,28 @@ export default function AdminEventsTab() {
             <tbody>
               {loading ? (
                 <tr>
-                  <td colSpan={6} className="py-6 text-center text-gray-400">
+                  <td colSpan={7} className="py-6 text-center text-gray-400">
                     Loading...
                   </td>
                 </tr>
               ) : items.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="py-6 text-center text-gray-400">
+                  <td colSpan={7} className="py-6 text-center text-gray-400">
                     No events found.
                   </td>
                 </tr>
               ) : (
                 items.map((ev) => (
                   <tr key={ev._id} className="border-b border-gray-50 text-gray-800">
+                    <td className="py-3 pr-4">
+                      {ev.coverImage ? (
+                        <img src={ev.coverImage} alt="" className="h-12 w-16 rounded-md object-cover" />
+                      ) : (
+                        <div className="flex h-12 w-16 items-center justify-center rounded-md bg-gray-100 text-gray-300">
+                          <ImageIcon className="h-4 w-4" />
+                        </div>
+                      )}
+                    </td>
                     <td className="py-3 pr-4 font-medium">{ev.title}</td>
                     <td className="py-3 pr-4">{ev.universityId?.name || '-'}</td>
                     <td className="py-3 pr-4">{new Date(ev.date).toLocaleDateString()}</td>

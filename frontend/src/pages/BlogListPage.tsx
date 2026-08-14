@@ -58,7 +58,7 @@ export default function BlogListPage() {
 
   return (
     <PageShell>
-      <div className="mx-auto max-w-[1200px] px-6 py-10 lg:px-10">
+      <div className="mx-auto max-w-[1440px] px-6 py-10 lg:px-10">
         <h1 className="text-3xl font-bold text-blue-600">Blog</h1>
         <p className="mt-2 max-w-2xl text-sm text-gray-500">
           Insights, guides, and tips to help you navigate your education journey and student life in the Middle East.

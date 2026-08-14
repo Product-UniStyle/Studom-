@@ -12,7 +12,7 @@ export default {
       fontFamily: {
         script: ['"Playwrite US Modern"', 'cursive'],
         logo: ['"Pacifico"', 'cursive'],
-        sans: ['"Poppins"', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+        sans: ['"Quicksand"', 'ui-sans-serif', 'system-ui', 'sans-serif'],
         forum: ['"Forum"', 'serif'],
         footerNav: ['"Poppins"', 'sans-serif'],
         georgia: ['Georgia', '"Times New Roman"', 'serif'],

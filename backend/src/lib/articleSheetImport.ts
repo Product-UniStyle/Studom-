@@ -39,18 +39,19 @@ export function readArticleSheetRows(buffer: Buffer, sheetName: string): Article
   return XLSX.utils.sheet_to_json<ArticleSheetRow>(sheet, { defval: null, range: headerRow });
 }
 
-function extractSections(row: ArticleSheetRow): IArticleSection[] {
-  const sections: IArticleSection[] = [];
+// Images are now upload-only via the admin panel's S3 widgets (same rule as
+// University logo/gallery) — the sheet's image columns are never read, so a
+// re-import can never clobber an admin-uploaded cover/section image.
+function extractSections(row: ArticleSheetRow): Omit<IArticleSection, 'image'>[] {
+  const sections: Omit<IArticleSection, 'image'>[] = [];
   for (let n = 1; n <= 20; n++) {
     const content = row[`Section ${n} Content`];
     if (typeof content !== 'string' || !content.trim()) continue;
     const title = row[`Section ${n} Title`];
-    const image = row[`Section ${n} Image`];
     sections.push({
       order: n,
       content: content.trim(),
       title: typeof title === 'string' && title.trim() ? title.trim() : undefined,
-      image: typeof image === 'string' && image.trim() ? image.trim() : undefined,
     });
   }
   return sections;
@@ -100,7 +101,6 @@ export async function importArticleSheet(
       payload: {
         title,
         content: typeof row['Main Content'] === 'string' ? row['Main Content'].trim() : '',
-        coverImage: row['Main Image URL'] || undefined,
         sourceLink,
         author: row.Author || undefined,
         source: row.Source || undefined,
@@ -116,9 +116,15 @@ export async function importArticleSheet(
 
   const existingDocs = await model
     .find({ sourceLink: { $in: validRows.map((r) => r.sourceLink) } })
-    .select('sourceLink')
+    .select('sourceLink sections')
     .lean();
   const existingSet = new Set(existingDocs.map((d) => (d as unknown as { sourceLink: string }).sourceLink));
+  const existingSectionsByLink = new Map(
+    existingDocs.map((d) => {
+      const doc = d as unknown as { sourceLink: string; sections?: IArticleSection[] };
+      return [doc.sourceLink, doc.sections || []];
+    })
+  );
 
   if (opts.write) {
     const takenSlugs = new Set(
@@ -126,7 +132,17 @@ export async function importArticleSheet(
     );
 
     const ops = validRows.map((r) => {
-      const update: Record<string, unknown> = { $set: r.payload };
+      // The sheet no longer supplies section images (upload-only via admin
+      // now), but this array is fully re-set on every import, so carry
+      // forward any image an admin already attached to that section order —
+      // otherwise a routine re-import would silently wipe it.
+      const existingSections = existingSectionsByLink.get(r.sourceLink) || [];
+      const sections = (r.payload.sections as Omit<IArticleSection, 'image'>[]).map((s) => ({
+        ...s,
+        image: existingSections.find((es) => es.order === s.order)?.image,
+      }));
+      const payload = { ...r.payload, sections };
+      const update: Record<string, unknown> = { $set: payload };
       if (!existingSet.has(r.sourceLink)) {
         update.$setOnInsert = { slug: uniqueSlug(r.title, takenSlugs) };
       }

@@ -11,7 +11,7 @@ const upload = multer({
   limits: { fileSize: 4 * 1024 * 1024 },
 });
 
-const IMAGE_TYPES = ['logo', 'image', 'gallery', 'cover'];
+const IMAGE_TYPES = ['logo', 'image', 'gallery', 'cover', 'section'];
 
 router.post('/image', requireEditorOrAdmin, upload.single('file'), async (req, res) => {
   if (!req.file) {
@@ -23,11 +23,13 @@ router.post('/image', requireEditorOrAdmin, upload.single('file'), async (req, r
 
   const universityName = typeof req.body.universityName === 'string' ? req.body.universityName : '';
   const articleTitle = typeof req.body.articleTitle === 'string' ? req.body.articleTitle : '';
+  const ARTICLE_KINDS = ['news', 'blogs', 'events'];
+  const articleKind = ARTICLE_KINDS.includes(req.body.articleKind) ? req.body.articleKind : 'news';
   const type = IMAGE_TYPES.includes(req.body.type) ? req.body.type : 'misc';
 
   let folder: string;
   if (articleTitle) {
-    folder = `articles/${sanitizeFolderSegment(articleTitle)}/${type}`;
+    folder = `${articleKind}/${sanitizeFolderSegment(articleTitle)}/${type}`;
   } else if (universityName) {
     folder = `universities/${sanitizeFolderSegment(universityName)}/${type}`;
   } else {

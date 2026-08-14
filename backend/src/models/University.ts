@@ -48,6 +48,8 @@ export interface IUniversity extends Document {
   locality?: string;
   mode?: string;
   inclusions: Types.ObjectId[];
+  essayQuestions?: { question: string }[];
+  pageViews: number;
 }
 
 const universitySchema = new Schema<IUniversity>(
@@ -94,6 +96,11 @@ const universitySchema = new Schema<IUniversity>(
     locality: String,
     mode: String,
     inclusions: [{ type: Schema.Types.ObjectId, ref: 'Inclusion' }],
+    essayQuestions: {
+      type: [{ question: { type: String, required: true } }],
+      default: [],
+    },
+    pageViews: { type: Number, default: 0 },
   },
   { timestamps: true }
 );

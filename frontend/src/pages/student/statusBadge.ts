@@ -11,6 +11,7 @@ export function statusBadgeClass(status: string) {
     case 'Rejected':
       return 'bg-red-100 text-red-700'
     case 'Accepted':
+    case 'Approved':
       return 'bg-green-100 text-green-700'
     case 'Pending Review':
       return 'bg-yellow-100 text-yellow-700'

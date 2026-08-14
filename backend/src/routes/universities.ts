@@ -75,6 +75,12 @@ router.patch('/:id', requireEditorOrAdmin, async (req, res) => {
   if (Array.isArray(body.subjects)) {
     update.subjects = body.subjects.filter((v): v is string => typeof v === 'string');
   }
+  if (Array.isArray(body.essayQuestions)) {
+    update.essayQuestions = body.essayQuestions
+      .filter((v): v is Record<string, unknown> => typeof v === 'object' && v !== null && typeof (v as Record<string, unknown>).question === 'string')
+      .map((v) => ({ question: (v.question as string).trim() }))
+      .filter((v) => v.question.length > 0);
+  }
   if (body.detail && typeof body.detail === 'object') {
     const detail = body.detail as Record<string, unknown>;
     const detailUpdate: Record<string, unknown> = {};

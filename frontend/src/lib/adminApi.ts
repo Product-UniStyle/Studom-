@@ -166,6 +166,7 @@ export interface UniversityDetail extends UniversityListItem {
     poc?: { name?: string; address?: string; email?: string; phone?: string; fax?: string }
   }
   inclusions?: { _id: string; label: string }[]
+  essayQuestions?: { question: string }[]
 }
 
 export async function getUniversity(id: string): Promise<UniversityDetail> {
@@ -215,12 +216,34 @@ export async function uploadImage(file: File, universityName: string, type: Imag
   return data.url as string
 }
 
-export async function uploadArticleCoverImage(file: File, articleTitle: string): Promise<string> {
+export type UploadContentKind = 'news' | 'blogs' | 'events'
+
+export async function uploadArticleCoverImage(file: File, articleTitle: string, kind: UploadContentKind): Promise<string> {
   const token = getAdminToken()
   const formData = new FormData()
   formData.append('file', file)
   formData.append('articleTitle', articleTitle)
+  formData.append('articleKind', kind)
   formData.append('type', 'cover')
+
+  const res = await fetch(`${API_URL}/api/uploads/image`, {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${token}` },
+    body: formData,
+  })
+  if (isUnauthorized(res)) throw new Error('Session expired. Please log in again.')
+  const data = await res.json()
+  if (!res.ok) throw new Error(data.error || 'Upload failed')
+  return data.url as string
+}
+
+export async function uploadArticleSectionImage(file: File, articleTitle: string, kind: ArticleKind): Promise<string> {
+  const token = getAdminToken()
+  const formData = new FormData()
+  formData.append('file', file)
+  formData.append('articleTitle', articleTitle)
+  formData.append('articleKind', kind)
+  formData.append('type', 'section')
 
   const res = await fetch(`${API_URL}/api/uploads/image`, {
     method: 'POST',

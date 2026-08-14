@@ -44,7 +44,10 @@ export default function ReviewApplicationPage() {
     setSubmitting(true)
     setError(null)
     try {
-      await createStudentApplications(selectedUniversities.map((u) => u.id))
+      const essayAnswers = essays
+        .filter((q) => q.answer.trim().length > 0)
+        .map((q) => ({ universityId: q.universityId, question: q.question, answer: q.answer }))
+      await createStudentApplications(selectedUniversities.map((u) => u.id), undefined, essayAnswers)
       navigate('/apply/submitted')
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to submit applications')
@@ -161,7 +164,7 @@ export default function ReviewApplicationPage() {
                   <div className="text-sm font-semibold text-black">
                     {q.question}{' '}
                     <span className="font-normal text-blue-500">
-                      ({q.universities.join(', ')})
+                      ({q.universityName})
                     </span>
                   </div>
                   <p className="mt-1 text-sm text-gray-600">

@@ -1,11 +1,13 @@
 import { useEffect, useState } from 'react'
-import { useParams, Link } from 'react-router-dom'
-import { Award, Landmark, Info, Star, MapPin, Mail, Phone } from 'lucide-react'
+import { useParams, Link, useNavigate } from 'react-router-dom'
+import { Award, Landmark, Info, Star, MapPin, Mail, Phone, X } from 'lucide-react'
 import PageShell from '../components/layout/PageShell'
 import SelectField from '../components/form/SelectField'
 import TextField from '../components/form/TextField'
 import SafeImage from '../components/ui/SafeImage'
 import Avatar from '../components/ui/Avatar'
+import ContributorModal from '../components/university/ContributorModal'
+import AddReviewModal from '../components/university/AddReviewModal'
 import { getInclusionIcon } from '../lib/inclusionIcons'
 import {
   getPublicUniversity,
@@ -22,12 +24,26 @@ import type { StudentProfile } from '../lib/studentApi'
 
 export default function UniversityDetailPage() {
   const { id } = useParams<{ id: string }>()
+  const navigate = useNavigate()
   const [uni, setUni] = useState<PublicUniversityDetail | null>(null)
   const [reviews, setReviews] = useState<PublicUniversityReview[]>([])
   const [universityOptions, setUniversityOptions] = useState<PublicUniversityListItem[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [student, setStudent] = useState<StudentProfile | null>(null)
+  const [showContributorInfo, setShowContributorInfo] = useState(false)
+  const [showContributorModal, setShowContributorModal] = useState(false)
+  const [showReviewModal, setShowReviewModal] = useState(false)
+
+  function refreshReviews() {
+    if (!id) return
+    getPublicUniversity(id)
+      .then((res) => setUni(res))
+      .catch(() => {})
+    listPublicUniversityReviews(id)
+      .then((res) => setReviews(res.items))
+      .catch(() => {})
+  }
 
   useEffect(() => {
     if (!id) return
@@ -78,7 +94,7 @@ export default function UniversityDetailPage() {
   if (loading) {
     return (
       <PageShell>
-        <div className="py-32 text-center font-poppins text-gray-400">Loading...</div>
+        <div className="py-32 text-center text-gray-400">Loading...</div>
       </PageShell>
     )
   }
@@ -86,7 +102,7 @@ export default function UniversityDetailPage() {
   if (error || !uni) {
     return (
       <PageShell>
-        <div className="py-32 text-center font-poppins text-gray-400">
+        <div className="py-32 text-center text-gray-400">
           {error || 'University not found'}
         </div>
       </PageShell>
@@ -103,7 +119,7 @@ export default function UniversityDetailPage() {
 
   return (
     <PageShell>
-      <div className="mx-auto max-w-[1440px] px-6 py-8 font-poppins lg:px-10">
+      <div className="mx-auto max-w-[1440px] px-6 py-8 lg:px-10">
         {/* Gallery */}
         {gallery.length > 0 && (
           <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
@@ -170,9 +186,41 @@ export default function UniversityDetailPage() {
               <h2 className="text-sm font-bold tracking-wide text-blue-900">
                 ABOUT
               </h2>
-              <span className="flex items-center gap-1 text-sm text-blue-600">
-                <Info className="h-3.5 w-3.5" /> Become a Contributor
-              </span>
+              <div className="relative flex items-center gap-1 text-sm text-blue-600">
+                <button
+                  type="button"
+                  onClick={() => setShowContributorInfo((v) => !v)}
+                  className="text-blue-600 hover:text-blue-800"
+                >
+                  <Info className="h-3.5 w-3.5" />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setShowContributorModal(true)}
+                  className="hover:underline"
+                >
+                  Become a Contributor
+                </button>
+                {showContributorInfo && (
+                  <div className="absolute right-0 top-full z-10 mt-2 w-72 rounded-xl bg-gray-800 p-4 text-white shadow-lg">
+                    <div className="flex items-start justify-between gap-2">
+                      <p className="text-sm font-semibold">What does a Contributor do?</p>
+                      <button
+                        type="button"
+                        onClick={() => setShowContributorInfo(false)}
+                        className="shrink-0 text-gray-400 hover:text-white"
+                      >
+                        <X className="h-4 w-4" />
+                      </button>
+                    </div>
+                    <p className="mt-2 text-xs leading-relaxed text-gray-300">
+                      A Contributor needs to keep the university's Studom page up to date by checking and updating
+                      university information, and uploading the latest news, blogs and events so students always see
+                      accurate and current information.
+                    </p>
+                  </div>
+                )}
+              </div>
             </div>
             <div className="mt-4 space-y-4 text-sm leading-relaxed text-gray-600">
               {about.length > 0 ? (
@@ -256,7 +304,16 @@ export default function UniversityDetailPage() {
                 ({reviewCount} reviews)
               </span>
             </h2>
-            <button className="rounded-lg border border-gray-200 px-4 py-2 text-sm font-medium text-black hover:bg-gray-50">
+            <button
+              onClick={() => {
+                if (student) {
+                  setShowReviewModal(true)
+                } else {
+                  navigate('/student/login')
+                }
+              }}
+              className="rounded-lg border border-gray-200 px-4 py-2 text-sm font-medium text-black hover:bg-gray-50"
+            >
               + Add Review
             </button>
           </div>
@@ -381,6 +438,26 @@ export default function UniversityDetailPage() {
           </div>
         </div>
       </div>
+
+      {showContributorModal && (
+        <ContributorModal
+          universityId={uni._id}
+          universityName={uni.name}
+          onClose={() => setShowContributorModal(false)}
+        />
+      )}
+
+      {showReviewModal && (
+        <AddReviewModal
+          universityId={uni._id}
+          universityName={uni.name}
+          onClose={() => setShowReviewModal(false)}
+          onSaved={() => {
+            setShowReviewModal(false)
+            refreshReviews()
+          }}
+        />
+      )}
     </PageShell>
   )
 }

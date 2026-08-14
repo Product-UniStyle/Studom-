@@ -6,6 +6,7 @@ export interface IInstitutionAccount extends Document {
   email: string;
   universityName: string;
   designation?: string;
+  phone?: string;
   password: string;
 }
 
@@ -16,6 +17,7 @@ const institutionAccountSchema = new Schema<IInstitutionAccount>(
     email: { type: String, required: true, unique: true },
     universityName: { type: String, required: true },
     designation: String,
+    phone: String,
     password: { type: String, required: true },
   },
   { timestamps: true }

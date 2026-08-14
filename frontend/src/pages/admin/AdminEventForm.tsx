@@ -90,7 +90,7 @@ export default function AdminEventForm({ event, onSaved, onCancel }: AdminEventF
           label="Cover Image"
           name="coverImage"
           defaultValue={event?.coverImage}
-          onUpload={(file) => uploadArticleCoverImage(file, event?.title || 'untitled-event')}
+          onUpload={(file) => uploadArticleCoverImage(file, event?.title || 'untitled-event', 'events')}
         />
         <div className="space-y-4">
           <SelectField label="Mode" name="mode" options={EVENT_MODES} defaultValue={event?.mode || 'In-person'} required />
