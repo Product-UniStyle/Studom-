@@ -28,17 +28,30 @@ const TYPE_LABELS: Record<string, string> = {
 const PAGE_SIZE = 8
 
 export default function UniversitySearchPage() {
-  const [searchParams] = useSearchParams()
+  const [searchParams, setSearchParams] = useSearchParams()
   const typeParam = searchParams.get('type') || ''
   const type = TYPE_PARAM_MAP[typeParam.toLowerCase()] || ''
 
-  const [country, setCountry] = useState('')
-  const [location, setLocation] = useState('')
-  const [field, setField] = useState('')
-  const [additional, setAdditional] = useState('QS Ranking')
-  const [query, setQuery] = useState('')
-  const [page, setPage] = useState(1)
-  const [applied, setApplied] = useState(false)
+  const country = searchParams.get('country') || ''
+  const location = searchParams.get('location') || ''
+  const field = searchParams.get('field') || ''
+  const additional = searchParams.get('additional') || 'QS Ranking'
+  const query = searchParams.get('q') || ''
+  const page = Number(searchParams.get('page') || '1')
+  const applied = searchParams.get('applied') === '1'
+
+  const updateParams = (
+    patch: Record<string, string | undefined>,
+    opts?: { resetPage?: boolean }
+  ) => {
+    const next = new URLSearchParams(searchParams)
+    Object.entries(patch).forEach(([key, value]) => {
+      if (!value) next.delete(key)
+      else next.set(key, value)
+    })
+    if (opts?.resetPage) next.set('page', '1')
+    setSearchParams(next, { replace: true })
+  }
 
   const [items, setItems] = useState<PublicUniversityListItem[]>([])
   const [total, setTotal] = useState(0)
@@ -48,10 +61,6 @@ export default function UniversitySearchPage() {
   const [countries, setCountries] = useState<string[]>([])
   const [cities, setCities] = useState<string[]>([])
   const [fields, setFields] = useState<string[]>([])
-
-  useEffect(() => {
-    setPage(1)
-  }, [type])
 
   useEffect(() => {
     getPublicUniversityFacets({ type: type || undefined })
@@ -108,8 +117,7 @@ export default function UniversitySearchPage() {
   }, [type, field, location])
 
   const handleSearch = () => {
-    setApplied(true)
-    setPage(1)
+    updateParams({ applied: '1' }, { resetPage: true })
   }
 
   return (
@@ -123,9 +131,7 @@ export default function UniversitySearchPage() {
             placeholder="Select country"
             options={countries}
             onChange={(v) => {
-              setCountry(v)
-              setLocation('')
-              setPage(1)
+              updateParams({ country: v, location: undefined }, { resetPage: true })
             }}
           />
           <FilterDropdown
@@ -134,8 +140,7 @@ export default function UniversitySearchPage() {
             placeholder="Select location"
             options={cities}
             onChange={(v) => {
-              setLocation(v)
-              setPage(1)
+              updateParams({ location: v }, { resetPage: true })
             }}
           />
           <FilterDropdown
@@ -144,8 +149,7 @@ export default function UniversitySearchPage() {
             placeholder="Select field of study"
             options={fields}
             onChange={(v) => {
-              setField(v)
-              setPage(1)
+              updateParams({ field: v }, { resetPage: true })
             }}
           />
           <FilterDropdown
@@ -153,7 +157,7 @@ export default function UniversitySearchPage() {
             value={additional}
             placeholder="QS Ranking, Cost of Living, Student Population"
             options={ADDITIONAL_FILTERS}
-            onChange={setAdditional}
+            onChange={(v) => updateParams({ additional: v })}
           />
           <div className="flex justify-center pl-0 md:pl-6">
             <button
@@ -189,8 +193,7 @@ export default function UniversitySearchPage() {
                 <input
                   value={query}
                   onChange={(e) => {
-                    setQuery(e.target.value)
-                    setPage(1)
+                    updateParams({ q: e.target.value }, { resetPage: true })
                   }}
                   placeholder="Search universities..."
                   className="w-full rounded-full border border-gray-200 py-2.5 pl-9 pr-4 text-sm focus:border-blue-500 focus:outline-none"
@@ -239,7 +242,11 @@ export default function UniversitySearchPage() {
               </div>
             )}
 
-            <Pagination page={page} totalPages={totalPages} onChange={setPage} />
+            <Pagination
+              page={page}
+              totalPages={totalPages}
+              onChange={(p) => updateParams({ page: String(p) })}
+            />
           </div>
         )}
       </div>
