@@ -34,7 +34,7 @@ export default function UniversitySearchPage() {
 
   const country = searchParams.get('country') || ''
   const location = searchParams.get('location') || ''
-  const field = searchParams.get('field') || ''
+  const field = searchParams.get('field') || 'All'
   const additional = searchParams.get('additional') || 'QS Ranking'
   const query = searchParams.get('q') || ''
   const page = Number(searchParams.get('page') || '1')
@@ -87,7 +87,7 @@ export default function UniversitySearchPage() {
       type: type || undefined,
       country: country || undefined,
       city: location || undefined,
-      fieldOfStudy: field || undefined,
+      fieldOfStudy: field !== 'All' ? field : undefined,
       page,
       limit: PAGE_SIZE,
     })
@@ -112,7 +112,7 @@ export default function UniversitySearchPage() {
 
   const heading = useMemo(() => {
     if (type) return `Top ${TYPE_LABELS[type] || type} in ${location || 'all locations'}`
-    if (field) return `Top universities for ${field} in ${location || 'all locations'}`
+    if (field !== 'All') return `Top universities for ${field} in ${location || 'all locations'}`
     return `Top universities in ${location || 'all locations'}`
   }, [type, field, location])
 
@@ -147,9 +147,9 @@ export default function UniversitySearchPage() {
             label="Field of Study"
             value={field}
             placeholder="Select field of study"
-            options={fields}
+            options={['All', ...fields]}
             onChange={(v) => {
-              updateParams({ field: v }, { resetPage: true })
+              updateParams({ field: v === 'All' ? undefined : v }, { resetPage: true })
             }}
           />
           <FilterDropdown

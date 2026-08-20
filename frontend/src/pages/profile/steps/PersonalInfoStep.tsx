@@ -1,4 +1,6 @@
 import TextField from '../../../components/form/TextField'
+import SelectField from '../../../components/form/SelectField'
+import { COUNTRIES } from '../../../data/countries'
 import type { ProfileData } from '../profileTypes'
 
 interface Props {
@@ -31,10 +33,12 @@ export default function PersonalInfoStep({ data, update }: Props) {
           value={p.mobile}
           onChange={(e) => update({ mobile: e.target.value })}
         />
-        <TextField
+        <SelectField
           label="Country of Residence"
           required
-          value={p.countryOfResidence}
+          placeholder="Select country"
+          options={COUNTRIES}
+          defaultValue={p.countryOfResidence}
           onChange={(e) => update({ countryOfResidence: e.target.value })}
         />
         <TextField

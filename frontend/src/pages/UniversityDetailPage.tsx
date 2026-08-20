@@ -1,6 +1,17 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useParams, Link, useNavigate } from 'react-router-dom'
-import { Award, Landmark, Info, Star, MapPin, Mail, Phone, X } from 'lucide-react'
+import {
+  Award,
+  Landmark,
+  Info,
+  Star,
+  MapPin,
+  Mail,
+  Phone,
+  X,
+  ChevronLeft,
+  ChevronRight,
+} from 'lucide-react'
 import PageShell from '../components/layout/PageShell'
 import SelectField from '../components/form/SelectField'
 import TextField from '../components/form/TextField'
@@ -34,6 +45,10 @@ export default function UniversityDetailPage() {
   const [showContributorInfo, setShowContributorInfo] = useState(false)
   const [showContributorModal, setShowContributorModal] = useState(false)
   const [showReviewModal, setShowReviewModal] = useState(false)
+  const [copiedField, setCopiedField] = useState<string | null>(null)
+  const [expandedReviews, setExpandedReviews] = useState<Set<string>>(new Set())
+  const [lightboxIndex, setLightboxIndex] = useState<number | null>(null)
+  const reviewsScrollRef = useRef<HTMLDivElement>(null)
 
   function refreshReviews() {
     if (!id) return
@@ -117,6 +132,29 @@ export default function UniversityDetailPage() {
   const avgRating = uni.aggregateRating
   const reviewCount = uni.aggregateReviewCount ?? reviews.length
 
+  const handleCopy = (field: string, value: string) => {
+    navigator.clipboard.writeText(value).then(() => {
+      setCopiedField(field)
+      setTimeout(() => setCopiedField((prev) => (prev === field ? null : prev)), 1500)
+    })
+  }
+
+  const toggleReviewExpanded = (id: string) => {
+    setExpandedReviews((prev) => {
+      const next = new Set(prev)
+      if (next.has(id)) next.delete(id)
+      else next.add(id)
+      return next
+    })
+  }
+
+  const scrollReviews = (direction: 'left' | 'right') => {
+    reviewsScrollRef.current?.scrollBy({
+      left: direction === 'left' ? -320 : 320,
+      behavior: 'smooth',
+    })
+  }
+
   return (
     <PageShell>
       <div className="mx-auto max-w-[1440px] px-6 py-8 lg:px-10">
@@ -126,17 +164,33 @@ export default function UniversityDetailPage() {
             <SafeImage
               src={gallery[0]}
               alt={uni.name}
-              className="h-64 w-full rounded-xl object-cover md:col-span-2 md:h-[22rem]"
+              onClick={() => setLightboxIndex(0)}
+              className="h-64 w-full cursor-pointer rounded-xl object-cover md:col-span-2 md:h-[22rem]"
             />
             <div className="grid grid-cols-2 gap-3">
-              {gallery.slice(1, 5).map((src, i) => (
-                <SafeImage
-                  key={i}
-                  src={src}
-                  alt=""
-                  className="h-32 w-full rounded-xl object-cover md:h-[10.25rem]"
-                />
-              ))}
+              {gallery.slice(1, 5).map((src, i) => {
+                const isLast = i === 3
+                const remaining = gallery.length - 5
+                return (
+                  <div key={i} className="relative">
+                    <SafeImage
+                      src={src}
+                      alt=""
+                      onClick={() => setLightboxIndex(i + 1)}
+                      className="h-32 w-full cursor-pointer rounded-xl object-cover md:h-[10.25rem]"
+                    />
+                    {isLast && remaining > 0 && (
+                      <button
+                        type="button"
+                        onClick={() => setLightboxIndex(i + 1)}
+                        className="absolute inset-0 flex items-center justify-center rounded-xl bg-black/50 text-sm font-semibold text-white hover:bg-black/60"
+                      >
+                        +{remaining} more
+                      </button>
+                    )}
+                  </div>
+                )
+              })}
             </div>
           </div>
         )}
@@ -320,38 +374,83 @@ export default function UniversityDetailPage() {
           {reviews.length === 0 ? (
             <p className="mt-6 text-sm text-gray-400">No reviews yet.</p>
           ) : (
-            <div className="mt-6 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
-              {reviews.map((r) => (
-                <div key={r._id}>
-                  <div className="flex items-center gap-2">
-                    <Avatar src={r.reviewerAvatar} name={r.reviewerName} className="h-8 w-8 text-xs" />
-                    <div>
-                      <div className="text-sm font-semibold text-black">
-                        {r.reviewerName}
-                      </div>
-                      <div className="text-xs text-gray-400">
-                        {r.reviewerMeta || r.platform || ''}
-                      </div>
-                    </div>
-                  </div>
-                  {r.rating != null && (
-                    <div className="mt-2 flex text-yellow-500">
-                      {Array.from({ length: 5 }).map((_, s) => (
-                        <Star
-                          key={s}
-                          className={`h-3 w-3 ${s < r.rating! ? 'fill-current' : ''}`}
-                        />
-                      ))}
-                    </div>
-                  )}
-                  <p className="mt-2 text-xs leading-relaxed text-gray-600">
-                    {r.text}
-                  </p>
-                  <div className="mt-2 text-xs text-gray-400">
-                    {new Date(r.date).toLocaleDateString()}
-                  </div>
+            <div className="mt-6">
+              {reviews.length > 6 && (
+                <div className="mb-3 flex justify-end gap-2">
+                  <button
+                    type="button"
+                    onClick={() => scrollReviews('left')}
+                    className="flex h-8 w-8 items-center justify-center rounded-full border border-gray-200 bg-white text-gray-500 hover:bg-gray-50"
+                    aria-label="Scroll reviews left"
+                  >
+                    <ChevronLeft className="h-4 w-4" />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => scrollReviews('right')}
+                    className="flex h-8 w-8 items-center justify-center rounded-full border border-gray-200 bg-white text-gray-500 hover:bg-gray-50"
+                    aria-label="Scroll reviews right"
+                  >
+                    <ChevronRight className="h-4 w-4" />
+                  </button>
                 </div>
-              ))}
+              )}
+              <div
+                ref={reviewsScrollRef}
+                className="flex gap-6 overflow-x-auto scroll-smooth pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+              >
+                {reviews.map((r) => {
+                  const isExpanded = expandedReviews.has(r._id)
+                  const isLong = r.text.length > 140
+                  return (
+                    <div
+                      key={r._id}
+                      className="w-[calc((100%_-_7.5rem)/6)] shrink-0"
+                    >
+                      <div className="flex items-center gap-2">
+                        <Avatar src={r.reviewerAvatar} name={r.reviewerName} className="h-8 w-8 text-xs" />
+                        <div>
+                          <div className="text-sm font-semibold text-black">
+                            {r.reviewerName}
+                          </div>
+                          <div className="text-xs text-gray-400">
+                            {r.reviewerMeta || r.platform || ''}
+                          </div>
+                        </div>
+                      </div>
+                      {r.rating != null && (
+                        <div className="mt-2 flex text-yellow-500">
+                          {Array.from({ length: 5 }).map((_, s) => (
+                            <Star
+                              key={s}
+                              className={`h-3 w-3 ${s < r.rating! ? 'fill-current' : ''}`}
+                            />
+                          ))}
+                        </div>
+                      )}
+                      <p
+                        className={`mt-2 text-xs leading-relaxed text-gray-600 ${
+                          isLong && !isExpanded ? 'line-clamp-3' : ''
+                        }`}
+                      >
+                        {r.text}
+                      </p>
+                      {isLong && (
+                        <button
+                          type="button"
+                          onClick={() => toggleReviewExpanded(r._id)}
+                          className="mt-1 text-xs font-medium text-black underline underline-offset-2"
+                        >
+                          {isExpanded ? 'Show less' : 'Show more'}
+                        </button>
+                      )}
+                      <div className="mt-2 text-xs text-gray-400">
+                        {new Date(r.date).toLocaleDateString()}
+                      </div>
+                    </div>
+                  )
+                })}
+              </div>
             </div>
           )}
         </div>
@@ -387,22 +486,43 @@ export default function UniversityDetailPage() {
               />
               <div className="space-y-3 text-sm text-gray-600">
                 {poc?.address && (
-                  <div className="flex items-start gap-2">
+                  <button
+                    type="button"
+                    onClick={() => handleCopy('address', poc.address!)}
+                    className="flex items-start gap-2 text-left hover:text-black"
+                  >
                     <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-gray-400" />
                     {poc.address}
-                  </div>
+                    {copiedField === 'address' && (
+                      <span className="text-xs font-medium text-green-600">(Copied!)</span>
+                    )}
+                  </button>
                 )}
                 {poc?.email && (
-                  <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => handleCopy('email', poc.email!)}
+                    className="flex items-center gap-2 text-left hover:text-black"
+                  >
                     <Mail className="h-4 w-4 shrink-0 text-gray-400" />
                     {poc.email}
-                  </div>
+                    {copiedField === 'email' && (
+                      <span className="text-xs font-medium text-green-600">(Copied!)</span>
+                    )}
+                  </button>
                 )}
                 {poc?.phone && (
-                  <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => handleCopy('phone', poc.phone!)}
+                    className="flex items-center gap-2 text-left hover:text-black"
+                  >
                     <Phone className="h-4 w-4 shrink-0 text-gray-400" />
                     {poc.phone}
-                  </div>
+                    {copiedField === 'phone' && (
+                      <span className="text-xs font-medium text-green-600">(Copied!)</span>
+                    )}
+                  </button>
                 )}
                 {!poc?.address && !poc?.email && !poc?.phone && (
                   <p className="text-gray-400">No contact details available yet.</p>
@@ -457,6 +577,54 @@ export default function UniversityDetailPage() {
             refreshReviews()
           }}
         />
+      )}
+
+      {lightboxIndex != null && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4"
+          onClick={() => setLightboxIndex(null)}
+        >
+          <button
+            type="button"
+            onClick={() => setLightboxIndex(null)}
+            className="absolute right-4 top-4 flex h-10 w-10 items-center justify-center rounded-full bg-white/10 text-white hover:bg-white/20"
+            aria-label="Close image"
+          >
+            <X className="h-5 w-5" />
+          </button>
+          {gallery.length > 1 && (
+            <>
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation()
+                  setLightboxIndex((i) => (i! - 1 + gallery.length) % gallery.length)
+                }}
+                className="absolute left-4 top-1/2 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-white/10 text-white hover:bg-white/20"
+                aria-label="Previous image"
+              >
+                <ChevronLeft className="h-6 w-6" />
+              </button>
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation()
+                  setLightboxIndex((i) => (i! + 1) % gallery.length)
+                }}
+                className="absolute right-4 top-1/2 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-white/10 text-white hover:bg-white/20"
+                aria-label="Next image"
+              >
+                <ChevronRight className="h-6 w-6" />
+              </button>
+            </>
+          )}
+          <img
+            src={gallery[lightboxIndex]}
+            alt=""
+            className="max-h-full max-w-full rounded-lg object-contain"
+            onClick={(e) => e.stopPropagation()}
+          />
+        </div>
       )}
     </PageShell>
   )
