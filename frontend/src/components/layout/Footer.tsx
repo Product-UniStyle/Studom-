@@ -34,11 +34,11 @@ export default function Footer() {
             <div className="mt-4 max-w-xs font-footerAddress text-sm leading-relaxed text-gray-300">
               Studom
               <br />
-              BIZ Nest Co-Working, Sunteck Kanika Park,
+              BIZ Nest Co-Working, Sunteck Kanaka Park,
               <br />
               Panjim, Goa - India 403001
               <br />
-              response@commonform.com
+              response@studom.com
             </div>
           </div>
 
