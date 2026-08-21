@@ -35,6 +35,8 @@ export async function listPublicUniversities(params: {
   city?: string
   country?: string
   fieldOfStudy?: string
+  grade?: string
+  mode?: string
   page?: number
   limit?: number
 }): Promise<PublicUniversityListResponse> {
@@ -44,6 +46,8 @@ export async function listPublicUniversities(params: {
   if (params.city) query.set('city', params.city)
   if (params.country) query.set('country', params.country)
   if (params.fieldOfStudy) query.set('fieldOfStudy', params.fieldOfStudy)
+  if (params.grade) query.set('grade', params.grade)
+  if (params.mode) query.set('mode', params.mode)
   if (params.page) query.set('page', String(params.page))
   if (params.limit) query.set('limit', String(params.limit))
   return publicFetch(`/api/public/universities?${query.toString()}`)
@@ -53,6 +57,7 @@ export interface PublicUniversityFacets {
   countries: string[]
   cities: string[]
   fieldsOfStudy: string[]
+  grades: string[]
 }
 
 export async function getPublicUniversityFacets(params: {

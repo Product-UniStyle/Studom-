@@ -11,14 +11,17 @@ import ReviewStep from './steps/ReviewStep'
 import { initialProfileData, REQUIRED_DOCUMENTS, type ProfileData } from './profileTypes'
 import { getStudentMe, updateStudentMe } from '../../lib/studentApi'
 import type { StudentProfile, StudentProfilePatch } from '../../lib/studentApi'
+import { splitMobile } from '../../data/countryCodes'
 
 function toProfileData(student: StudentProfile): ProfileData {
   const { personal, education, activities, achievements } = student.profile
+  const { code: mobileCountryCode, number: mobile } = splitMobile(personal?.mobile || '')
   return {
     personal: {
       fullName: student.fullName,
       email: student.email,
-      mobile: personal?.mobile || '',
+      mobileCountryCode,
+      mobile,
       countryOfResidence: personal?.countryOfResidence || '',
       schoolName: personal?.schoolName || '',
       currentGrade: personal?.currentGrade || '',
@@ -60,6 +63,7 @@ function validateStep(step: number, data: ProfileData): string | null {
   if (step === 1) {
     const p = data.personal
     if (!p.fullName.trim()) return 'Full Name is required.'
+    if (!p.mobileCountryCode.trim()) return 'Country Code is required.'
     if (!p.mobile.trim()) return 'Mobile Number is required.'
     if (!p.countryOfResidence.trim()) return 'Country of Residence is required.'
     if (!p.schoolName.trim()) return 'School Name is required.'
@@ -82,7 +86,9 @@ function toPatch(data: ProfileData): StudentProfilePatch {
   return {
     fullName: data.personal.fullName || undefined,
     personal: {
-      mobile: data.personal.mobile,
+      mobile: [data.personal.mobileCountryCode, data.personal.mobile.trim()]
+        .filter(Boolean)
+        .join(' '),
       countryOfResidence: data.personal.countryOfResidence,
       schoolName: data.personal.schoolName,
       currentGrade: data.personal.currentGrade,

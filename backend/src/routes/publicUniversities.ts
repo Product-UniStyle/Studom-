@@ -18,6 +18,8 @@ router.get('/', async (req, res) => {
   const city = typeof req.query.city === 'string' ? req.query.city.trim() : '';
   const country = typeof req.query.country === 'string' ? req.query.country.trim() : '';
   const fieldOfStudy = typeof req.query.fieldOfStudy === 'string' ? req.query.fieldOfStudy.trim() : '';
+  const grade = typeof req.query.grade === 'string' ? req.query.grade.trim() : '';
+  const mode = typeof req.query.mode === 'string' ? req.query.mode.trim() : '';
   const page = Math.max(1, Number(req.query.page) || 1);
   const limit = Math.min(50, Math.max(1, Number(req.query.limit) || 8));
 
@@ -27,6 +29,8 @@ router.get('/', async (req, res) => {
   if (city) filter.city = new RegExp(`^${escapeRegex(city)}$`, 'i');
   if (country) filter.country = new RegExp(`^${escapeRegex(country)}$`, 'i');
   if (fieldOfStudy) filter.fieldsOfStudy = new RegExp(`^${escapeRegex(fieldOfStudy)}$`, 'i');
+  if (grade) filter.grade = new RegExp(`^${escapeRegex(grade)}$`, 'i');
+  if (mode) filter.mode = new RegExp(`^${escapeRegex(mode)}$`, 'i');
 
   const [items, total] = await Promise.all([
     University.find(filter)
@@ -51,16 +55,18 @@ router.get('/facets', async (req, res) => {
   const cityFilter = { ...baseFilter };
   if (country) cityFilter.country = new RegExp(`^${escapeRegex(country)}$`, 'i');
 
-  const [countries, cities, fieldsOfStudy] = await Promise.all([
+  const [countries, cities, fieldsOfStudy, grades] = await Promise.all([
     University.distinct('country', baseFilter),
     University.distinct('city', cityFilter),
     University.distinct('fieldsOfStudy', baseFilter),
+    University.distinct('grade', baseFilter),
   ]);
 
   res.json({
     countries: countries.filter(Boolean).sort(),
     cities: cities.filter(Boolean).sort(),
     fieldsOfStudy: fieldsOfStudy.filter(Boolean).sort(),
+    grades: grades.filter(Boolean).sort(),
   });
 });
 

@@ -180,7 +180,7 @@ export default function AdminUniversityForm({ university, onSaved, onCancel }: A
           label="Mode"
           name="mode"
           placeholder="Select mode"
-          options={['Offline', 'Online', 'Offline/Online']}
+          options={['Online', 'Offline', 'Online/Offline', 'Home Tuition', 'Private Tutor']}
           defaultValue={university.mode}
         />
       </div>

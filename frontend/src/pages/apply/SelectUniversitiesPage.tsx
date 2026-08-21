@@ -1,4 +1,4 @@
-import { useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { Search, ChevronDown, Check } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import PageShell from '../../components/layout/PageShell'
@@ -105,19 +105,27 @@ export default function SelectUniversitiesPage() {
                       </span>
                     </div>
                   </div>
-                  <button
-                    onClick={() =>
-                      toggleUniversity({ id: u._id, slug: u.slug, name: u.name, city: u.city, country: u.country, logo: u.logo })
-                    }
-                    className={`flex shrink-0 items-center gap-1.5 rounded-lg px-5 py-2 text-sm font-semibold ${
-                      selected
-                        ? 'bg-green-600 text-white'
-                        : 'bg-black text-white hover:bg-gray-800'
-                    }`}
-                  >
-                    {selected && <Check className="h-4 w-4" />}
-                    {selected ? 'Selected' : 'Select'}
-                  </button>
+                  <div className="flex shrink-0 items-center gap-2">
+                    <Link
+                      to={`/universities/${u.slug || u._id}`}
+                      className="rounded-lg border border-gray-300 px-5 py-2 text-sm font-semibold text-black hover:bg-gray-50"
+                    >
+                      View
+                    </Link>
+                    <button
+                      onClick={() =>
+                        toggleUniversity({ id: u._id, slug: u.slug, name: u.name, city: u.city, country: u.country, logo: u.logo })
+                      }
+                      className={`flex items-center gap-1.5 rounded-lg px-5 py-2 text-sm font-semibold ${
+                        selected
+                          ? 'bg-green-600 text-white'
+                          : 'bg-black text-white hover:bg-gray-800'
+                      }`}
+                    >
+                      {selected && <Check className="h-4 w-4" />}
+                      {selected ? 'Selected' : 'Select'}
+                    </button>
+                  </div>
                 </div>
               )
             })}

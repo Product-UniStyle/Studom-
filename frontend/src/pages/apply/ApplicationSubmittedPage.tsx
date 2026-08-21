@@ -206,8 +206,11 @@ export default function ApplicationSubmittedPage() {
             <SummaryRow label="Documents Uploaded" value={String(stats.documentsCount)} />
             <SummaryRow label="Profile Completion" value={`${stats.profileCompletion}%`} />
             <div className="mt-4 rounded-lg bg-blue-50 px-3 py-2.5 text-xs text-blue-700">
-              You can track the status of your application anytime from your
-              dashboard.
+              You can track the status of your application anytime from your{' '}
+              <Link to="/student/dashboard" className="underline hover:text-blue-800">
+                dashboard
+              </Link>
+              .
             </div>
           </div>
 

@@ -8,6 +8,8 @@ import type { PublicUniversityListItem } from '../lib/publicApi'
 
 const ADDITIONAL_FILTERS = ['QS Ranking', 'Cost of Living', 'Student Population']
 
+const MODE_OPTIONS = ['Online', 'Offline', 'Online/Offline', 'Home Tuition', 'Private Tutor']
+
 const TYPE_PARAM_MAP: Record<string, string> = {
   schools: 'School',
   school: 'School',
@@ -32,10 +34,13 @@ export default function UniversitySearchPage() {
   const typeParam = searchParams.get('type') || ''
   const type = TYPE_PARAM_MAP[typeParam.toLowerCase()] || ''
 
+  const isSchool = type === 'School'
+  const isTuition = type === 'Tuition'
+
   const country = searchParams.get('country') || ''
   const location = searchParams.get('location') || ''
   const field = searchParams.get('field') || 'All'
-  const additional = searchParams.get('additional') || 'QS Ranking'
+  const additional = searchParams.get('additional') || (isTuition ? '' : 'QS Ranking')
   const query = searchParams.get('q') || ''
   const page = Number(searchParams.get('page') || '1')
   const applied = searchParams.get('applied') === '1'
@@ -61,14 +66,18 @@ export default function UniversitySearchPage() {
   const [countries, setCountries] = useState<string[]>([])
   const [cities, setCities] = useState<string[]>([])
   const [fields, setFields] = useState<string[]>([])
+  const [grades, setGrades] = useState<string[]>([])
 
   useEffect(() => {
     getPublicUniversityFacets({ type: type || undefined })
       .then((res) => {
         setCountries(res.countries)
         setFields(res.fieldsOfStudy)
+        setGrades(res.grades)
       })
       .catch(() => {})
+    updateParams({ field: undefined, additional: undefined })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [type])
 
   useEffect(() => {
@@ -87,7 +96,9 @@ export default function UniversitySearchPage() {
       type: type || undefined,
       country: country || undefined,
       city: location || undefined,
-      fieldOfStudy: field !== 'All' ? field : undefined,
+      fieldOfStudy: !isSchool && field !== 'All' ? field : undefined,
+      grade: isSchool && field !== 'All' ? field : undefined,
+      mode: isTuition && additional ? additional : undefined,
       page,
       limit: PAGE_SIZE,
     })
@@ -106,15 +117,19 @@ export default function UniversitySearchPage() {
     return () => {
       cancelled = true
     }
-  }, [applied, query, type, country, location, field, page])
+  }, [applied, query, type, isSchool, isTuition, country, location, field, additional, page])
 
   const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE))
 
   const heading = useMemo(() => {
     if (type) return `Top ${TYPE_LABELS[type] || type} in ${location || 'all locations'}`
-    if (field !== 'All') return `Top universities for ${field} in ${location || 'all locations'}`
+    if (field !== 'All') {
+      return isSchool
+        ? `Top schools for ${field} in ${location || 'all locations'}`
+        : `Top universities for ${field} in ${location || 'all locations'}`
+    }
     return `Top universities in ${location || 'all locations'}`
-  }, [type, field, location])
+  }, [type, field, location, isSchool])
 
   const handleSearch = () => {
     updateParams({ applied: '1' }, { resetPage: true })
@@ -144,20 +159,20 @@ export default function UniversitySearchPage() {
             }}
           />
           <FilterDropdown
-            label="Field of Study"
+            label={isSchool ? 'Grades' : 'Field of Study'}
             value={field}
-            placeholder="Select field of study"
-            options={['All', ...fields]}
+            placeholder={isSchool ? 'Select grade' : 'Select field of study'}
+            options={['All', ...(isSchool ? grades : fields)]}
             onChange={(v) => {
               updateParams({ field: v === 'All' ? undefined : v }, { resetPage: true })
             }}
           />
           <FilterDropdown
-            label="Additional Filters"
+            label={isTuition ? 'Mode' : 'Additional Filters'}
             value={additional}
-            placeholder="QS Ranking, Cost of Living, Student Population"
-            options={ADDITIONAL_FILTERS}
-            onChange={(v) => updateParams({ additional: v })}
+            placeholder={isTuition ? 'Select mode' : 'QS Ranking, Cost of Living, Student Population'}
+            options={isTuition ? MODE_OPTIONS : ADDITIONAL_FILTERS}
+            onChange={(v) => updateParams({ additional: v }, { resetPage: true })}
           />
           <div className="flex justify-center pl-0 md:pl-6">
             <button

@@ -4,7 +4,7 @@ import { Eye, EyeOff } from 'lucide-react'
 import { cn } from '../../lib/utils'
 
 interface TextFieldProps extends InputHTMLAttributes<HTMLInputElement> {
-  label: string
+  label?: string
   required?: boolean
   icon?: ReactNode
   hint?: string
@@ -27,9 +27,11 @@ export default function TextField({
 
   return (
     <div className={className}>
-      <label className="mb-1.5 block text-sm font-medium text-gray-900">
-        {label} {required && <span className="text-red-500">*</span>}
-      </label>
+      {label && (
+        <label className="mb-1.5 block text-sm font-medium text-gray-900">
+          {label} {required && <span className="text-red-500">*</span>}
+        </label>
+      )}
       <div className="relative">
         {icon && (
           <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">

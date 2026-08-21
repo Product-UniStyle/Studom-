@@ -18,6 +18,7 @@ export interface ProfileData {
   personal: {
     fullName: string
     email: string
+    mobileCountryCode: string
     mobile: string
     countryOfResidence: string
     schoolName: string
@@ -53,6 +54,7 @@ export const initialProfileData: ProfileData = {
   personal: {
     fullName: '',
     email: '',
+    mobileCountryCode: '',
     mobile: '',
     countryOfResidence: '',
     schoolName: '',

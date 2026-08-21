@@ -1,6 +1,7 @@
 import TextField from '../../../components/form/TextField'
 import SelectField from '../../../components/form/SelectField'
 import { COUNTRIES } from '../../../data/countries'
+import { DIAL_CODE_OPTIONS } from '../../../data/countryCodes'
 import type { ProfileData } from '../profileTypes'
 
 interface Props {
@@ -27,12 +28,25 @@ export default function PersonalInfoStep({ data, update }: Props) {
           hint="Contact support to change your login email."
           onChange={(e) => update({ email: e.target.value })}
         />
-        <TextField
-          label="Mobile Number"
-          required
-          value={p.mobile}
-          onChange={(e) => update({ mobile: e.target.value })}
-        />
+        <div>
+          <label className="mb-1.5 block text-sm font-medium text-gray-900">
+            Mobile Number <span className="text-red-500">*</span>
+          </label>
+          <div className="flex gap-2">
+            <SelectField
+              className="w-24 shrink-0"
+              placeholder="Code"
+              options={DIAL_CODE_OPTIONS}
+              defaultValue={p.mobileCountryCode}
+              onChange={(e) => update({ mobileCountryCode: e.target.value })}
+            />
+            <TextField
+              className="flex-1"
+              value={p.mobile}
+              onChange={(e) => update({ mobile: e.target.value })}
+            />
+          </div>
+        </div>
         <SelectField
           label="Country of Residence"
           required
