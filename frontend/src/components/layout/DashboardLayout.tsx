@@ -30,7 +30,7 @@ export default function DashboardLayout({
   return (
     <div className="flex min-h-screen flex-col bg-white">
       <Header />
-      <div className="mx-auto flex w-full max-w-[1440px] flex-1 gap-8 px-6 py-8 lg:px-10">
+      <div className="mx-auto flex w-full max-w-[1440px] flex-1 gap-8 px-[6.5rem] py-8">
         <aside className="hidden w-64 shrink-0 flex-col md:flex">
           <div className="mb-8 flex items-center gap-3">
             <div className="flex h-12 w-12 items-center justify-center rounded-full bg-blue-50 text-blue-600">

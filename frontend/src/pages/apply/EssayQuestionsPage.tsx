@@ -9,7 +9,7 @@ export default function EssayQuestionsPage() {
 
   return (
     <PageShell hideFooter>
-      <div className="mx-auto max-w-4xl px-6 py-10">
+      <div className="mx-auto max-w-4xl px-[6.5rem] py-10">
         <div className="flex items-start justify-between">
           <div>
             <h1 className="font-script text-3xl text-blue-600">

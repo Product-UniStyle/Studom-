@@ -31,9 +31,9 @@ export default function HomePage() {
   return (
     <PageShell>
       {/* Hero */}
-      <section className="mx-auto max-w-[1440px] px-6 pb-10 pt-14 lg:px-10">
+      <section className="mx-auto max-w-[1440px] px-[6.5rem] pb-10 pt-14">
         <div className="grid grid-cols-1 items-center gap-10 lg:grid-cols-2">
-          <h1 className="font-script text-4xl leading-[1.5] text-blue-600 sm:text-5xl sm:leading-[1.5]">
+          <h1 className="font-script text-4xl leading-[1.5] text-blue-600 sm:text-[2.75rem] sm:leading-[1.5]">
             One platform to discover, plan &amp; apply to institutions while
             building the Middle East's largest student community.
           </h1>
@@ -46,7 +46,7 @@ export default function HomePage() {
       </section>
 
       {/* Category cards */}
-      <section className="mx-auto max-w-[1440px] px-6 pb-10 lg:px-10">
+      <section className="mx-auto max-w-[1440px] px-[6.5rem] pb-10">
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-3">
           {categories.map((cat) => (
             <Link
@@ -65,13 +65,13 @@ export default function HomePage() {
         </div>
       </section>
 
-      <p className="mx-auto whitespace-nowrap px-6 pb-14 text-center font-script text-sm text-blue-600 lg:px-10">
+      <p className="mx-auto whitespace-nowrap px-[6.5rem] pb-14 text-center font-script text-sm text-blue-600">
         Of the students, by the students, for the students. All information
         has been obtained from open sources.
       </p>
 
       {/* CTA */}
-      <section className="mx-auto max-w-[1440px] px-6 pb-16 lg:px-10">
+      <section className="mx-auto max-w-[1440px] px-[6.5rem] pb-16">
         <div className="rounded-3xl bg-gray-50 px-6 py-16 text-center">
           <h2 className="font-script text-3xl text-blue-600 sm:text-4xl">
             Apply to any university at once
@@ -98,7 +98,7 @@ export default function HomePage() {
       </section>
 
       {/* Platform inclusions */}
-      <section className="mx-auto max-w-[1440px] px-6 pb-16 lg:px-10">
+      <section className="mx-auto max-w-[1440px] px-[6.5rem] pb-16">
         <h2 className="mb-8 font-forum text-3xl font-medium text-gray-800">
           Platform inclusions.
         </h2>
@@ -113,7 +113,7 @@ export default function HomePage() {
       </section>
 
       {/* Happy Students */}
-      <section className="mx-auto max-w-[1440px] px-6 pb-20 lg:px-10">
+      <section className="mx-auto max-w-[1440px] px-[6.5rem] pb-20">
         <h2 className="mb-8 font-forum text-3xl font-medium text-gray-800">
           Happy Students!
         </h2>

@@ -55,7 +55,7 @@ export default function Header() {
 
   return (
     <header className="w-full border-b border-gray-200 bg-white">
-      <div className="mx-auto grid max-w-[1440px] grid-cols-[1fr_auto_1fr] items-center px-6 py-4 lg:px-10">
+      <div className="mx-auto grid max-w-[1440px] grid-cols-[1fr_auto_1fr] items-center px-[6.5rem] py-4">
         <Link to="/" className="justify-self-start font-logo text-3xl text-black shrink-0">
           Studom
         </Link>

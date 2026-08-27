@@ -27,7 +27,7 @@ const TYPE_LABELS: Record<string, string> = {
   College: 'colleges',
 }
 
-const PAGE_SIZE = 8
+const PAGE_SIZE = 20
 
 export default function UniversitySearchPage() {
   const [searchParams, setSearchParams] = useSearchParams()
@@ -99,6 +99,7 @@ export default function UniversitySearchPage() {
       fieldOfStudy: !isSchool && field !== 'All' ? field : undefined,
       grade: isSchool && field !== 'All' ? field : undefined,
       mode: isTuition && additional ? additional : undefined,
+      sort: !isTuition && additional === 'QS Ranking' ? 'qsRank_desc' : undefined,
       page,
       limit: PAGE_SIZE,
     })
@@ -137,7 +138,7 @@ export default function UniversitySearchPage() {
 
   return (
     <PageShell>
-      <div className="mx-auto max-w-[1440px] px-6 py-8 lg:px-10">
+      <div className="mx-auto max-w-[1440px] px-[6.5rem] py-8">
         {/* Filter bar */}
         <div className="flex flex-col gap-4 rounded-full border border-black px-6 py-3 md:flex-row md:items-center md:gap-0 md:divide-x md:divide-gray-300">
           <FilterDropdown
@@ -228,7 +229,7 @@ export default function UniversitySearchPage() {
                   <Link
                     to={`/universities/${u.slug || u._id}`}
                     key={u._id}
-                    className="group relative overflow-hidden rounded-xl"
+                    className="group relative aspect-square overflow-hidden rounded-xl"
                   >
                     <div className="absolute left-3 top-3 z-10 flex h-8 w-8 items-center justify-center rounded-md bg-white text-sm font-bold text-black shadow">
                       {(page - 1) * PAGE_SIZE + idx + 1}
@@ -236,7 +237,7 @@ export default function UniversitySearchPage() {
                     <SafeImage
                       src={u.image}
                       alt={u.name}
-                      className="h-48 w-full object-cover transition duration-300 group-hover:scale-105"
+                      className="h-full w-full object-cover transition duration-300 group-hover:scale-105"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/10 to-transparent" />
                     <div className="absolute bottom-0 left-0 right-0 p-4 text-white">

@@ -59,7 +59,7 @@ export default function ReviewApplicationPage() {
   if (loading || !student || !stats) {
     return (
       <PageShell hideFooter>
-        <p className="mx-auto max-w-4xl px-6 py-20 text-center text-gray-400">{error || 'Loading...'}</p>
+        <p className="mx-auto max-w-4xl px-[6.5rem] py-20 text-center text-gray-400">{error || 'Loading...'}</p>
       </PageShell>
     )
   }
@@ -71,7 +71,7 @@ export default function ReviewApplicationPage() {
 
   return (
     <PageShell hideFooter>
-      <div className="mx-auto max-w-4xl px-6 py-10">
+      <div className="mx-auto max-w-4xl px-[6.5rem] py-10">
         <h1 className="text-2xl font-bold text-black">Review Application</h1>
 
         <div className="mt-6 rounded-2xl border border-gray-200 p-6">

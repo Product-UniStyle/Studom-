@@ -209,14 +209,14 @@ export default function BuildProfilePage() {
   if (loading) {
     return (
       <PageShell hideFooter>
-        <p className="mx-auto max-w-4xl px-6 py-20 text-center text-gray-400">Loading your profile...</p>
+        <p className="mx-auto max-w-4xl px-[6.5rem] py-20 text-center text-gray-400">Loading your profile...</p>
       </PageShell>
     )
   }
 
   return (
     <PageShell hideFooter>
-      <div className="mx-auto max-w-4xl px-6 py-12">
+      <div className="mx-auto max-w-4xl px-[6.5rem] py-12">
         <div className="text-center">
           <h1 className="text-3xl font-semibold text-black">
             Build Your Student Profile

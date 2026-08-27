@@ -157,7 +157,7 @@ export default function UniversityDetailPage() {
 
   return (
     <PageShell>
-      <div className="mx-auto max-w-[1440px] px-6 py-8 lg:px-10">
+      <div className="mx-auto max-w-[1440px] px-[6.5rem] py-8">
         {/* Gallery */}
         {gallery.length > 0 && (
           <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
@@ -197,15 +197,12 @@ export default function UniversityDetailPage() {
 
         {/* Title + stats */}
         <div className="mt-8 flex flex-col justify-between gap-6 lg:flex-row lg:items-center">
-          <div className="flex items-center gap-4">
+          <div className="flex flex-1 items-center justify-center">
             <SafeImage
               src={uni.logo}
-              alt=""
-              className="h-14 w-14 rounded-md border border-gray-100 object-contain p-1"
+              alt={uni.name}
+              className="h-40 w-40 rounded-md border border-gray-100 object-contain p-1"
             />
-            <h1 className="font-georgia text-2xl font-semibold text-blue-900 sm:text-3xl">
-              {uni.name}
-            </h1>
           </div>
           <div className="flex gap-4">
             <div className="flex items-center gap-3 rounded-xl border border-gray-100 px-5 py-3">
@@ -276,7 +273,7 @@ export default function UniversityDetailPage() {
                 )}
               </div>
             </div>
-            <div className="mt-4 space-y-4 text-sm leading-relaxed text-gray-600">
+            <div className="mt-4 space-y-4 text-base leading-relaxed text-gray-600">
               {about.length > 0 ? (
                 about.map((p, i) => <p key={i}>{p}</p>)
               ) : (

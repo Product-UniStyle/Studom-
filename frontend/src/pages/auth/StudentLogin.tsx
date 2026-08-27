@@ -28,7 +28,7 @@ export default function StudentLogin() {
 
   return (
     <PageShell hideFooter>
-      <div className="mx-auto max-w-2xl px-6 py-16">
+      <div className="mx-auto max-w-2xl px-[6.5rem] py-16">
         <h1 className="font-script text-center text-4xl text-blue-600">
           Login to Your Studom Account
         </h1>

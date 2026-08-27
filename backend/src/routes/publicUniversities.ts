@@ -20,6 +20,7 @@ router.get('/', async (req, res) => {
   const fieldOfStudy = typeof req.query.fieldOfStudy === 'string' ? req.query.fieldOfStudy.trim() : '';
   const grade = typeof req.query.grade === 'string' ? req.query.grade.trim() : '';
   const mode = typeof req.query.mode === 'string' ? req.query.mode.trim() : '';
+  const sort = typeof req.query.sort === 'string' ? req.query.sort.trim() : '';
   const page = Math.max(1, Number(req.query.page) || 1);
   const limit = Math.min(50, Math.max(1, Number(req.query.limit) || 8));
 
@@ -32,10 +33,13 @@ router.get('/', async (req, res) => {
   if (grade) filter.grade = new RegExp(`^${escapeRegex(grade)}$`, 'i');
   if (mode) filter.mode = new RegExp(`^${escapeRegex(mode)}$`, 'i');
 
+  const sortSpec: Record<string, 1 | -1> =
+    sort === 'qsRank_desc' ? { qsRank: -1, name: 1 } : { name: 1 };
+
   const [items, total] = await Promise.all([
     University.find(filter)
       .select(LIST_FIELDS)
-      .sort({ name: 1 })
+      .sort(sortSpec)
       .skip((page - 1) * limit)
       .limit(limit)
       .lean(),

@@ -132,14 +132,14 @@ export default function ApplicationSubmittedPage() {
   if (loading || !student || !stats) {
     return (
       <PageShell hideFooter>
-        <p className="mx-auto max-w-5xl px-6 py-20 text-center text-gray-400">Loading...</p>
+        <p className="mx-auto max-w-5xl px-[6.5rem] py-20 text-center text-gray-400">Loading...</p>
       </PageShell>
     )
   }
 
   return (
     <PageShell hideFooter>
-      <div className="mx-auto max-w-5xl px-6 py-14 text-center">
+      <div className="mx-auto max-w-5xl px-[6.5rem] py-14 text-center">
         <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-green-50">
           <CheckCircle2 className="h-9 w-9 text-green-500" />
         </div>

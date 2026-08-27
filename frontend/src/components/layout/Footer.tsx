@@ -27,7 +27,7 @@ function InstagramIcon(props: React.SVGProps<SVGSVGElement>) {
 export default function Footer() {
   return (
     <footer className="w-full bg-black text-white">
-      <div className="mx-auto max-w-[1440px] px-6 py-14 lg:px-10">
+      <div className="mx-auto max-w-[1440px] px-[6.5rem] py-14">
         <div className="flex flex-col justify-between gap-10 md:flex-row">
           <div>
             <div className="font-logo text-3xl">Studom</div>
@@ -58,7 +58,7 @@ export default function Footer() {
       </div>
 
       <div className="border-t border-gray-800">
-        <div className="mx-auto max-w-[1440px] px-6 py-6 text-center font-footerNav font-extralight lg:px-10">
+        <div className="mx-auto max-w-[1440px] px-[6.5rem] py-6 text-center font-footerNav font-extralight">
           <p className="text-sm text-gray-300">
             © Copyright 2026-27 STUDOM – All Rights Reserved.
           </p>
@@ -67,7 +67,7 @@ export default function Footer() {
       </div>
 
       <div className="border-t border-gray-800">
-        <div className="mx-auto flex max-w-[1440px] flex-col items-center justify-between gap-4 px-6 py-4 font-footerNav text-xs font-extralight text-gray-400 lg:flex-row lg:px-10">
+        <div className="mx-auto flex max-w-[1440px] flex-col items-center justify-between gap-4 px-[6.5rem] py-4 font-footerNav text-xs font-extralight text-gray-400 lg:flex-row">
           <div className="flex items-center gap-4">
             <span>Privacy</span>
             <span>·</span>

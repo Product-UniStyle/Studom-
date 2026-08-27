@@ -44,7 +44,7 @@ export default function SelectUniversitiesPage() {
 
   return (
     <PageShell hideFooter>
-      <div className="mx-auto max-w-[1100px] px-6 py-8">
+      <div className="mx-auto max-w-[1100px] px-[6.5rem] py-8">
         <div className="flex flex-col gap-4 rounded-full border border-black px-6 py-3 md:flex-row md:items-center md:divide-x md:divide-gray-300">
           <StaticFilter label="Country" value="United Arab Emirates" />
           <StaticFilter label="Location" value="All Locations" />
