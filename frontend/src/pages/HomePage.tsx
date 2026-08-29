@@ -1,10 +1,13 @@
+import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { School, GraduationCap, BookOpen, ArrowRight, Star } from 'lucide-react'
 import PageShell from '../components/layout/PageShell'
 import SafeImage from '../components/ui/SafeImage'
 import Avatar from '../components/ui/Avatar'
+import Modal from '../components/ui/Modal'
 import { homeInclusions } from '../data/inclusions'
 import { testimonials } from '../data/testimonials'
+import type { Testimonial } from '../data/testimonials'
 
 const categories = [
   {
@@ -28,6 +31,8 @@ const categories = [
 ]
 
 export default function HomePage() {
+  const [activeTestimonial, setActiveTestimonial] = useState<Testimonial | null>(null)
+
   return (
     <PageShell>
       {/* Hero */}
@@ -137,16 +142,45 @@ export default function HomePage() {
                 </div>
                 <span className="text-xs text-gray-400">{t.time}</span>
               </div>
-              <p className="mt-2 text-sm leading-relaxed text-gray-600">
+              <p className="mt-2 line-clamp-3 text-sm leading-relaxed text-gray-600">
                 {t.text}
               </p>
-              <button className="mt-2 text-sm font-medium text-black underline underline-offset-2">
+              <button
+                type="button"
+                onClick={() => setActiveTestimonial(t)}
+                className="mt-2 text-sm font-medium text-black underline underline-offset-2"
+              >
                 Show more
               </button>
             </div>
           ))}
         </div>
       </section>
+
+      {activeTestimonial && (
+        <Modal
+          title="Student Review"
+          onClose={() => setActiveTestimonial(null)}
+          maxWidthClassName="max-w-md"
+        >
+          <div className="flex items-center gap-3">
+            <Avatar src={activeTestimonial.avatar} name={activeTestimonial.name} className="h-10 w-10 text-sm" />
+            <div>
+              <div className="text-sm font-semibold text-black">{activeTestimonial.name}</div>
+              <div className="text-xs text-gray-500">{activeTestimonial.meta}</div>
+            </div>
+          </div>
+          <div className="mt-3 flex items-center gap-2">
+            <div className="flex text-yellow-500">
+              {Array.from({ length: 5 }).map((_, s) => (
+                <Star key={s} className="h-3.5 w-3.5 fill-current" />
+              ))}
+            </div>
+            <span className="text-xs text-gray-400">{activeTestimonial.time}</span>
+          </div>
+          <p className="mt-4 text-sm leading-relaxed text-gray-600">{activeTestimonial.text}</p>
+        </Modal>
+      )}
     </PageShell>
   )
 }

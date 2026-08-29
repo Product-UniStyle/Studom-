@@ -5,29 +5,24 @@ import {
   Landmark,
   Info,
   Star,
-  MapPin,
-  Mail,
-  Phone,
   X,
   ChevronLeft,
   ChevronRight,
 } from 'lucide-react'
 import PageShell from '../components/layout/PageShell'
-import SelectField from '../components/form/SelectField'
 import TextField from '../components/form/TextField'
 import SafeImage from '../components/ui/SafeImage'
 import Avatar from '../components/ui/Avatar'
+import Modal from '../components/ui/Modal'
 import ContributorModal from '../components/university/ContributorModal'
 import AddReviewModal from '../components/university/AddReviewModal'
 import { getInclusionIcon } from '../lib/inclusionIcons'
 import {
   getPublicUniversity,
-  listPublicUniversities,
   listPublicUniversityReviews,
 } from '../lib/publicApi'
 import type {
   PublicUniversityDetail,
-  PublicUniversityListItem,
   PublicUniversityReview,
 } from '../lib/publicApi'
 import { getStudentToken, getStudentMe } from '../lib/studentApi'
@@ -38,15 +33,13 @@ export default function UniversityDetailPage() {
   const navigate = useNavigate()
   const [uni, setUni] = useState<PublicUniversityDetail | null>(null)
   const [reviews, setReviews] = useState<PublicUniversityReview[]>([])
-  const [universityOptions, setUniversityOptions] = useState<PublicUniversityListItem[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [student, setStudent] = useState<StudentProfile | null>(null)
   const [showContributorInfo, setShowContributorInfo] = useState(false)
   const [showContributorModal, setShowContributorModal] = useState(false)
   const [showReviewModal, setShowReviewModal] = useState(false)
-  const [copiedField, setCopiedField] = useState<string | null>(null)
-  const [expandedReviews, setExpandedReviews] = useState<Set<string>>(new Set())
+  const [activeReview, setActiveReview] = useState<PublicUniversityReview | null>(null)
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null)
   const reviewsScrollRef = useRef<HTMLDivElement>(null)
 
@@ -88,12 +81,6 @@ export default function UniversityDetailPage() {
   }, [id])
 
   useEffect(() => {
-    listPublicUniversities({ limit: 200 })
-      .then((res) => setUniversityOptions(res.items))
-      .catch(() => {})
-  }, [])
-
-  useEffect(() => {
     if (!getStudentToken()) return
     let cancelled = false
     getStudentMe()
@@ -105,6 +92,22 @@ export default function UniversityDetailPage() {
       cancelled = true
     }
   }, [])
+
+  useEffect(() => {
+    if (lightboxIndex == null) return
+    const galleryLength = uni?.detail?.gallery?.length || 0
+    function handleKeyDown(e: KeyboardEvent) {
+      if (e.key === 'Escape') {
+        setLightboxIndex(null)
+      } else if (galleryLength > 1 && e.key === 'ArrowLeft') {
+        setLightboxIndex((i) => (i! - 1 + galleryLength) % galleryLength)
+      } else if (galleryLength > 1 && e.key === 'ArrowRight') {
+        setLightboxIndex((i) => (i! + 1) % galleryLength)
+      }
+    }
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [lightboxIndex, uni])
 
   if (loading) {
     return (
@@ -127,30 +130,14 @@ export default function UniversityDetailPage() {
   const gallery = uni.detail?.gallery || []
   const about = uni.detail?.about || []
   const website = uni.detail?.website
-  const poc = uni.detail?.poc
   const inclusions = uni.inclusions || []
   const avgRating = uni.aggregateRating
   const reviewCount = uni.aggregateReviewCount ?? reviews.length
 
-  const handleCopy = (field: string, value: string) => {
-    navigator.clipboard.writeText(value).then(() => {
-      setCopiedField(field)
-      setTimeout(() => setCopiedField((prev) => (prev === field ? null : prev)), 1500)
-    })
-  }
-
-  const toggleReviewExpanded = (id: string) => {
-    setExpandedReviews((prev) => {
-      const next = new Set(prev)
-      if (next.has(id)) next.delete(id)
-      else next.add(id)
-      return next
-    })
-  }
-
   const scrollReviews = (direction: 'left' | 'right') => {
+    const width = reviewsScrollRef.current?.clientWidth ?? 320
     reviewsScrollRef.current?.scrollBy({
-      left: direction === 'left' ? -320 : 320,
+      left: direction === 'left' ? -width : width,
       behavior: 'smooth',
     })
   }
@@ -209,7 +196,7 @@ export default function UniversityDetailPage() {
               <Award className="h-6 w-6 text-blue-900" />
               <div>
                 <div className="flex items-center gap-1 text-xs text-gray-500">
-                  QS Ranking <Info className="h-3 w-3" />
+                  QS Ranking
                 </div>
                 <div className="text-lg font-bold text-blue-900">
                   {uni.qsRank ?? 'Not Ranked'}
@@ -220,7 +207,7 @@ export default function UniversityDetailPage() {
               <Landmark className="h-6 w-6 text-blue-900" />
               <div>
                 <div className="flex items-center gap-1 text-xs text-gray-500">
-                  University Origin <Info className="h-3 w-3" />
+                  University Origin
                 </div>
                 <div className="text-lg font-bold text-blue-900">
                   {uni.origin || '-'}
@@ -273,7 +260,7 @@ export default function UniversityDetailPage() {
                 )}
               </div>
             </div>
-            <div className="mt-4 space-y-4 text-base leading-relaxed text-gray-600">
+            <div className="mt-4 space-y-4 text-base font-medium leading-relaxed text-gray-600">
               {about.length > 0 ? (
                 about.map((p, i) => <p key={i}>{p}</p>)
               ) : (
@@ -290,34 +277,39 @@ export default function UniversityDetailPage() {
             )}
           </div>
 
-          <div className="rounded-xl border border-gray-100 p-6 shadow-sm">
-            <TextField label="Full Name" placeholder="Your name" defaultValue={student?.fullName} />
-            <TextField
-              label="Email"
-              type="email"
-              placeholder="you@example.com"
-              defaultValue={student?.email}
-              className="mt-4"
-            />
-            <SelectField
-              label="Studying in School or University"
-              options={['School', 'University']}
-              defaultValue={student?.currentStage === 'School Student' ? 'School' : 'University'}
-              className="mt-4"
-            />
-            <SelectField
-              label="Select University"
-              placeholder="Select a university"
-              options={universityOptions.map((u) => u.name)}
-              defaultValue={uni?.name}
-              className="mt-4"
-            />
-            <Link
-              to="/profile/build"
-              className="mt-6 block w-full rounded-lg bg-blue-900 py-3 text-center text-sm font-semibold text-white hover:bg-blue-800"
-            >
-              Build Your Profile
-            </Link>
+          <div className="space-y-6">
+            <div className="rounded-xl border border-gray-100 p-6 shadow-sm">
+              <h2 className="mb-4 text-sm font-bold tracking-wide text-black">
+                CONNECT WITH US
+              </h2>
+              <p className="mb-4 text-sm text-gray-500">
+                Have questions or need more information? Reach out to the
+                university team directly.
+              </p>
+              <TextField label="Full Name" placeholder="" />
+              <TextField label="Email" type="email" placeholder="" className="mt-4" />
+              <div className="mt-4">
+                <label className="mb-1.5 block text-sm font-medium text-gray-900">
+                  Your Message
+                </label>
+                <textarea
+                  rows={4}
+                  className="w-full rounded-lg border border-gray-200 px-4 py-3 text-sm focus:border-blue-500 focus:outline-none"
+                />
+              </div>
+              <button className="mt-4 w-full rounded-lg bg-blue-600 py-3 text-sm font-semibold text-white hover:bg-blue-700">
+                Send Message
+              </button>
+            </div>
+
+            <div className="rounded-xl border border-gray-100 p-6 shadow-sm">
+              <Link
+                to="/profile/build"
+                className="block w-full rounded-lg bg-blue-600 py-3 text-center text-sm font-semibold text-white hover:bg-blue-700"
+              >
+                Build Your Profile
+              </Link>
+            </div>
           </div>
         </div>
 
@@ -372,7 +364,7 @@ export default function UniversityDetailPage() {
             <p className="mt-6 text-sm text-gray-400">No reviews yet.</p>
           ) : (
             <div className="mt-6">
-              {reviews.length > 6 && (
+              {reviews.length > 4 && (
                 <div className="mb-3 flex justify-end gap-2">
                   <button
                     type="button"
@@ -397,12 +389,11 @@ export default function UniversityDetailPage() {
                 className="flex gap-6 overflow-x-auto scroll-smooth pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
               >
                 {reviews.map((r) => {
-                  const isExpanded = expandedReviews.has(r._id)
                   const isLong = r.text.length > 140
                   return (
                     <div
                       key={r._id}
-                      className="w-[calc((100%_-_7.5rem)/6)] shrink-0"
+                      className="w-[calc((100%_-_4.5rem)/4)] shrink-0"
                     >
                       <div className="flex items-center gap-2">
                         <Avatar src={r.reviewerAvatar} name={r.reviewerName} className="h-8 w-8 text-xs" />
@@ -426,8 +417,8 @@ export default function UniversityDetailPage() {
                         </div>
                       )}
                       <p
-                        className={`mt-2 text-xs leading-relaxed text-gray-600 ${
-                          isLong && !isExpanded ? 'line-clamp-3' : ''
+                        className={`mt-2 text-sm leading-relaxed text-gray-600 ${
+                          isLong ? 'line-clamp-3' : ''
                         }`}
                       >
                         {r.text}
@@ -435,10 +426,10 @@ export default function UniversityDetailPage() {
                       {isLong && (
                         <button
                           type="button"
-                          onClick={() => toggleReviewExpanded(r._id)}
-                          className="mt-1 text-xs font-medium text-black underline underline-offset-2"
+                          onClick={() => setActiveReview(r)}
+                          className="mt-1 text-sm font-medium text-black underline underline-offset-2"
                         >
-                          {isExpanded ? 'Show less' : 'Show more'}
+                          Show more
                         </button>
                       )}
                       <div className="mt-2 text-xs text-gray-400">
@@ -469,91 +460,6 @@ export default function UniversityDetailPage() {
           </div>
         </div>
 
-        {/* POC + Connect */}
-        <div className="mt-14 grid grid-cols-1 gap-10 pb-16 lg:grid-cols-2">
-          <div>
-            <h2 className="mb-4 text-sm font-bold tracking-wide text-black">
-              UNIVERSITY POC DETAILS
-            </h2>
-            <div className="flex items-start gap-4">
-              <SafeImage
-                src={uni.logo}
-                alt=""
-                className="h-14 w-14 rounded-md border border-gray-100 object-contain p-1"
-              />
-              <div className="space-y-3 text-sm text-gray-600">
-                {poc?.address && (
-                  <button
-                    type="button"
-                    onClick={() => handleCopy('address', poc.address!)}
-                    className="flex items-start gap-2 text-left hover:text-black"
-                  >
-                    <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-gray-400" />
-                    {poc.address}
-                    {copiedField === 'address' && (
-                      <span className="text-xs font-medium text-green-600">(Copied!)</span>
-                    )}
-                  </button>
-                )}
-                {poc?.email && (
-                  <button
-                    type="button"
-                    onClick={() => handleCopy('email', poc.email!)}
-                    className="flex items-center gap-2 text-left hover:text-black"
-                  >
-                    <Mail className="h-4 w-4 shrink-0 text-gray-400" />
-                    {poc.email}
-                    {copiedField === 'email' && (
-                      <span className="text-xs font-medium text-green-600">(Copied!)</span>
-                    )}
-                  </button>
-                )}
-                {poc?.phone && (
-                  <button
-                    type="button"
-                    onClick={() => handleCopy('phone', poc.phone!)}
-                    className="flex items-center gap-2 text-left hover:text-black"
-                  >
-                    <Phone className="h-4 w-4 shrink-0 text-gray-400" />
-                    {poc.phone}
-                    {copiedField === 'phone' && (
-                      <span className="text-xs font-medium text-green-600">(Copied!)</span>
-                    )}
-                  </button>
-                )}
-                {!poc?.address && !poc?.email && !poc?.phone && (
-                  <p className="text-gray-400">No contact details available yet.</p>
-                )}
-              </div>
-            </div>
-          </div>
-
-          <div>
-            <h2 className="mb-4 text-sm font-bold tracking-wide text-black">
-              CONNECT WITH US
-            </h2>
-            <p className="mb-4 text-sm text-gray-500">
-              Have questions or need more information? Reach out to the
-              university team directly.
-            </p>
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-              <TextField label="Full Name" placeholder="" />
-              <TextField label="Email" type="email" placeholder="" />
-            </div>
-            <div className="mt-4">
-              <label className="mb-1.5 block text-sm font-medium text-gray-900">
-                Your Message
-              </label>
-              <textarea
-                rows={4}
-                className="w-full rounded-lg border border-gray-200 px-4 py-3 text-sm focus:border-blue-500 focus:outline-none"
-              />
-            </div>
-            <button className="mt-4 w-full rounded-full bg-blue-500 py-3 text-sm font-semibold text-white hover:bg-blue-600">
-              Send Message
-            </button>
-          </div>
-        </div>
       </div>
 
       {showContributorModal && (
@@ -574,6 +480,34 @@ export default function UniversityDetailPage() {
             refreshReviews()
           }}
         />
+      )}
+
+      {activeReview && (
+        <Modal title={activeReview.reviewerName} onClose={() => setActiveReview(null)} maxWidthClassName="max-w-md">
+          <div className="flex items-center gap-3">
+            <Avatar src={activeReview.reviewerAvatar} name={activeReview.reviewerName} className="h-10 w-10 text-sm" />
+            <div>
+              <div className="text-sm font-semibold text-black">{activeReview.reviewerName}</div>
+              <div className="text-xs text-gray-400">
+                {activeReview.reviewerMeta || activeReview.platform || ''}
+              </div>
+            </div>
+          </div>
+          {activeReview.rating != null && (
+            <div className="mt-3 flex text-yellow-500">
+              {Array.from({ length: 5 }).map((_, s) => (
+                <Star
+                  key={s}
+                  className={`h-4 w-4 ${s < activeReview.rating! ? 'fill-current' : ''}`}
+                />
+              ))}
+            </div>
+          )}
+          <p className="mt-4 text-sm leading-relaxed text-gray-600">{activeReview.text}</p>
+          <div className="mt-4 text-xs text-gray-400">
+            {new Date(activeReview.date).toLocaleDateString()}
+          </div>
+        </Modal>
       )}
 
       {lightboxIndex != null && (

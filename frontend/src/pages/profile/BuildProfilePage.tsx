@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { ArrowLeft, ArrowRight } from 'lucide-react'
-import PageShell from '../../components/layout/PageShell'
+import DashboardLayout from '../../components/layout/DashboardLayout'
+import { studentNav } from '../student/studentNav'
 import ProfileStepper from './ProfileStepper'
 import PersonalInfoStep from './steps/PersonalInfoStep'
 import EducationInfoStep from './steps/EducationInfoStep'
@@ -208,15 +209,15 @@ export default function BuildProfilePage() {
 
   if (loading) {
     return (
-      <PageShell hideFooter>
-        <p className="mx-auto max-w-4xl px-[6.5rem] py-20 text-center text-gray-400">Loading your profile...</p>
-      </PageShell>
+      <DashboardLayout navItems={studentNav} userName={data.personal.fullName || ''} userRole="Student">
+        <p className="py-20 text-center text-gray-400">Loading your profile...</p>
+      </DashboardLayout>
     )
   }
 
   return (
-    <PageShell hideFooter>
-      <div className="mx-auto max-w-4xl px-[6.5rem] py-12">
+    <DashboardLayout navItems={studentNav} userName={data.personal.fullName || ''} userRole="Student">
+      <div className="mx-auto max-w-4xl">
         <div className="text-center">
           <h1 className="text-3xl font-semibold text-black">
             Build Your Student Profile
@@ -300,6 +301,6 @@ export default function BuildProfilePage() {
           </div>
         </div>
       </div>
-    </PageShell>
+    </DashboardLayout>
   )
 }

@@ -40,7 +40,7 @@ export default function UniversitySearchPage() {
   const country = searchParams.get('country') || ''
   const location = searchParams.get('location') || ''
   const field = searchParams.get('field') || 'All'
-  const additional = searchParams.get('additional') || (isTuition ? '' : 'QS Ranking')
+  const additional = searchParams.get('additional') || (isTuition ? '' : 'All')
   const query = searchParams.get('q') || ''
   const page = Number(searchParams.get('page') || '1')
   const applied = searchParams.get('applied') === '1'
@@ -77,7 +77,10 @@ export default function UniversitySearchPage() {
         setGrades(res.grades)
       })
       .catch(() => {})
-    updateParams({ field: undefined, additional: undefined })
+    updateParams(
+      { field: undefined, additional: undefined, country: country || 'United Arab Emirates' },
+      { resetPage: true }
+    )
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [type])
 
@@ -151,7 +154,7 @@ export default function UniversitySearchPage() {
             label="Country"
             value={country}
             placeholder="Select country"
-            options={countries}
+            options={country && !countries.includes(country) ? [country, ...countries] : countries}
             onChange={(v) => {
               setFilterError(false)
               updateParams({ country: v, location: undefined }, { resetPage: true })
@@ -180,8 +183,13 @@ export default function UniversitySearchPage() {
             label={isTuition ? 'Mode' : 'Additional Filters'}
             value={additional}
             placeholder={isTuition ? 'Select mode' : 'QS Ranking, Cost of Living, Student Population'}
-            options={isTuition ? MODE_OPTIONS : ADDITIONAL_FILTERS}
-            onChange={(v) => updateParams({ additional: v }, { resetPage: true })}
+            options={isTuition ? MODE_OPTIONS : ['All', ...ADDITIONAL_FILTERS]}
+            onChange={(v) =>
+              updateParams(
+                { additional: !isTuition && v === 'All' ? undefined : v },
+                { resetPage: true }
+              )
+            }
           />
           <div className="flex justify-center pl-0 md:pl-6">
             <button
@@ -251,7 +259,7 @@ export default function UniversitySearchPage() {
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/10 to-transparent" />
                     <div className="absolute bottom-0 left-0 right-0 p-4 text-white">
-                      <div className="text-sm font-semibold leading-snug">
+                      <div className="truncate text-sm font-semibold leading-snug">
                         {u.name}
                       </div>
                       <div className="mt-2 flex items-center gap-2 text-xs">
