@@ -310,7 +310,7 @@ function FilterDropdown({
           onChange={(e) => onChange(e.target.value)}
           className="w-full cursor-pointer appearance-none truncate bg-transparent pr-6 text-sm text-gray-500 focus:outline-none"
         >
-          <option value="">{placeholder}</option>
+          <option value="" disabled hidden>{placeholder}</option>
           {options.map((opt) => (
             <option key={opt} value={opt} className="text-black">
               {opt}
