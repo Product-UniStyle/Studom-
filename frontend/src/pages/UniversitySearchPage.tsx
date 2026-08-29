@@ -62,6 +62,7 @@ export default function UniversitySearchPage() {
   const [total, setTotal] = useState(0)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [filterError, setFilterError] = useState(false)
 
   const [countries, setCountries] = useState<string[]>([])
   const [cities, setCities] = useState<string[]>([])
@@ -87,7 +88,7 @@ export default function UniversitySearchPage() {
   }, [type, country])
 
   useEffect(() => {
-    if (!applied) return
+    if (!applied || !country || !location) return
     let cancelled = false
     setLoading(true)
     setError(null)
@@ -133,6 +134,11 @@ export default function UniversitySearchPage() {
   }, [type, field, location, isSchool])
 
   const handleSearch = () => {
+    if (!country || !location) {
+      setFilterError(true)
+      return
+    }
+    setFilterError(false)
     updateParams({ applied: '1' }, { resetPage: true })
   }
 
@@ -147,6 +153,7 @@ export default function UniversitySearchPage() {
             placeholder="Select country"
             options={countries}
             onChange={(v) => {
+              setFilterError(false)
               updateParams({ country: v, location: undefined }, { resetPage: true })
             }}
           />
@@ -156,6 +163,7 @@ export default function UniversitySearchPage() {
             placeholder="Select location"
             options={cities}
             onChange={(v) => {
+              setFilterError(false)
               updateParams({ location: v }, { resetPage: true })
             }}
           />
@@ -185,14 +193,16 @@ export default function UniversitySearchPage() {
           </div>
         </div>
 
-        {!applied ? (
+        {!applied || !country || !location ? (
           <div className="flex flex-col items-center justify-center py-32 text-center">
             <Landmark className="h-16 w-16 text-gray-300" strokeWidth={1} />
             <h2 className="mt-6 text-2xl font-bold text-black">
               Please fill in the filters
             </h2>
             <p className="mt-2 text-gray-500">
-              Choose your filters to explore universities.
+              {filterError
+                ? 'Country and location are required to search.'
+                : 'Choose a country and location to explore universities.'}
             </p>
           </div>
         ) : (
