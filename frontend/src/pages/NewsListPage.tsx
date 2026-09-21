@@ -1,4 +1,4 @@
-﻿import { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Search, ChevronDown, Bookmark } from 'lucide-react'
 import PageShell from '../components/layout/PageShell'
@@ -130,7 +130,7 @@ export default function NewsListPage() {
                       </Link>
                       <div className="mt-2 flex items-center justify-between gap-3">
                         <Link to={`/news/${n.slug || n._id}`} className="text-sm font-medium text-blue-600 hover:underline">
-                          Read more â†’
+                          Read more →
                         </Link>
                         <button
                           onClick={() => toggleSave(n._id)}
@@ -155,7 +155,7 @@ export default function NewsListPage() {
                   disabled={page <= 1}
                   className="flex h-9 w-9 items-center justify-center rounded-full border border-gray-200 text-gray-500 disabled:opacity-40"
                 >
-                  â€¹
+                  ‹
                 </button>
                 {Array.from({ length: Math.min(5, totalPages) }, (_, i) => i + 1).map((n) => (
                   <button
@@ -174,7 +174,7 @@ export default function NewsListPage() {
                   disabled={page >= totalPages}
                   className="flex h-9 w-9 items-center justify-center rounded-full border border-gray-200 text-gray-500 disabled:opacity-40"
                 >
-                  â€º
+                  ›
                 </button>
               </div>
             )}
