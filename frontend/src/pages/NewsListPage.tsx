@@ -1,12 +1,12 @@
-import { useEffect, useState } from 'react'
+﻿import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { Search, ChevronDown, Bookmark, Tag, Layers } from 'lucide-react'
+import { Search, ChevronDown, Bookmark } from 'lucide-react'
 import PageShell from '../components/layout/PageShell'
 import SafeImage from '../components/ui/SafeImage'
-import { listPublicNews, getPublicNewsCategories } from '../lib/publicApi'
+import { listPublicNews } from '../lib/publicApi'
 import type { PublicArticleListItem } from '../lib/publicApi'
 
-const PAGE_SIZE = 6
+const PAGE_SIZE = 12
 
 function fmtDate(value?: string): string {
   if (!value) return ''
@@ -15,10 +15,8 @@ function fmtDate(value?: string): string {
 
 export default function NewsListPage() {
   const [query, setQuery] = useState('')
-  const [category, setCategory] = useState('')
   const [sort, setSort] = useState<'latest' | 'oldest'>('latest')
   const [page, setPage] = useState(1)
-  const [categories, setCategories] = useState<string[]>([])
   const [items, setItems] = useState<PublicArticleListItem[]>([])
   const [total, setTotal] = useState(0)
   const [loading, setLoading] = useState(true)
@@ -26,17 +24,11 @@ export default function NewsListPage() {
   const [saved, setSaved] = useState<Set<string>>(new Set())
 
   useEffect(() => {
-    getPublicNewsCategories()
-      .then((res) => setCategories(res.categories))
-      .catch(() => {})
-  }, [])
-
-  useEffect(() => {
     let cancelled = false
     setLoading(true)
     setError(null)
     const t = setTimeout(() => {
-      listPublicNews({ search: query || undefined, type: category || undefined, sort, page, limit: PAGE_SIZE })
+      listPublicNews({ search: query || undefined, sort, page, limit: PAGE_SIZE })
         .then((res) => {
           if (cancelled) return
           setItems(res.items)
@@ -54,7 +46,7 @@ export default function NewsListPage() {
       cancelled = true
       clearTimeout(t)
     }
-  }, [query, category, sort, page])
+  }, [query, sort, page])
 
   const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE))
 
@@ -105,7 +97,7 @@ export default function NewsListPage() {
           </label>
         </div>
 
-        <div className="mt-6 grid grid-cols-1 gap-8 lg:grid-cols-[1fr_280px]">
+        <div className="mt-6">
           <div>
             {error && <p className="text-sm text-red-600">{error}</p>}
             {loading ? (
@@ -113,9 +105,9 @@ export default function NewsListPage() {
             ) : items.length === 0 ? (
               <p className="py-16 text-center text-gray-400">No news articles found.</p>
             ) : (
-              <div className="divide-y divide-gray-100 rounded-2xl border border-gray-100">
+              <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                 {items.map((n) => (
-                  <div key={n._id} className="flex flex-col gap-4 p-5 sm:flex-row">
+                  <div key={n._id} className="flex flex-col gap-4 rounded-2xl border border-gray-100 p-5 sm:flex-row">
                     <SafeImage
                       src={n.coverImage}
                       alt=""
@@ -138,7 +130,7 @@ export default function NewsListPage() {
                       </Link>
                       <div className="mt-2 flex items-center justify-between gap-3">
                         <Link to={`/news/${n.slug || n._id}`} className="text-sm font-medium text-blue-600 hover:underline">
-                          Read more →
+                          Read more â†’
                         </Link>
                         <button
                           onClick={() => toggleSave(n._id)}
@@ -163,7 +155,7 @@ export default function NewsListPage() {
                   disabled={page <= 1}
                   className="flex h-9 w-9 items-center justify-center rounded-full border border-gray-200 text-gray-500 disabled:opacity-40"
                 >
-                  ‹
+                  â€¹
                 </button>
                 {Array.from({ length: Math.min(5, totalPages) }, (_, i) => i + 1).map((n) => (
                   <button
@@ -182,68 +174,11 @@ export default function NewsListPage() {
                   disabled={page >= totalPages}
                   className="flex h-9 w-9 items-center justify-center rounded-full border border-gray-200 text-gray-500 disabled:opacity-40"
                 >
-                  ›
+                  â€º
                 </button>
               </div>
             )}
           </div>
-
-          <aside className="space-y-6">
-            <div className="rounded-2xl border border-gray-200 p-5">
-              <h2 className="mb-3 text-lg font-semibold text-blue-600">Categories</h2>
-              <div className="space-y-1">
-                <button
-                  onClick={() => {
-                    setCategory('')
-                    setPage(1)
-                  }}
-                  className={`flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-left text-sm ${
-                    category === '' ? 'bg-blue-50 font-medium text-blue-700' : 'text-gray-600 hover:bg-gray-50'
-                  }`}
-                >
-                  <Layers className="h-4 w-4" /> All News
-                </button>
-                {categories.map((c) => (
-                  <button
-                    key={c}
-                    onClick={() => {
-                      setCategory(c)
-                      setPage(1)
-                    }}
-                    className={`flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-left text-sm ${
-                      category === c ? 'bg-blue-50 font-medium text-blue-700' : 'text-gray-600 hover:bg-gray-50'
-                    }`}
-                  >
-                    <Tag className="h-4 w-4" /> {c}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            <div className="rounded-2xl border border-gray-200 bg-blue-50/40 p-5">
-              <h2 className="text-base font-semibold text-blue-600">Subscribe to our newsletter</h2>
-              <p className="mt-1 text-sm text-gray-500">
-                Get the latest education updates delivered to your inbox.
-              </p>
-              <form
-                onSubmit={(e) => e.preventDefault()}
-                className="mt-3 flex flex-col gap-2"
-              >
-                <input
-                  type="email"
-                  required
-                  placeholder="Enter your email"
-                  className="w-full rounded-lg border border-gray-200 px-3 py-2.5 text-sm focus:border-blue-500 focus:outline-none"
-                />
-                <button
-                  type="submit"
-                  className="rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-blue-700"
-                >
-                  Subscribe
-                </button>
-              </form>
-            </div>
-          </aside>
         </div>
       </div>
     </PageShell>

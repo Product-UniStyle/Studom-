@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { Upload } from 'lucide-react'
+import { Upload, X } from 'lucide-react'
 
 interface ImageUploadFieldProps {
   label: string
@@ -38,6 +38,12 @@ export default function ImageUploadField({ label, name, defaultValue, onUpload, 
     }
   }
 
+  function removeImage() {
+    setValue('')
+    setError(null)
+    onChange?.('')
+  }
+
   function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0]
     e.target.value = ''
@@ -50,6 +56,7 @@ export default function ImageUploadField({ label, name, defaultValue, onUpload, 
       <label className="mb-1.5 block text-sm font-medium text-gray-900">{label}</label>
       <input type="hidden" name={name} value={value} readOnly />
 
+      <div className="relative h-28 w-28">
       <div
         onClick={() => fileInputRef.current?.click()}
         onDragOver={(e) => {
@@ -77,6 +84,17 @@ export default function ImageUploadField({ label, name, defaultValue, onUpload, 
             <span className="text-[10px]">{uploading ? 'Uploading...' : 'Drag or click'}</span>
           </div>
         )}
+      </div>
+      {value && (
+        <button
+          type="button"
+          onClick={removeImage}
+          aria-label="Remove image"
+          className="absolute -right-2 -top-2 flex h-6 w-6 items-center justify-center rounded-full bg-red-600 text-white shadow hover:bg-red-700"
+        >
+          <X className="h-3.5 w-3.5" />
+        </button>
+      )}
       </div>
       <input
         ref={fileInputRef}

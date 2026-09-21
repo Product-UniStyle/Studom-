@@ -16,6 +16,7 @@ export default function NewsDetailPage() {
   const [article, setArticle] = useState<PublicArticleDetail | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [activeImage, setActiveImage] = useState<string | null>(null)
 
   useEffect(() => {
     if (!id) return
@@ -36,6 +37,36 @@ export default function NewsDetailPage() {
       cancelled = true
     }
   }, [id])
+
+  // Only sections that have an image count, so the left/right alternation
+  // continues past image-less sections (cover image is always right).
+  let imageIndex = 0
+  const sectionsWithSide = article
+    ? article.sections
+        .slice()
+        .sort((a, b) => a.order - b.order)
+        .map((s) => {
+          if (!s.image) return { ...s, imageSide: null }
+          const imageSide: 'left' | 'right' = imageIndex % 2 === 0 ? 'left' : 'right'
+          imageIndex += 1
+          return { ...s, imageSide }
+        })
+    : []
+
+  const renderFloatingImage = (src: string | undefined, side: 'left' | 'right') => {
+    if (!src) return null
+    const floatClasses = side === 'left' ? 'md:float-left md:mr-8' : 'md:float-right md:ml-8'
+    return (
+      <div className={`mb-5 h-auto w-full overflow-hidden rounded-xl md:mb-3 md:w-[38%] lg:w-[36%] ${floatClasses}`}>
+        <SafeImage
+          src={src}
+          alt=""
+          className="block h-auto w-full cursor-pointer"
+          onClick={() => setActiveImage(src)}
+        />
+      </div>
+    )
+  }
 
   return (
     <PageShell>
@@ -69,32 +100,26 @@ export default function NewsDetailPage() {
               )}
             </div>
 
-            {article.coverImage && (
-              <SafeImage
-                src={article.coverImage}
-                alt=""
-                className="mt-6 h-64 w-full rounded-xl object-cover sm:h-96"
-              />
-            )}
+            <div className="mt-8 flex flex-col gap-8 text-[15px] leading-relaxed text-gray-700">
+              <section className="clear-both flow-root">
+                {renderFloatingImage(article.coverImage, 'right')}
+                <div className="space-y-4">
+                  {article.content
+                    .split(/\n\s*\n/)
+                    .filter(Boolean)
+                    .map((para, i) => (
+                      <p key={i}>{para}</p>
+                    ))}
+                </div>
+              </section>
 
-            <div className="mt-8 space-y-4 text-[15px] leading-relaxed text-gray-700">
-              {article.content
-                .split(/\n\s*\n/)
-                .filter(Boolean)
-                .map((para, i) => (
-                  <p key={i}>{para}</p>
-                ))}
-
-              {article.sections
-                .slice()
-                .sort((a, b) => a.order - b.order)
-                .map((s, i) => (
-                  <div key={i}>
-                    {s.title && <h3 className="mb-2 mt-6 text-lg font-semibold text-black">{s.title}</h3>}
-                    {s.image && <SafeImage src={s.image} alt="" className="mb-3 w-full rounded-xl object-cover" />}
-                    <p>{s.content}</p>
-                  </div>
-                ))}
+              {sectionsWithSide.map((s, i) => (
+                <article key={i} className="clear-both flow-root">
+                  {s.title && <h3 className="mb-4 text-lg font-semibold text-black">{s.title}</h3>}
+                  {renderFloatingImage(s.image, s.imageSide ?? 'right')}
+                  <p className="whitespace-pre-line">{s.content}</p>
+                </article>
+              ))}
             </div>
 
             {article.sourceLink && (
@@ -110,6 +135,25 @@ export default function NewsDetailPage() {
           </div>
         )}
       </div>
+
+      {activeImage && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black p-4"
+          onClick={() => setActiveImage(null)}
+        >
+          <div className="relative max-h-full max-w-5xl" onClick={(e) => e.stopPropagation()}>
+            <button
+              type="button"
+              className="absolute -right-3 -top-3 rounded-full bg-white px-2 py-1 text-sm font-semibold text-gray-700 shadow"
+              onClick={() => setActiveImage(null)}
+              aria-label="Close image preview"
+            >
+              ✕
+            </button>
+            <img src={activeImage} alt="Expanded content" className="max-h-[85vh] w-full rounded-lg object-contain shadow-xl" />
+          </div>
+        </div>
+      )}
     </PageShell>
   )
 }

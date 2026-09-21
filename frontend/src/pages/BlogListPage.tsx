@@ -6,7 +6,7 @@ import SafeImage from '../components/ui/SafeImage'
 import { listPublicBlogs, getPublicBlogCategories } from '../lib/publicApi'
 import type { PublicArticleListItem } from '../lib/publicApi'
 
-const PAGE_SIZE = 6
+const PAGE_SIZE = 12
 
 function fmtDate(value?: string): string {
   if (!value) return ''
@@ -128,8 +128,6 @@ export default function BlogListPage() {
                     <span>{b.author || b.source || 'Studom Team'}</span>
                     <span>·</span>
                     <span>{fmtDate(b.publishedDate)}</span>
-                    <span>·</span>
-                    <span>{b.readingMinutes} min read</span>
                   </div>
                 </div>
               </Link>
