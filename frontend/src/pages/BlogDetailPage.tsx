@@ -3,6 +3,7 @@ import { Link, useParams } from 'react-router-dom'
 import { ArrowLeft, FileText, User, Calendar, Tag, ExternalLink } from 'lucide-react'
 import PageShell from '../components/layout/PageShell'
 import SafeImage from '../components/ui/SafeImage'
+import ArticleDisclaimer from '../components/ui/ArticleDisclaimer'
 import { getPublicBlogPost } from '../lib/publicApi'
 import type { PublicArticleDetail } from '../lib/publicApi'
 
@@ -132,6 +133,8 @@ export default function BlogDetailPage() {
                 Read Original Article <ExternalLink className="h-4 w-4" />
               </a>
             )}
+
+            <ArticleDisclaimer />
           </div>
         )}
       </div>
