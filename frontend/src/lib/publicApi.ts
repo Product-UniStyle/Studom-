@@ -158,6 +158,7 @@ export interface PublicArticleDetail extends PublicArticleListItem {
 interface ArticleListParams {
   search?: string
   type?: string
+  destination?: string
   sort?: 'latest' | 'oldest'
   page?: number
   limit?: number
@@ -167,6 +168,7 @@ function buildArticleQuery(params: ArticleListParams): string {
   const query = new URLSearchParams()
   if (params.search) query.set('search', params.search)
   if (params.type) query.set('type', params.type)
+  if (params.destination) query.set('destination', params.destination)
   if (params.sort) query.set('sort', params.sort)
   if (params.page) query.set('page', String(params.page))
   if (params.limit) query.set('limit', String(params.limit))
@@ -191,6 +193,10 @@ export function listPublicBlogs(params: ArticleListParams): Promise<PublicArticl
 
 export function getPublicBlogCategories(): Promise<{ categories: string[] }> {
   return publicFetch('/api/public/blogs/categories')
+}
+
+export function getPublicBlogLocations(): Promise<{ locations: string[] }> {
+  return publicFetch('/api/public/blogs/locations')
 }
 
 export function getPublicBlogPost(id: string): Promise<PublicArticleDetail> {

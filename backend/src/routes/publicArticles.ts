@@ -16,6 +16,7 @@ export function buildPublicArticleRouter<T>(model: Model<T>): Router {
   router.get('/', async (req, res) => {
     const search = typeof req.query.search === 'string' ? req.query.search.trim() : '';
     const type = typeof req.query.type === 'string' ? req.query.type.trim() : '';
+    const destination = typeof req.query.destination === 'string' ? req.query.destination.trim() : '';
     const sort = req.query.sort === 'oldest' ? 1 : -1;
     const page = Math.max(1, Number(req.query.page) || 1);
     const limit = Math.min(50, Math.max(1, Number(req.query.limit) || 20));
@@ -23,6 +24,7 @@ export function buildPublicArticleRouter<T>(model: Model<T>): Router {
     const filter: Record<string, unknown> = {};
     if (search) filter.title = new RegExp(escapeRegex(search), 'i');
     if (type) filter.type = type;
+    if (destination) filter.destination = destination;
 
     const [rawItems, total] = await Promise.all([
       model
@@ -49,6 +51,11 @@ export function buildPublicArticleRouter<T>(model: Model<T>): Router {
   router.get('/categories', async (_req, res) => {
     const types = await model.distinct('type');
     res.json({ categories: (types as unknown[]).filter(Boolean).sort() });
+  });
+
+  router.get('/locations', async (_req, res) => {
+    const destinations = await model.distinct('destination');
+    res.json({ locations: (destinations as unknown[]).filter(Boolean).sort() });
   });
 
   router.get('/:id', async (req, res) => {

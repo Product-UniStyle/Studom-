@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom'
 import { Search, ChevronDown } from 'lucide-react'
 import PageShell from '../components/layout/PageShell'
 import SafeImage from '../components/ui/SafeImage'
-import { listPublicBlogs, getPublicBlogCategories } from '../lib/publicApi'
+import { listPublicBlogs, getPublicBlogLocations } from '../lib/publicApi'
 import type { PublicArticleListItem } from '../lib/publicApi'
 
 const PAGE_SIZE = 12
@@ -15,17 +15,18 @@ function fmtDate(value?: string): string {
 
 export default function BlogListPage() {
   const [query, setQuery] = useState('')
-  const [category, setCategory] = useState('')
+  const [location, setLocation] = useState('')
+  const [sort, setSort] = useState<'latest' | 'oldest'>('latest')
   const [page, setPage] = useState(1)
-  const [categories, setCategories] = useState<string[]>([])
+  const [locations, setLocations] = useState<string[]>([])
   const [items, setItems] = useState<PublicArticleListItem[]>([])
   const [total, setTotal] = useState(0)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
-    getPublicBlogCategories()
-      .then((res) => setCategories(res.categories))
+    getPublicBlogLocations()
+      .then((res) => setLocations(res.locations))
       .catch(() => {})
   }, [])
 
@@ -34,7 +35,7 @@ export default function BlogListPage() {
     setLoading(true)
     setError(null)
     const t = setTimeout(() => {
-      listPublicBlogs({ search: query || undefined, type: category || undefined, page, limit: PAGE_SIZE })
+      listPublicBlogs({ search: query || undefined, destination: location || undefined, sort, page, limit: PAGE_SIZE })
         .then((res) => {
           if (cancelled) return
           setItems(res.items)
@@ -52,7 +53,7 @@ export default function BlogListPage() {
       cancelled = true
       clearTimeout(t)
     }
-  }, [query, category, page])
+  }, [query, location, sort, page])
 
   const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE))
 
@@ -77,23 +78,42 @@ export default function BlogListPage() {
               className="w-full rounded-lg border border-gray-200 py-2.5 pl-9 pr-4 text-sm focus:border-blue-500 focus:outline-none"
             />
           </div>
-          <div className="relative w-full sm:w-56">
-            <select
-              value={category}
-              onChange={(e) => {
-                setCategory(e.target.value)
-                setPage(1)
-              }}
-              className="w-full cursor-pointer appearance-none rounded-lg border border-gray-200 py-2.5 pl-4 pr-8 text-sm text-gray-700 focus:border-blue-500 focus:outline-none"
-            >
-              <option value="">All Categories</option>
-              {categories.map((c) => (
-                <option key={c} value={c}>
-                  {c}
-                </option>
-              ))}
-            </select>
-            <ChevronDown className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+          <div className="flex w-full flex-col gap-3 sm:w-auto sm:flex-row sm:items-center">
+            <div className="relative w-full sm:w-56">
+              <select
+                value={location}
+                onChange={(e) => {
+                  setLocation(e.target.value)
+                  setPage(1)
+                }}
+                className="w-full cursor-pointer appearance-none rounded-lg border border-gray-200 py-2.5 pl-4 pr-8 text-sm text-gray-700 focus:border-blue-500 focus:outline-none"
+              >
+                <option value="">All Locations</option>
+                {locations.map((c) => (
+                  <option key={c} value={c}>
+                    {c}
+                  </option>
+                ))}
+              </select>
+              <ChevronDown className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+            </div>
+            <label className="flex items-center gap-2 text-sm text-gray-600">
+              Sort by:
+              <div className="relative">
+                <select
+                  value={sort}
+                  onChange={(e) => {
+                    setSort(e.target.value as 'latest' | 'oldest')
+                    setPage(1)
+                  }}
+                  className="cursor-pointer appearance-none rounded-lg border border-gray-200 py-2 pl-3 pr-8 text-sm text-gray-700 focus:border-blue-500 focus:outline-none"
+                >
+                  <option value="latest">Latest</option>
+                  <option value="oldest">Oldest</option>
+                </select>
+                <ChevronDown className="pointer-events-none absolute right-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-gray-400" />
+              </div>
+            </label>
           </div>
         </div>
 
@@ -121,6 +141,7 @@ export default function BlogListPage() {
                 </div>
                 <div className="p-4">
                   <h3 className="font-semibold text-blue-700 group-hover:underline">{b.title}</h3>
+                  {b.source && <p className="mt-1 text-xs text-gray-500">Source - {b.source}</p>}
                   <div className="mt-2 flex items-center gap-2 text-xs text-gray-400">
                     <span className="flex h-5 w-5 items-center justify-center rounded-full bg-gray-200 text-[10px] font-medium text-gray-600">
                       {(b.author || b.source || 'S').charAt(0)}
