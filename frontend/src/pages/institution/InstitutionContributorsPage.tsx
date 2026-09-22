@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { Search, ChevronDown } from 'lucide-react'
 import DashboardLayout from '../../components/layout/DashboardLayout'
 import Modal from '../../components/ui/Modal'
+import PageLoading from '../../components/ui/PageLoading'
 import { institutionNav } from './institutionNav'
 import { getInstitutionMe, listInstitutionContributors, updateContributorStatus } from '../../lib/institutionApi'
 import type { InstitutionAccount, InstitutionContributorItem } from '../../lib/institutionApi'
@@ -62,7 +63,7 @@ export default function InstitutionContributorsPage() {
   if (loading || !account) {
     return (
       <DashboardLayout navItems={institutionNav} userName={account?.universityName || ''} userRole="Institution">
-        <p className="mt-10 text-center text-gray-400">{error || 'Loading...'}</p>
+        <PageLoading message={error || 'Loading...'} />
       </DashboardLayout>
     )
   }

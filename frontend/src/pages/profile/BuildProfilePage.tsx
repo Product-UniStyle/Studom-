@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { ArrowLeft, ArrowRight } from 'lucide-react'
 import DashboardLayout from '../../components/layout/DashboardLayout'
+import PageLoading from '../../components/ui/PageLoading'
 import { studentNav } from '../student/studentNav'
 import ProfileStepper from './ProfileStepper'
 import PersonalInfoStep from './steps/PersonalInfoStep'
@@ -210,7 +211,7 @@ export default function BuildProfilePage() {
   if (loading) {
     return (
       <DashboardLayout navItems={studentNav} userName={data.personal.fullName || ''} userRole="Student">
-        <p className="py-20 text-center text-gray-400">Loading your profile...</p>
+        <PageLoading message="Loading your profile..." />
       </DashboardLayout>
     )
   }

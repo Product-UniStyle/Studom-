@@ -3,6 +3,7 @@ import { Search, ChevronDown, Download } from 'lucide-react'
 import DashboardLayout from '../../components/layout/DashboardLayout'
 import Modal from '../../components/ui/Modal'
 import SafeImage from '../../components/ui/SafeImage'
+import PageLoading from '../../components/ui/PageLoading'
 import { studentNav } from './studentNav'
 import { Landmark, CheckCircle2, Clock, ClipboardList } from 'lucide-react'
 import { getStudentMe, listStudentApplications, getStudentApplication } from '../../lib/studentApi'
@@ -90,7 +91,7 @@ export default function MyApplicationsPage() {
   if (loading || !student) {
     return (
       <DashboardLayout navItems={studentNav} userName={student?.fullName || ''} userRole="Student">
-        <p className="mt-10 text-center text-gray-400">{error || 'Loading...'}</p>
+        <PageLoading message={error || 'Loading...'} />
       </DashboardLayout>
     )
   }

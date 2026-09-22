@@ -13,6 +13,7 @@ import {
   Star,
 } from 'lucide-react'
 import DashboardLayout from '../../components/layout/DashboardLayout'
+import PageLoading from '../../components/ui/PageLoading'
 import { institutionNav } from './institutionNav'
 import {
   getInstitutionMe,
@@ -69,7 +70,7 @@ export default function InstitutionDashboardPage() {
   if (loading || !account || !stats) {
     return (
       <DashboardLayout navItems={institutionNav} userName={account?.universityName || ''} userRole="Institution" contentClassName="font-poppins">
-        <p className="mt-10 text-center text-gray-400">{error || 'Loading...'}</p>
+        <PageLoading message={error || 'Loading...'} />
       </DashboardLayout>
     )
   }

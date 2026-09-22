@@ -17,6 +17,7 @@ import {
 } from 'lucide-react'
 import DashboardLayout from '../../components/layout/DashboardLayout'
 import Modal from '../../components/ui/Modal'
+import PageLoading from '../../components/ui/PageLoading'
 import { studentNav } from './studentNav'
 import { getStudentMe, clearStudentToken } from '../../lib/studentApi'
 import type { StudentProfile } from '../../lib/studentApi'
@@ -64,7 +65,7 @@ export default function SettingsPage() {
   if (loading || !student) {
     return (
       <DashboardLayout navItems={studentNav} userName={student?.fullName || ''} userRole="Student">
-        <p className="mt-10 text-center text-gray-400">{error || 'Loading...'}</p>
+        <PageLoading message={error || 'Loading...'} />
       </DashboardLayout>
     )
   }

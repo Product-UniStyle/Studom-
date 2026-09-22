@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { Heart, MapPin } from 'lucide-react'
 import DashboardLayout from '../../components/layout/DashboardLayout'
 import SafeImage from '../../components/ui/SafeImage'
+import PageLoading from '../../components/ui/PageLoading'
 import { studentNav } from './studentNav'
 import { getStudentMe } from '../../lib/studentApi'
 import type { StudentProfile } from '../../lib/studentApi'
@@ -59,7 +60,7 @@ export default function FavoritesPage() {
   if (loading || !student) {
     return (
       <DashboardLayout navItems={studentNav} userName={student?.fullName || ''} userRole="Student">
-        <p className="mt-10 text-center text-gray-400">{error || 'Loading...'}</p>
+        <PageLoading message={error || 'Loading...'} />
       </DashboardLayout>
     )
   }
