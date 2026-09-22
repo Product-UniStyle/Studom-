@@ -21,6 +21,7 @@ import ApplicationSubmittedPage from './pages/apply/ApplicationSubmittedPage'
 import StudentDashboardPage from './pages/student/StudentDashboardPage'
 import MyProfilePage from './pages/student/MyProfilePage'
 import MyApplicationsPage from './pages/student/MyApplicationsPage'
+import FavoritesPage from './pages/student/FavoritesPage'
 import DocumentsPage from './pages/student/DocumentsPage'
 import SettingsPage from './pages/student/SettingsPage'
 import InstitutionDashboardPage from './pages/institution/InstitutionDashboardPage'
@@ -77,6 +78,7 @@ function App() {
       <Route path="/student/dashboard" element={<RequireStudentAuth><StudentDashboardPage /></RequireStudentAuth>} />
       <Route path="/student/profile" element={<RequireStudentAuth><MyProfilePage /></RequireStudentAuth>} />
       <Route path="/student/applications" element={<RequireStudentAuth><MyApplicationsPage /></RequireStudentAuth>} />
+      <Route path="/student/favorites" element={<RequireStudentAuth><FavoritesPage /></RequireStudentAuth>} />
       <Route path="/student/documents" element={<RequireStudentAuth><DocumentsPage /></RequireStudentAuth>} />
       <Route path="/student/settings" element={<RequireStudentAuth><SettingsPage /></RequireStudentAuth>} />
 

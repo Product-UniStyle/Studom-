@@ -5,6 +5,7 @@ import PageShell from '../components/layout/PageShell'
 import SafeImage from '../components/ui/SafeImage'
 import { getPublicUniversityFacets, listPublicUniversities } from '../lib/publicApi'
 import { getStudentToken } from '../lib/studentApi'
+import { getFavoriteIds, setFavoriteIds } from '../lib/favorites'
 import type { PublicUniversityListItem } from '../lib/publicApi'
 
 const ADDITIONAL_FILTERS = ['QS Ranking', 'Cost of Living', 'Student Population']
@@ -29,7 +30,6 @@ const TYPE_LABELS: Record<string, string> = {
 }
 
 const PAGE_SIZE = 20
-const FAVORITES_KEY = 'studom-favorite-universities'
 
 export default function UniversitySearchPage() {
   const [searchParams, setSearchParams] = useSearchParams()
@@ -64,13 +64,7 @@ export default function UniversitySearchPage() {
   const previousType = useRef<string | undefined>(undefined)
   const navigate = useNavigate()
   const [showLoginPrompt, setShowLoginPrompt] = useState(false)
-  const [favorites, setFavorites] = useState<Set<string>>(() => {
-    try {
-      return new Set<string>(JSON.parse(localStorage.getItem(FAVORITES_KEY) || '[]'))
-    } catch {
-      return new Set<string>()
-    }
-  })
+  const [favorites, setFavorites] = useState<Set<string>>(() => new Set(getFavoriteIds()))
 
   const toggleFavorite = (id: string) => {
     if (!getStudentToken()) {
@@ -81,11 +75,7 @@ export default function UniversitySearchPage() {
       const next = new Set(prev)
       if (next.has(id)) next.delete(id)
       else next.add(id)
-      try {
-        localStorage.setItem(FAVORITES_KEY, JSON.stringify([...next]))
-      } catch {
-        // storage unavailable — the toggle still works for this session
-      }
+      setFavoriteIds([...next])
       return next
     })
   }
