@@ -183,8 +183,8 @@ export default function UniversityDetailPage() {
         )}
 
         {/* Title + stats */}
-        <div className="mt-8 flex flex-col justify-between gap-6 lg:flex-row lg:items-center">
-          <div className="flex flex-1 items-center justify-center">
+        <div className="mt-8 grid grid-cols-1 gap-10 lg:grid-cols-3 lg:items-center">
+          <div className="flex items-center justify-center lg:col-span-2">
             <SafeImage
               src={uni.logo}
               alt={uni.name}
