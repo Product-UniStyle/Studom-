@@ -62,7 +62,7 @@ export default function Footer() {
           <p className="text-sm text-gray-300">
             © Copyright 2026-27 STUDOM – All Rights Reserved.
           </p>
-          <p className="mt-1 text-sm text-gray-500">Your paragraph text</p>
+          {/* <p className="mt-1 text-sm text-gray-500">Your paragraph text</p> */}
         </div>
       </div>
 
