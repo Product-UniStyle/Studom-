@@ -1,8 +1,10 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { Link, useNavigate, useSearchParams } from 'react-router-dom'
-import { Search, ChevronDown, ChevronLeft, ChevronRight, MapPin, Landmark, Heart } from 'lucide-react'
+import { Search, MapPin, Landmark, Heart } from 'lucide-react'
 import PageShell from '../components/layout/PageShell'
 import SafeImage from '../components/ui/SafeImage'
+import Pagination from '../components/ui/Pagination'
+import FilterDropdown from '../components/ui/FilterDropdown'
 import { getPublicUniversityFacets, listPublicUniversities } from '../lib/publicApi'
 import { getStudentToken } from '../lib/studentApi'
 import { getFavoriteIds, setFavoriteIds } from '../lib/favorites'
@@ -379,117 +381,5 @@ export default function UniversitySearchPage() {
         </div>
       )}
     </PageShell>
-  )
-}
-
-function FilterDropdown({
-  label,
-  value,
-  placeholder,
-  options,
-  onChange,
-}: {
-  label: string
-  value: string
-  placeholder: string
-  options: string[]
-  onChange: (v: string) => void
-}) {
-  const [open, setOpen] = useState(false)
-  const containerRef = useRef<HTMLDivElement>(null)
-
-  useEffect(() => {
-    if (!open) return
-    const handleClickOutside = (e: MouseEvent) => {
-      if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
-        setOpen(false)
-      }
-    }
-    document.addEventListener('mousedown', handleClickOutside)
-    return () => document.removeEventListener('mousedown', handleClickOutside)
-  }, [open])
-
-  return (
-    <div ref={containerRef} className="relative flex-1 px-0 md:px-6">
-      <div className="text-sm font-semibold text-black">{label}</div>
-      <button
-        type="button"
-        onClick={() => setOpen((v) => !v)}
-        className="mt-0.5 flex w-full items-center justify-between gap-2 truncate bg-transparent text-left text-sm text-gray-500 focus:outline-none"
-      >
-        <span className="truncate">{value || placeholder}</span>
-        <ChevronDown className={`h-4 w-4 shrink-0 text-gray-400 transition-transform ${open ? 'rotate-180' : ''}`} />
-      </button>
-      {open && (
-        <div className="absolute left-0 top-full z-20 mt-2 max-h-64 w-full min-w-[12rem] overflow-auto rounded-xl border border-gray-100 bg-white p-1.5 text-sm shadow-lg">
-          {options.map((opt) => (
-            <button
-              key={opt}
-              type="button"
-              onClick={() => {
-                onChange(opt)
-                setOpen(false)
-              }}
-              className={`block w-full truncate rounded-lg px-3 py-2 text-left hover:bg-gray-50 ${
-                opt === value ? 'bg-blue-50 font-medium text-blue-600' : 'text-black'
-              }`}
-            >
-              {opt}
-            </button>
-          ))}
-        </div>
-      )}
-    </div>
-  )
-}
-
-function Pagination({
-  page,
-  totalPages,
-  onChange,
-}: {
-  page: number
-  totalPages: number
-  onChange: (p: number) => void
-}) {
-  const pages = useMemo(() => {
-    const nums = new Set<number>([1, 2, 3, 4, 5, totalPages])
-    return Array.from(nums)
-      .filter((n) => n >= 1 && n <= totalPages)
-      .sort((a, b) => a - b)
-  }, [totalPages])
-
-  return (
-    <div className="mt-10 flex items-center justify-center gap-2">
-      <button
-        onClick={() => onChange(Math.max(1, page - 1))}
-        className="flex h-9 w-9 items-center justify-center rounded-full border border-gray-200 text-gray-500 hover:bg-gray-50"
-      >
-        <ChevronLeft className="h-4 w-4" />
-      </button>
-      {pages.map((n, i) => (
-        <span key={n} className="flex items-center gap-2">
-          {i > 0 && n - pages[i - 1] > 1 && (
-            <span className="text-gray-400">...</span>
-          )}
-          <button
-            onClick={() => onChange(n)}
-            className={`flex h-9 w-9 items-center justify-center rounded-full text-sm font-medium ${
-              n === page
-                ? 'bg-red-500 text-white'
-                : 'border border-gray-200 text-gray-600 hover:bg-gray-50'
-            }`}
-          >
-            {n}
-          </button>
-        </span>
-      ))}
-      <button
-        onClick={() => onChange(Math.min(totalPages, page + 1))}
-        className="flex h-9 w-9 items-center justify-center rounded-full border border-gray-200 text-gray-500 hover:bg-gray-50"
-      >
-        <ChevronRight className="h-4 w-4" />
-      </button>
-    </div>
   )
 }

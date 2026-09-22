@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { Landmark, ClipboardCheck, UserCircle2, Headphones } from 'lucide-react'
+import { Landmark, ClipboardCheck, UserCircle2 } from 'lucide-react'
 import DashboardLayout from '../../components/layout/DashboardLayout'
 import SafeImage from '../../components/ui/SafeImage'
 import { studentNav } from './studentNav'
@@ -155,22 +155,6 @@ export default function StudentDashboardPage() {
         </div>
       </div>
 
-      <div className="mt-6 flex flex-col items-center justify-between gap-4 rounded-2xl bg-gray-50 p-6 sm:flex-row">
-        <div className="flex items-center gap-4">
-          <div className="flex h-11 w-11 items-center justify-center rounded-full bg-blue-100 text-blue-600">
-            <Headphones className="h-5 w-5" />
-          </div>
-          <div>
-            <div className="font-semibold text-black">Need Help?</div>
-            <div className="text-sm text-gray-500">
-              Our support team is here to assist you.
-            </div>
-          </div>
-        </div>
-        <button className="shrink-0 rounded-lg border border-gray-300 px-5 py-2.5 text-sm font-medium text-black hover:bg-white">
-          Contact Support
-        </button>
-      </div>
     </DashboardLayout>
   )
 }

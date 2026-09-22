@@ -1,26 +1,70 @@
 import { Link, useNavigate } from 'react-router-dom'
-import { Search, ChevronDown, Check } from 'lucide-react'
+import { Search, Check } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import PageShell from '../../components/layout/PageShell'
-import { listPublicUniversities } from '../../lib/publicApi'
+import Pagination from '../../components/ui/Pagination'
+import FilterDropdown from '../../components/ui/FilterDropdown'
+import { getPublicUniversityFacets, listPublicUniversities } from '../../lib/publicApi'
 import type { PublicUniversityListItem } from '../../lib/publicApi'
 import { useApplyFlow } from '../../context/ApplyFlowContext'
+
+const PAGE_SIZE = 7
+const ALL_LOCATIONS = 'All Locations'
+const ALL_FIELDS = 'All Fields'
 
 export default function SelectUniversitiesPage() {
   const { selectedUniversities, toggleUniversity } = useApplyFlow()
   const [query, setQuery] = useState('')
+  const [country, setCountry] = useState('United Arab Emirates')
+  const [location, setLocation] = useState(ALL_LOCATIONS)
+  const [field, setField] = useState(ALL_FIELDS)
+  const [applied, setApplied] = useState(false)
+  const [page, setPage] = useState(1)
   const [items, setItems] = useState<PublicUniversityListItem[]>([])
   const [total, setTotal] = useState(0)
-  const [loading, setLoading] = useState(true)
+  const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+
+  const [countries, setCountries] = useState<string[]>([])
+  const [cities, setCities] = useState<string[]>([])
+  const [fields, setFields] = useState<string[]>([])
+
   const navigate = useNavigate()
 
   useEffect(() => {
+    getPublicUniversityFacets({ type: 'University' })
+      .then((res) => {
+        setCountries(res.countries)
+        setFields(res.fieldsOfStudy)
+      })
+      .catch(() => {})
+  }, [])
+
+  useEffect(() => {
+    getPublicUniversityFacets({ type: 'University', country: country || undefined })
+      .then((res) => setCities(res.cities))
+      .catch(() => {})
+  }, [country])
+
+  useEffect(() => {
+    setPage(1)
+  }, [query, country, location, field])
+
+  useEffect(() => {
+    if (!applied) return
     let cancelled = false
     setLoading(true)
     setError(null)
     const t = setTimeout(() => {
-      listPublicUniversities({ type: 'University', search: query || undefined, limit: 50 })
+      listPublicUniversities({
+        type: 'University',
+        search: query || undefined,
+        country: country || undefined,
+        city: location !== ALL_LOCATIONS ? location : undefined,
+        fieldOfStudy: field !== ALL_FIELDS ? field : undefined,
+        page,
+        limit: PAGE_SIZE,
+      })
         .then((res) => {
           if (cancelled) return
           setItems(res.items)
@@ -38,7 +82,9 @@ export default function SelectUniversitiesPage() {
       cancelled = true
       clearTimeout(t)
     }
-  }, [query])
+  }, [applied, query, country, location, field, page])
+
+  const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE))
 
   const selectedIds = new Set(selectedUniversities.map((u) => u.id))
 
@@ -46,11 +92,32 @@ export default function SelectUniversitiesPage() {
     <PageShell hideFooter>
       <div className="mx-auto max-w-[1100px] px-[6.5rem] py-8">
         <div className="flex flex-col gap-4 rounded-full border border-black px-6 py-3 md:flex-row md:items-center md:divide-x md:divide-gray-300">
-          <StaticFilter label="Country" value="United Arab Emirates" />
-          <StaticFilter label="Location" value="All Locations" />
-          <StaticFilter label="Field of Study" value="All Fields" />
+          <FilterDropdown
+            label="Country"
+            value={country}
+            placeholder="Select country"
+            options={country && !countries.includes(country) ? [country, ...countries] : countries}
+            onChange={setCountry}
+          />
+          <FilterDropdown
+            label="Location"
+            value={location}
+            placeholder={ALL_LOCATIONS}
+            options={[ALL_LOCATIONS, ...cities]}
+            onChange={setLocation}
+          />
+          <FilterDropdown
+            label="Field of Study"
+            value={field}
+            placeholder={ALL_FIELDS}
+            options={[ALL_FIELDS, ...fields]}
+            onChange={setField}
+          />
           <div className="flex justify-center pl-0 md:pl-6">
-            <button className="flex h-11 w-11 items-center justify-center rounded-full bg-red-500 text-white">
+            <button
+              onClick={() => setApplied(true)}
+              className="flex h-11 w-11 items-center justify-center rounded-full bg-red-500 text-white hover:bg-red-600"
+            >
               <Search className="h-5 w-5" />
             </button>
           </div>
@@ -79,12 +146,23 @@ export default function SelectUniversitiesPage() {
             <span className="whitespace-nowrap rounded-full bg-blue-50 px-3 py-1.5 text-sm font-medium text-blue-600">
               {selectedUniversities.length} selected
             </span>
+            <button
+              onClick={() => navigate('/apply/essays')}
+              disabled={selectedUniversities.length === 0}
+              className="whitespace-nowrap rounded-full bg-black px-8 py-3 text-sm font-semibold text-white hover:bg-gray-800 disabled:opacity-40"
+            >
+              Proceed
+            </button>
           </div>
         </div>
 
         {error && <p className="mt-6 text-sm text-red-600">{error}</p>}
 
-        {loading ? (
+        {!applied ? (
+          <p className="mt-10 text-center text-gray-400">
+            Choose a country and click search to see universities.
+          </p>
+        ) : loading ? (
           <p className="mt-10 text-center text-gray-400">Loading...</p>
         ) : items.length === 0 ? (
           <p className="mt-10 text-center text-gray-400">No universities found.</p>
@@ -132,31 +210,16 @@ export default function SelectUniversitiesPage() {
           </div>
         )}
 
-        <div className="mt-8 flex items-center justify-between">
-          <span className="text-sm text-gray-500">
-            {total} universities available
-          </span>
-          <button
-            onClick={() => navigate('/apply/essays')}
-            disabled={selectedUniversities.length === 0}
-            className="rounded-full bg-black px-8 py-3 text-sm font-semibold text-white hover:bg-gray-800 disabled:opacity-40"
-          >
-            Proceed
-          </button>
-        </div>
+        {applied && totalPages > 1 && <Pagination page={page} totalPages={totalPages} onChange={setPage} />}
+
+        {applied && (
+          <div className="mt-8">
+            <span className="text-sm text-gray-500">
+              {total} universities available
+            </span>
+          </div>
+        )}
       </div>
     </PageShell>
-  )
-}
-
-function StaticFilter({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="flex-1 px-0 md:px-6">
-      <div className="text-sm font-semibold text-black">{label}</div>
-      <div className="relative mt-0.5 flex items-center justify-between text-sm text-gray-500">
-        {value}
-        <ChevronDown className="h-4 w-4 text-gray-400" />
-      </div>
-    </div>
   )
 }

@@ -110,9 +110,11 @@ export default function DocumentsPage() {
       {error && <p className="mt-4 text-sm text-red-600">{error}</p>}
 
       {filtered.length === 0 ? (
-        <p className="mt-10 text-center text-gray-400">
-          {documents.length === 0 ? "You haven't uploaded any documents yet." : 'No documents match your search.'}
-        </p>
+        <div className="flex min-h-[320px] items-center justify-center">
+          <p className="text-center text-gray-400">
+            {documents.length === 0 ? "You haven't uploaded any documents yet." : 'No documents match your search.'}
+          </p>
+        </div>
       ) : (
         <div className="mt-4 overflow-x-auto rounded-2xl border border-gray-200">
           <table className="w-full text-left text-sm">
@@ -171,23 +173,6 @@ export default function DocumentsPage() {
           </table>
         </div>
       )}
-
-      <div className="mt-4 rounded-lg bg-blue-50 px-4 py-3 text-sm text-blue-700">
-        Required documents must be uploaded before universities can fully
-        review your applications.
-      </div>
-
-      <div className="mt-6 flex flex-col items-center justify-between gap-4 rounded-2xl bg-gray-50 p-6 sm:flex-row">
-        <div>
-          <div className="font-semibold text-black">Need Help?</div>
-          <div className="text-sm text-gray-500">
-            Our support team is here to assist you.
-          </div>
-        </div>
-        <button className="shrink-0 rounded-lg border border-gray-300 px-5 py-2.5 text-sm font-medium text-black hover:bg-white">
-          Contact Support
-        </button>
-      </div>
     </DashboardLayout>
   )
 }
