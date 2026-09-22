@@ -6,7 +6,9 @@ import { bySlugOrId } from '../lib/slugify';
 
 const router = Router();
 
-const LIST_FIELDS = 'slug name city country type image logo qsRank origin aggregateRating aggregateReviewCount';
+const LIST_FIELDS =
+  'slug name city country type image logo qsRank costOfLiving studentPopulation origin ' +
+  'aggregateRating aggregateReviewCount';
 const DETAIL_FIELDS =
   'slug name city country area type image logo origin course qsRank uaeRank uaeScore overallScore ' +
   'latitude longitude googleMapLink costOfLiving studentPopulation aggregateRating aggregateReviewCount ' +
@@ -33,18 +35,30 @@ router.get('/', async (req, res) => {
   if (grade) filter.grade = new RegExp(`^${escapeRegex(grade)}$`, 'i');
   if (mode) filter.mode = new RegExp(`^${escapeRegex(mode)}$`, 'i');
 
-  const sortSpec: Record<string, 1 | -1> =
-    sort === 'qsRank_desc' ? { qsRank: -1, name: 1 } : { name: 1 };
-
-  const [items, total] = await Promise.all([
-    University.find(filter)
+  // Ascending QS rank (1 = best). Mongo sorts a missing field first in
+  // ascending order, so unranked universities are given a sentinel rank to
+  // keep them after every ranked one.
+  const findItems = () => {
+    if (sort === 'qsRank_asc') {
+      const projection = Object.fromEntries(LIST_FIELDS.split(' ').map((f) => [f, 1]));
+      return University.aggregate([
+        { $match: filter },
+        { $addFields: { _rankSort: { $ifNull: ['$qsRank', Number.MAX_SAFE_INTEGER] } } },
+        { $sort: { _rankSort: 1, name: 1 } },
+        { $skip: (page - 1) * limit },
+        { $limit: limit },
+        { $project: projection },
+      ]);
+    }
+    return University.find(filter)
       .select(LIST_FIELDS)
-      .sort(sortSpec)
+      .sort({ name: 1 })
       .skip((page - 1) * limit)
       .limit(limit)
-      .lean(),
-    University.countDocuments(filter),
-  ]);
+      .lean();
+  };
+
+  const [items, total] = await Promise.all([findItems(), University.countDocuments(filter)]);
 
   res.json({ items, total, page, limit });
 });

@@ -17,6 +17,8 @@ export interface PublicUniversityListItem {
   image?: string
   logo?: string
   qsRank?: number
+  costOfLiving?: number
+  studentPopulation?: number
   origin?: string
   aggregateRating?: number
   aggregateReviewCount?: number

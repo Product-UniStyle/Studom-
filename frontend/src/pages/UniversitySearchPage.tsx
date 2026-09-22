@@ -1,9 +1,10 @@
-import { useEffect, useMemo, useState } from 'react'
-import { Link, useSearchParams } from 'react-router-dom'
-import { Search, ChevronDown, ChevronLeft, ChevronRight, MapPin, Landmark } from 'lucide-react'
+import { useEffect, useMemo, useRef, useState } from 'react'
+import { Link, useNavigate, useSearchParams } from 'react-router-dom'
+import { Search, ChevronDown, ChevronLeft, ChevronRight, MapPin, Landmark, Heart } from 'lucide-react'
 import PageShell from '../components/layout/PageShell'
 import SafeImage from '../components/ui/SafeImage'
 import { getPublicUniversityFacets, listPublicUniversities } from '../lib/publicApi'
+import { getStudentToken } from '../lib/studentApi'
 import type { PublicUniversityListItem } from '../lib/publicApi'
 
 const ADDITIONAL_FILTERS = ['QS Ranking', 'Cost of Living', 'Student Population']
@@ -28,6 +29,7 @@ const TYPE_LABELS: Record<string, string> = {
 }
 
 const PAGE_SIZE = 20
+const FAVORITES_KEY = 'studom-favorite-universities'
 
 export default function UniversitySearchPage() {
   const [searchParams, setSearchParams] = useSearchParams()
@@ -44,6 +46,7 @@ export default function UniversitySearchPage() {
   const query = searchParams.get('q') || ''
   const page = Number(searchParams.get('page') || '1')
   const applied = searchParams.get('applied') === '1'
+  const isQsSorted = !isTuition && additional === 'QS Ranking'
 
   const updateParams = (
     patch: Record<string, string | undefined>,
@@ -56,6 +59,35 @@ export default function UniversitySearchPage() {
     })
     if (opts?.resetPage) next.set('page', '1')
     setSearchParams(next, { replace: true })
+  }
+
+  const previousType = useRef<string | undefined>(undefined)
+  const navigate = useNavigate()
+  const [showLoginPrompt, setShowLoginPrompt] = useState(false)
+  const [favorites, setFavorites] = useState<Set<string>>(() => {
+    try {
+      return new Set<string>(JSON.parse(localStorage.getItem(FAVORITES_KEY) || '[]'))
+    } catch {
+      return new Set<string>()
+    }
+  })
+
+  const toggleFavorite = (id: string) => {
+    if (!getStudentToken()) {
+      setShowLoginPrompt(true)
+      return
+    }
+    setFavorites((prev) => {
+      const next = new Set(prev)
+      if (next.has(id)) next.delete(id)
+      else next.add(id)
+      try {
+        localStorage.setItem(FAVORITES_KEY, JSON.stringify([...next]))
+      } catch {
+        // storage unavailable — the toggle still works for this session
+      }
+      return next
+    })
   }
 
   const [items, setItems] = useState<PublicUniversityListItem[]>([])
@@ -77,10 +109,18 @@ export default function UniversitySearchPage() {
         setGrades(res.grades)
       })
       .catch(() => {})
-    updateParams(
-      { field: undefined, additional: undefined, country: country || 'United Arab Emirates' },
-      { resetPage: true }
-    )
+    // Reset dependent filters only when the type is switched. On the first
+    // mount (refresh, or Back from a detail page) the URL already holds the
+    // user's filters, so keep them and only fill in a missing default country.
+    if (previousType.current === undefined) {
+      if (!country) updateParams({ country: 'United Arab Emirates' })
+    } else if (previousType.current !== type) {
+      updateParams(
+        { field: undefined, additional: undefined, country: country || 'United Arab Emirates' },
+        { resetPage: true }
+      )
+    }
+    previousType.current = type
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [type])
 
@@ -103,7 +143,7 @@ export default function UniversitySearchPage() {
       fieldOfStudy: !isSchool && field !== 'All' ? field : undefined,
       grade: isSchool && field !== 'All' ? field : undefined,
       mode: isTuition && additional ? additional : undefined,
-      sort: !isTuition && additional === 'QS Ranking' ? 'qsRank_desc' : undefined,
+      sort: isQsSorted ? 'qsRank_asc' : undefined,
       page,
       limit: PAGE_SIZE,
     })
@@ -243,15 +283,34 @@ export default function UniversitySearchPage() {
               <p className="mt-10 text-center text-gray-400">No results found.</p>
             ) : (
               <div className="mt-8 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
-                {items.map((u, idx) => (
+                {items.map((u, i) => (
                   <Link
                     to={`/universities/${u.slug || u._id}`}
                     key={u._id}
                     className="group relative aspect-square overflow-hidden rounded-xl"
                   >
-                    <div className="absolute left-3 top-3 z-10 flex h-8 w-8 items-center justify-center rounded-md bg-white text-sm font-bold text-black shadow">
-                      {(page - 1) * PAGE_SIZE + idx + 1}
-                    </div>
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.preventDefault()
+                        e.stopPropagation()
+                        toggleFavorite(u._id)
+                      }}
+                      aria-label={favorites.has(u._id) ? 'Remove from favourites' : 'Add to favourites'}
+                      className="absolute right-3 top-3 z-10 flex h-8 w-8 items-center justify-center rounded-full bg-white shadow hover:bg-gray-50"
+                    >
+                      <Heart
+                        className={`h-4 w-4 ${favorites.has(u._id) ? 'fill-red-500 text-red-500' : 'text-gray-600'}`}
+                      />
+                    </button>
+                    {additional === 'QS Ranking' && (
+                      <div className="absolute left-3 top-3 z-10 flex h-8 min-w-8 items-center justify-center rounded-md bg-white px-2 text-sm font-bold text-black shadow">
+                        #
+                        {isQsSorted && u.qsRank
+                          ? (page - 1) * PAGE_SIZE + i + 1
+                          : u.qsRank || '-'}
+                      </div>
+                    )}
                     <SafeImage
                       src={u.image}
                       alt={u.name}
@@ -262,13 +321,27 @@ export default function UniversitySearchPage() {
                       <div className="truncate text-sm font-semibold leading-snug">
                         {u.name}
                       </div>
-                      <div className="mt-2 flex items-center gap-2 text-xs">
-                        <span className="flex items-center gap-1">
-                          <MapPin className="h-3 w-3" /> {u.city || u.country || '-'}
+                      <div className="mt-2 flex items-center justify-between gap-2 text-xs">
+                        <span className="flex items-center gap-1 truncate">
+                          <MapPin className="h-3 w-3 shrink-0" /> {u.city || u.country || '-'}
                         </span>
-                        <span className="rounded-full bg-white/20 px-2 py-0.5 backdrop-blur">
-                          {u.qsRank ? `QS Rank ${u.qsRank}` : 'Not QS Ranked'}
-                        </span>
+                        {additional === 'Cost of Living' ? (
+                          <span className="shrink-0 whitespace-nowrap rounded-full bg-white/20 px-2 py-0.5 backdrop-blur">
+                            {u.costOfLiving
+                              ? `Cost of Living ${u.costOfLiving.toLocaleString()}`
+                              : 'Cost of Living N/A'}
+                          </span>
+                        ) : additional === 'Student Population' ? (
+                          <span className="shrink-0 whitespace-nowrap rounded-full bg-white/20 px-2 py-0.5 backdrop-blur">
+                            {u.studentPopulation
+                              ? `Population ${u.studentPopulation.toLocaleString()}`
+                              : 'Population N/A'}
+                          </span>
+                        ) : additional === 'QS Ranking' ? (
+                          <span className="shrink-0 whitespace-nowrap rounded-full bg-white/20 px-2 py-0.5 backdrop-blur">
+                            {u.qsRank ? `QS Rank ${u.qsRank}` : 'Not QS Ranked'}
+                          </span>
+                        ) : null}
                       </div>
                     </div>
                   </Link>
@@ -284,6 +357,37 @@ export default function UniversitySearchPage() {
           </div>
         )}
       </div>
+
+      {showLoginPrompt && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
+          onClick={() => setShowLoginPrompt(false)}
+        >
+          <div
+            className="w-full max-w-sm rounded-2xl bg-white p-6 shadow-xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h2 className="text-lg font-bold text-black">Login required</h2>
+            <p className="mt-2 text-sm text-gray-500">Please log in to add universities to your favourites.</p>
+            <div className="mt-5 flex justify-end gap-3">
+              <button
+                type="button"
+                onClick={() => setShowLoginPrompt(false)}
+                className="rounded-lg border border-gray-200 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={() => navigate('/student/login')}
+                className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700"
+              >
+                Log in
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </PageShell>
   )
 }

@@ -188,7 +188,7 @@ export default function UniversityDetailPage() {
             <SafeImage
               src={uni.logo}
               alt={uni.name}
-              className="h-40 w-40 rounded-md border border-gray-100 object-contain p-1"
+              // className="h-40 w-40 rounded-md border border-gray-100 object-contain p-1"
             />
           </div>
           <div className="flex gap-4">
@@ -221,8 +221,8 @@ export default function UniversityDetailPage() {
         <div className="mt-10 grid grid-cols-1 gap-10 lg:grid-cols-3">
           <div className="lg:col-span-2">
             <div className="flex items-center justify-between border-b border-blue-600 pb-2">
-              <h2 className="text-sm font-bold tracking-wide text-blue-900">
-                ABOUT
+              <h2 className="text-lg font-bold tracking-wide text-blue-900">
+                ABOUT UNIVERSITY
               </h2>
               <div className="relative flex items-center gap-1 text-sm text-blue-600">
                 <button
@@ -260,7 +260,7 @@ export default function UniversityDetailPage() {
                 )}
               </div>
             </div>
-            <div className="mt-4 space-y-4 text-base font-medium leading-relaxed text-gray-600">
+            <div className="mt-4 space-y-4 text-lg font-medium leading-relaxed text-gray-600">
               {about.length > 0 ? (
                 about.map((p, i) => <p key={i}>{p}</p>)
               ) : (
@@ -279,25 +279,25 @@ export default function UniversityDetailPage() {
 
           <div className="space-y-6">
             <div className="rounded-xl border border-gray-100 p-6 shadow-sm">
-              <h2 className="mb-4 text-sm font-bold tracking-wide text-black">
+              <h2 className="mb-4 text-lg font-bold tracking-wide text-black">
                 CONNECT WITH US
               </h2>
-              <p className="mb-4 text-sm text-gray-500">
+              <p className="mb-4 text-base text-gray-500">
                 Have questions or need more information? Reach out to the
                 university team directly.
               </p>
               <TextField label="Full Name" placeholder="" />
               <TextField label="Email" type="email" placeholder="" className="mt-4" />
               <div className="mt-4">
-                <label className="mb-1.5 block text-sm font-medium text-gray-900">
+                <label className="mb-1.5 block text-base font-medium text-gray-900">
                   Your Message
                 </label>
                 <textarea
                   rows={4}
-                  className="w-full rounded-lg border border-gray-200 px-4 py-3 text-sm focus:border-blue-500 focus:outline-none"
+                  className="w-full rounded-lg border border-gray-200 px-4 py-3 text-base focus:border-blue-500 focus:outline-none"
                 />
               </div>
-              <button className="mt-4 w-full rounded-lg bg-blue-600 py-3 text-sm font-semibold text-white hover:bg-blue-700">
+              <button className="mt-4 w-full rounded-lg bg-blue-600 py-3 text-base font-semibold text-white hover:bg-blue-700">
                 Send Message
               </button>
             </div>
@@ -305,7 +305,7 @@ export default function UniversityDetailPage() {
             <div className="rounded-xl border border-gray-100 p-6 shadow-sm">
               <Link
                 to="/profile/build"
-                className="block w-full rounded-lg bg-blue-600 py-3 text-center text-sm font-semibold text-white hover:bg-blue-700"
+                className="block w-full rounded-lg bg-blue-600 py-3 text-center text-base font-semibold text-white hover:bg-blue-700"
               >
                 Build Your Profile
               </Link>
@@ -316,8 +316,8 @@ export default function UniversityDetailPage() {
         {/* Inclusions */}
         {inclusions.length > 0 && (
           <div className="mt-14">
-            <h2 className="mb-6 text-base font-bold text-black">
-              What inclusions does it offer
+            <h2 className="mb-6 text-lg font-bold text-black">
+              What inclusions does {uni.name} offer
             </h2>
             <div className="grid grid-cols-2 gap-x-8 gap-y-6 sm:grid-cols-3 md:grid-cols-5">
               {inclusions.map((item) => {
@@ -325,7 +325,7 @@ export default function UniversityDetailPage() {
                 return (
                   <div key={item._id} className="flex items-center gap-3">
                     <Icon className="h-6 w-6 shrink-0 text-black" strokeWidth={1.5} />
-                    <span className="text-sm text-gray-700">{item.label}</span>
+                    <span className="text-base text-gray-700">{item.label}</span>
                   </div>
                 )
               })}
@@ -336,7 +336,7 @@ export default function UniversityDetailPage() {
         {/* Reviews */}
         <div className="mt-14">
           <div className="flex items-center justify-between">
-            <h2 className="flex items-center gap-2 text-base font-bold text-black">
+            <h2 className="flex items-center gap-2 text-lg font-bold text-black">
               Student Reviews
               {avgRating != null && (
                 <span className="flex items-center gap-1 text-yellow-500">
@@ -445,7 +445,7 @@ export default function UniversityDetailPage() {
 
         {/* Map */}
         <div className="mt-14">
-          <h2 className="mb-4 text-sm font-bold tracking-wide text-black">
+          <h2 className="mb-4 text-lg font-bold tracking-wide text-black">
             WHERE YOU'LL BE
           </h2>
           <div className="h-96 w-full overflow-hidden rounded-xl border border-purple-200">
