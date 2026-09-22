@@ -6,7 +6,7 @@ import { getStudentToken, getStudentMe, clearStudentToken } from '../../lib/stud
 import { getInstitutionToken, getInstitutionMe, clearInstitutionToken } from '../../lib/institutionApi'
 
 const NAV_LINKS = [
-  { label: 'HOME', to: '/' },
+  { label: 'APPLY', to: '/apply' },
   { label: 'EVENTS', to: '/events' },
   { label: 'NEWS', to: '/news' },
   { label: 'BLOG', to: '/blog' },
