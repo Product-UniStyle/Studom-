@@ -5,7 +5,6 @@ import PageShell from '../components/layout/PageShell'
 import SafeImage from '../components/ui/SafeImage'
 import Avatar from '../components/ui/Avatar'
 import Modal from '../components/ui/Modal'
-import { homeInclusions } from '../data/inclusions'
 import { testimonials } from '../data/testimonials'
 import type { Testimonial } from '../data/testimonials'
 
@@ -99,21 +98,6 @@ export default function HomePage() {
               Apply to Universities
             </Link>
           </div>
-        </div>
-      </section>
-
-      {/* Platform inclusions */}
-      <section className="mx-auto max-w-[1440px] px-[6.5rem] pb-16">
-        <h2 className="mb-8 font-forum text-3xl font-medium text-gray-800">
-          Platform inclusions.
-        </h2>
-        <div className="grid grid-cols-2 gap-x-8 gap-y-8 sm:grid-cols-3 md:grid-cols-5">
-          {homeInclusions.map((item) => (
-            <div key={item.label} className="flex items-center gap-3">
-              <item.icon className="h-6 w-6 shrink-0 text-black" strokeWidth={1.5} />
-              <span className="font-forum text-sm text-gray-700">{item.label}</span>
-            </div>
-          ))}
         </div>
       </section>
 
