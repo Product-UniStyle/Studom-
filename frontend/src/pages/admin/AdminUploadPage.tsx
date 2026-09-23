@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { UploadCloud, LogOut, Landmark, Newspaper, Users, CalendarDays } from 'lucide-react'
+import { UploadCloud, LogOut, Landmark, Newspaper, Users, CalendarDays, MessageSquare } from 'lucide-react'
 import {
   clearAdminToken,
   getAdminToken,
@@ -15,9 +15,10 @@ import AdminImportModal from './AdminImportModal'
 import AdminArticlesTab from './AdminArticlesTab'
 import AdminEventsTab from './AdminEventsTab'
 import AdminUsersTab from './AdminUsersTab'
+import AdminReviewsTab from './AdminReviewsTab'
 
 type ImportKind = 'main' | 'poc' | 'reviews' | 'essayQuestions'
-type Tab = 'university' | 'articles' | 'events' | 'users'
+type Tab = 'university' | 'articles' | 'events' | 'reviews' | 'users'
 
 export default function AdminUploadPage() {
   const navigate = useNavigate()
@@ -40,6 +41,7 @@ export default function AdminUploadPage() {
     { key: 'university', label: 'University', icon: Landmark },
     { key: 'articles', label: 'News & Blogs', icon: Newspaper },
     { key: 'events', label: 'Events', icon: CalendarDays },
+    { key: 'reviews', label: 'Reviews', icon: MessageSquare },
     ...(isAdmin ? [{ key: 'users' as const, label: 'Users', icon: Users }] : []),
   ]
 
@@ -111,6 +113,7 @@ export default function AdminUploadPage() {
 
         {tab === 'articles' && <AdminArticlesTab />}
         {tab === 'events' && <AdminEventsTab />}
+        {tab === 'reviews' && <AdminReviewsTab />}
         {tab === 'users' && isAdmin && <AdminUsersTab />}
       </main>
 

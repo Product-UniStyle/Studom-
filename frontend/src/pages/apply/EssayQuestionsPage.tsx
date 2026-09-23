@@ -4,7 +4,8 @@ import PageShell from '../../components/layout/PageShell'
 import { useApplyFlow } from '../../context/ApplyFlowContext'
 
 export default function EssayQuestionsPage() {
-  const { essays, essaysLoading, updateEssay, profileCompleted } = useApplyFlow()
+  const { essays, essaysLoading, updateEssay, profileCompletion, profileCompleted, firstIncompleteStep } =
+    useApplyFlow()
   const navigate = useNavigate()
 
   return (
@@ -53,7 +54,14 @@ export default function EssayQuestionsPage() {
         </div>
 
         <div className="mt-6 rounded-2xl border border-gray-200 p-6">
-          <div className="mb-3 font-semibold text-black">Student Profile</div>
+          <div className="mb-3 flex items-center justify-between">
+            <div className="font-semibold text-black">Student Profile</div>
+            <span
+              className={`text-sm font-semibold ${profileCompleted ? 'text-green-600' : 'text-red-500'}`}
+            >
+              {profileCompletion}% complete
+            </span>
+          </div>
           {profileCompleted ? (
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
@@ -80,15 +88,16 @@ export default function EssayQuestionsPage() {
               <div className="flex items-center gap-3">
                 <XCircle className="h-6 w-6 shrink-0 text-red-500" />
                 <div className="text-sm text-gray-600">
-                  Please complete your student profile before submitting your
-                  applications.
+                  Your profile is incomplete. Please complete it before you can
+                  review and submit your applications.
                 </div>
               </div>
               <Link
                 to="/profile/build"
+                state={{ step: firstIncompleteStep || 1 }}
                 className="shrink-0 rounded-lg border border-gray-200 px-4 py-2 text-sm font-medium text-black hover:bg-gray-50"
               >
-                Build Your Profile
+                Complete Your Profile
               </Link>
             </div>
           )}
@@ -103,7 +112,8 @@ export default function EssayQuestionsPage() {
           </button>
           <button
             onClick={() => navigate('/apply/review')}
-            className="rounded-full bg-black px-8 py-3 text-sm font-semibold text-white hover:bg-gray-800"
+            disabled={!profileCompleted}
+            className="rounded-full bg-black px-8 py-3 text-sm font-semibold text-white hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-black"
           >
             Review Application
           </button>

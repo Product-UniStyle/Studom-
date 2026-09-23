@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 import { ArrowLeft, ArrowRight } from 'lucide-react'
 import DashboardLayout from '../../components/layout/DashboardLayout'
 import PageLoading from '../../components/ui/PageLoading'
@@ -119,7 +119,13 @@ function toPatch(data: ProfileData): StudentProfilePatch {
 }
 
 export default function BuildProfilePage() {
-  const [step, setStep] = useState(1)
+  const location = useLocation()
+  const requestedStep = (location.state as { step?: number } | null)?.step
+  const initialStep =
+    requestedStep && Number.isInteger(requestedStep) && requestedStep >= 1 && requestedStep <= 5
+      ? requestedStep
+      : 1
+  const [step, setStep] = useState(initialStep)
   const [data, setData] = useState<ProfileData>(initialProfileData)
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)

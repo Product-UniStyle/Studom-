@@ -108,7 +108,9 @@ router.get('/:id/reviews', async (req, res) => {
   const university = await University.findOne(bySlugOrId(req.params.id)).select('_id').lean();
   if (!university) return res.status(404).json({ error: 'University not found' });
 
-  const reviews = await Review.find({ universityId: university._id })
+  // $nin (rather than status: 'approved') also matches legacy sheet-imported
+  // reviews that predate this field and were never given a status at all.
+  const reviews = await Review.find({ universityId: university._id, status: { $nin: ['pending', 'rejected'] } })
     .select('reviewerName text date rating platform reviewerMeta reviewerAvatar')
     .sort({ date: -1 })
     .limit(50)

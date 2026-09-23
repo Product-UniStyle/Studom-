@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect, useMemo, useState } from 'react'
 import type { ReactNode } from 'react'
 import { getPublicUniversity } from '../lib/publicApi'
+import { getStudentMe } from '../lib/studentApi'
 
 export interface EssayQuestion {
   id: string
@@ -25,7 +26,9 @@ interface ApplyFlowState {
   essays: EssayQuestion[]
   essaysLoading: boolean
   updateEssay: (id: string, answer: string) => void
+  profileCompletion: number
   profileCompleted: boolean
+  firstIncompleteStep: number | null
 }
 
 const ApplyFlowContext = createContext<ApplyFlowState | null>(null)
@@ -34,7 +37,22 @@ export function ApplyFlowProvider({ children }: { children: ReactNode }) {
   const [selectedUniversities, setSelectedUniversities] = useState<SelectedUniversity[]>([])
   const [essays, setEssays] = useState<EssayQuestion[]>([])
   const [essaysLoading, setEssaysLoading] = useState(false)
-  const [profileCompleted] = useState(true)
+  const [profileCompletion, setProfileCompletion] = useState(0)
+  const [firstIncompleteStep, setFirstIncompleteStep] = useState<number | null>(1)
+
+  useEffect(() => {
+    let cancelled = false
+    getStudentMe()
+      .then((res) => {
+        if (cancelled) return
+        setProfileCompletion(res.stats.profileCompletion)
+        setFirstIncompleteStep(res.stats.firstIncompleteStep)
+      })
+      .catch(() => {})
+    return () => {
+      cancelled = true
+    }
+  }, [])
 
   const toggleUniversity = (university: SelectedUniversity) =>
     setSelectedUniversities((list) =>
@@ -89,9 +107,20 @@ export function ApplyFlowProvider({ children }: { children: ReactNode }) {
     }
   }, [selectedUniversities])
 
+  const profileCompleted = profileCompletion >= 100
+
   const value = useMemo(
-    () => ({ selectedUniversities, toggleUniversity, essays, essaysLoading, updateEssay, profileCompleted }),
-    [selectedUniversities, essays, essaysLoading, profileCompleted]
+    () => ({
+      selectedUniversities,
+      toggleUniversity,
+      essays,
+      essaysLoading,
+      updateEssay,
+      profileCompletion,
+      profileCompleted,
+      firstIncompleteStep,
+    }),
+    [selectedUniversities, essays, essaysLoading, profileCompletion, profileCompleted, firstIncompleteStep]
   )
 
   return (

@@ -98,6 +98,7 @@ export interface StudentProfile {
       currentGrade?: string
       confirmed: boolean
       gender?: string
+      idNumber?: string
     }
     education: {
       curriculum?: string
@@ -124,6 +125,7 @@ export interface StudentStats {
   applicationsCount: number
   documentsCount: number
   profileCompletion: number
+  firstIncompleteStep: number | null
 }
 
 export async function getStudentMe(): Promise<{ student: StudentProfile; stats: StudentStats }> {
@@ -245,16 +247,22 @@ export interface SubmittedReview {
   rating: number
   date: string
   platform: string
+  yearOfPassing?: string
+  idNumber?: string
+  status: 'pending' | 'approved' | 'rejected'
 }
 
 export async function submitReview(
   universityId: string,
   rating: number,
-  text: string
+  text: string,
+  name: string,
+  yearOfPassing: string,
+  idNumber: string
 ): Promise<{ review: SubmittedReview }> {
   return studentFetch('/api/student/reviews', {
     method: 'POST',
-    body: JSON.stringify({ universityId, rating, text }),
+    body: JSON.stringify({ universityId, rating, text, name, yearOfPassing, idNumber }),
   })
 }
 

@@ -76,11 +76,11 @@ export default function HomePage() {
 
       {/* CTA */}
       <section className="mx-auto max-w-[1440px] px-[6.5rem] pb-16">
-        <div className="rounded-3xl bg-gray-50 px-6 py-16 text-center">
+        <div className="rounded-3xl bg-gray-50 px-6 py-8 text-center">
           <h2 className="font-script text-3xl text-blue-600 sm:text-4xl">
             Apply to any university at once
           </h2>
-          <p className="mx-auto mt-4 max-w-xl text-sm text-gray-600">
+          <p className="mx-auto mt-8 max-w-xl text-sm text-gray-600">
             Build your profile once and use it to apply to multiple
             universities through Studom.
           </p>

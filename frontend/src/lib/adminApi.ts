@@ -448,6 +448,29 @@ export async function updateEvent(id: string, data: Record<string, unknown>): Pr
   return adminFetch(`/api/events/${id}`, { method: 'PATCH', body: JSON.stringify(data) })
 }
 
+export type ReviewStatus = 'pending' | 'approved' | 'rejected'
+
+export interface AdminReviewItem {
+  _id: string
+  universityId: { _id: string; name: string; city?: string; country?: string } | string
+  reviewerName: string
+  text: string
+  date: string
+  rating?: number
+  yearOfPassing?: string
+  idNumber?: string
+  status: ReviewStatus
+  createdAt: string
+}
+
+export async function listReviews(status: ReviewStatus): Promise<{ items: AdminReviewItem[]; total: number }> {
+  return adminFetch(`/api/admin/reviews?status=${status}`)
+}
+
+export async function setReviewStatus(id: string, status: ReviewStatus): Promise<{ review: AdminReviewItem }> {
+  return adminFetch(`/api/admin/reviews/${id}/status`, { method: 'PATCH', body: JSON.stringify({ status }) })
+}
+
 export async function deleteEvent(id: string): Promise<void> {
   const token = getAdminToken()
   const res = await fetch(`${API_URL}/api/events/${id}`, {

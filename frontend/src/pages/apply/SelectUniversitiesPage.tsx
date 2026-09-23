@@ -1,5 +1,5 @@
 import { Link, useNavigate } from 'react-router-dom'
-import { Search, Check } from 'lucide-react'
+import { Search } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import PageShell from '../../components/layout/PageShell'
 import Pagination from '../../components/ui/Pagination'
@@ -123,26 +123,27 @@ export default function SelectUniversitiesPage() {
           </div>
         </div>
 
-        <div className="mt-8 flex flex-col justify-between gap-4 sm:flex-row sm:items-start">
-          <div>
-            <h1 className="font-script text-3xl text-blue-600">
-              Apply to Universities
-            </h1>
-            <p className="mt-1 text-sm text-gray-500">
-              Select the universities you want to apply to using your saved
-              profile.
-            </p>
+        <div className="mt-8">
+          <h1 className="font-script text-3xl text-blue-600">
+            Apply to Universities
+          </h1>
+          <p className="mt-1 text-sm text-gray-500">
+            Select the universities you want to apply to using your saved
+            profile.
+          </p>
+        </div>
+
+        <div className="mt-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div className="relative w-full sm:w-72">
+            <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+            <input
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder="Search universities..."
+              className="w-full rounded-full border border-gray-200 py-2.5 pl-9 pr-4 text-sm focus:border-blue-500 focus:outline-none"
+            />
           </div>
           <div className="flex items-center gap-4">
-            <div className="relative w-full sm:w-64">
-              <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
-              <input
-                value={query}
-                onChange={(e) => setQuery(e.target.value)}
-                placeholder="Search universities..."
-                className="w-full rounded-full border border-gray-200 py-2.5 pl-9 pr-4 text-sm focus:border-blue-500 focus:outline-none"
-              />
-            </div>
             <span className="whitespace-nowrap rounded-full bg-blue-50 px-3 py-1.5 text-sm font-medium text-blue-600">
               {selectedUniversities.length} selected
             </span>
@@ -159,9 +160,11 @@ export default function SelectUniversitiesPage() {
         {error && <p className="mt-6 text-sm text-red-600">{error}</p>}
 
         {!applied ? (
-          <p className="mt-10 text-center text-gray-400">
-            Choose a country and click search to see universities.
-          </p>
+          <div className="mt-10 flex min-h-[400px] items-center justify-center">
+            <p className="text-center text-gray-400">
+              Choose a country and click search to see universities.
+            </p>
+          </div>
         ) : loading ? (
           <p className="mt-10 text-center text-gray-400">Loading...</p>
         ) : items.length === 0 ? (
@@ -183,26 +186,22 @@ export default function SelectUniversitiesPage() {
                       </span>
                     </div>
                   </div>
-                  <div className="flex shrink-0 items-center gap-2">
+                  <div className="flex shrink-0 items-center gap-4">
                     <Link
                       to={`/universities/${u.slug || u._id}`}
                       className="rounded-lg border border-gray-300 px-5 py-2 text-sm font-semibold text-black hover:bg-gray-50"
                     >
-                      View
+                      Profile
                     </Link>
-                    <button
-                      onClick={() =>
+                    <input
+                      type="checkbox"
+                      checked={selected}
+                      onChange={() =>
                         toggleUniversity({ id: u._id, slug: u.slug, name: u.name, city: u.city, country: u.country, logo: u.logo })
                       }
-                      className={`flex items-center gap-1.5 rounded-lg px-5 py-2 text-sm font-semibold ${
-                        selected
-                          ? 'bg-green-600 text-white'
-                          : 'bg-black text-white hover:bg-gray-800'
-                      }`}
-                    >
-                      {selected && <Check className="h-4 w-4" />}
-                      {selected ? 'Selected' : 'Select'}
-                    </button>
+                      aria-label={selected ? `Deselect ${u.name}` : `Select ${u.name}`}
+                      className="h-5 w-5 cursor-pointer rounded border-gray-300 text-black focus:ring-black"
+                    />
                   </div>
                 </div>
               )

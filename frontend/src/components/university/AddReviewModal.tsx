@@ -1,21 +1,40 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Star } from 'lucide-react'
 import Modal from '../ui/Modal'
-import { submitReview } from '../../lib/studentApi'
+import TextField from '../form/TextField'
+import { getStudentMe, submitReview } from '../../lib/studentApi'
 
 interface AddReviewModalProps {
   universityId: string
   universityName: string
   onClose: () => void
-  onSaved: () => void
 }
 
-export default function AddReviewModal({ universityId, universityName, onClose, onSaved }: AddReviewModalProps) {
+export default function AddReviewModal({ universityId, universityName, onClose }: AddReviewModalProps) {
   const [rating, setRating] = useState(0)
   const [hoverRating, setHoverRating] = useState(0)
   const [text, setText] = useState('')
+  const [name, setName] = useState('')
+  const [yearOfPassing, setYearOfPassing] = useState('')
+  const [idNumber, setIdNumber] = useState('')
   const [submitting, setSubmitting] = useState(false)
+  const [submitted, setSubmitted] = useState(false)
   const [error, setError] = useState<string | null>(null)
+
+  useEffect(() => {
+    let cancelled = false
+    getStudentMe()
+      .then(({ student }) => {
+        if (cancelled) return
+        setName(student.fullName || '')
+        setYearOfPassing(student.profile.education.gradYear || '')
+        setIdNumber(student.profile.personal.idNumber || '')
+      })
+      .catch(() => {})
+    return () => {
+      cancelled = true
+    }
+  }, [])
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -27,11 +46,15 @@ export default function AddReviewModal({ universityId, universityName, onClose, 
       setError('Please write a short review')
       return
     }
+    if (!name.trim() || !yearOfPassing.trim() || !idNumber.trim()) {
+      setError('Please fill in your name, year of passing, and ID number')
+      return
+    }
     setSubmitting(true)
     setError(null)
     try {
-      await submitReview(universityId, rating, text.trim())
-      onSaved()
+      await submitReview(universityId, rating, text.trim(), name.trim(), yearOfPassing.trim(), idNumber.trim())
+      setSubmitted(true)
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to submit review')
     } finally {
@@ -39,11 +62,54 @@ export default function AddReviewModal({ universityId, universityName, onClose, 
     }
   }
 
+  if (submitted) {
+    return (
+      <Modal title="Review Submitted" onClose={onClose}>
+        <div className="space-y-4 text-center">
+          <p className="text-sm text-gray-700">
+            Thanks for sharing your experience at {universityName}. We will review your review, and
+            it will appear on the site once approved.
+          </p>
+          <button
+            onClick={onClose}
+            className="rounded-lg bg-black px-5 py-2.5 text-sm font-semibold text-white hover:bg-gray-800"
+          >
+            Done
+          </button>
+        </div>
+      </Modal>
+    )
+  }
+
   return (
     <Modal title="Add Your Review" onClose={onClose}>
       <form onSubmit={handleSubmit} className="space-y-4">
+        <div className="grid grid-cols-2 gap-4">
+          <TextField
+            label="Name"
+            required
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            className="col-span-2"
+          />
+          <TextField
+            label="Year of Passing"
+            required
+            value={yearOfPassing}
+            onChange={(e) => setYearOfPassing(e.target.value)}
+          />
+          <TextField
+            label="ID Number"
+            required
+            value={idNumber}
+            onChange={(e) => setIdNumber(e.target.value)}
+            hint="Your student/enrollment ID at this university"
+          />
+        </div>
+
         <p className="text-sm text-gray-500">
-          Share your experience at {universityName}. Your review will be posted publicly under your name.
+          Share your experience at {universityName}. Your review will be checked by our team before
+          it goes live.
         </p>
 
         <div>

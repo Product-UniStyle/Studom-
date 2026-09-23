@@ -2,7 +2,9 @@ import { Router } from 'express';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import StaffUser, { STAFF_ROLE_VALUES, StaffRole } from '../models/StaffUser';
-import { requireAdmin, StaffAuthedRequest } from '../middleware/adminAuth';
+import Review, { REVIEW_STATUS_VALUES, ReviewStatus } from '../models/Review';
+import University from '../models/University';
+import { requireAdmin, requireEditorOrAdmin, StaffAuthedRequest } from '../middleware/adminAuth';
 import { sendStaffCredentials } from '../lib/mailer';
 
 const router = Router();
@@ -93,6 +95,69 @@ router.delete('/users/:id', requireAdmin, async (req: StaffAuthedRequest, res) =
   const user = await StaffUser.findByIdAndDelete(req.params.id);
   if (!user) return res.status(404).json({ error: 'Staff user not found' });
   res.status(204).end();
+});
+
+router.get('/reviews', requireEditorOrAdmin, async (req, res) => {
+  const status = req.query.status as string | undefined;
+  const filter: Record<string, unknown> = {};
+  if (status && (REVIEW_STATUS_VALUES as string[]).includes(status)) {
+    filter.status = status;
+  } else {
+    filter.status = 'pending';
+  }
+
+  const reviews = await Review.find(filter)
+    .populate('universityId', 'name city country')
+    .sort({ createdAt: -1 })
+    .limit(200)
+    .lean();
+  res.json({ items: reviews, total: reviews.length });
+});
+
+router.patch('/reviews/:id/status', requireEditorOrAdmin, async (req, res) => {
+  const { status } = req.body as { status?: ReviewStatus };
+  if (!status || !(REVIEW_STATUS_VALUES as string[]).includes(status) || status === 'pending') {
+    return res.status(400).json({ error: "Status must be 'approved' or 'rejected'" });
+  }
+
+  const review = await Review.findById(req.params.id);
+  if (!review) return res.status(404).json({ error: 'Review not found' });
+
+  const wasApproved = review.status === 'approved';
+  if (status === 'approved' && !wasApproved) {
+    // Sheet-imported universities already carry a precomputed aggregateRating
+    // / aggregateReviewCount, so an approved review has to fold into that
+    // weighted average rather than just recounting from the Review collection.
+    if (typeof review.rating === 'number') {
+      const university = await University.findById(review.universityId).select('aggregateRating aggregateReviewCount');
+      if (university) {
+        const previousCount = university.aggregateReviewCount || 0;
+        const previousAvg = university.aggregateRating || 0;
+        const newCount = previousCount + 1;
+        const newAvg = Math.round(((previousAvg * previousCount + review.rating) / newCount) * 10) / 10;
+        university.aggregateReviewCount = newCount;
+        university.aggregateRating = newAvg;
+        await university.save();
+      }
+    }
+  } else if (status === 'rejected' && wasApproved && typeof review.rating === 'number') {
+    // Reverses the fold-in above for an approved review that's being undone.
+    const university = await University.findById(review.universityId).select('aggregateRating aggregateReviewCount');
+    if (university) {
+      const previousCount = university.aggregateReviewCount || 0;
+      const previousAvg = university.aggregateRating || 0;
+      const newCount = Math.max(previousCount - 1, 0);
+      const newAvg = newCount > 0 ? Math.round(((previousAvg * previousCount - review.rating) / newCount) * 10) / 10 : 0;
+      university.aggregateReviewCount = newCount;
+      university.aggregateRating = newAvg;
+      await university.save();
+    }
+  }
+
+  review.status = status;
+  await review.save();
+
+  res.json({ review });
 });
 
 export default router;

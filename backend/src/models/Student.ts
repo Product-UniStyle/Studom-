@@ -30,6 +30,7 @@ export interface IStudentProfile {
     currentGrade?: string;
     confirmed: boolean;
     gender?: string;
+    idNumber?: string;
   };
   education: {
     curriculum?: string;
@@ -94,6 +95,7 @@ const studentProfileSchema = new Schema<IStudentProfile>(
       currentGrade: String,
       confirmed: { type: Boolean, default: false },
       gender: String,
+      idNumber: String,
     },
     education: {
       curriculum: String,

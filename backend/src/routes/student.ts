@@ -20,6 +20,17 @@ const upload = multer({
   limits: { fileSize: 10 * 1024 * 1024 },
 });
 
+// Mirrors REQUIRED_DOCUMENTS in frontend/src/pages/profile/profileTypes.ts,
+// minus 'Other Documents (Optional)' which is never required for completion.
+const REQUIRED_STUDENT_DOCUMENT_CATEGORIES = [
+  'Passport / ID Proof',
+  'Academic Transcripts',
+  'Standardized Test Scores',
+  'Letter of Recommendation',
+  'Statement of Purpose',
+  'Resume / CV',
+];
+
 // Mongoose's `minimize: true` default strips embedded objects that end up
 // fully empty (e.g. a brand-new student's `preferences`), so restore them
 // here to keep the response shape consistent for the frontend.
@@ -34,11 +45,40 @@ function serializeStudent(student: InstanceType<typeof Student>) {
   return studentObj;
 }
 
-function computeProfileCompletion(student: InstanceType<typeof Student>): number {
+// Only counts fields the Build Profile wizard (/profile/build) actually
+// collects, so finishing all 5 of its steps is both necessary and sufficient
+// to reach 100% — fields like birthdate/nationality/currentLocation live
+// only in Settings and are deliberately excluded here.
+async function computeProfileCompletion(
+  student: InstanceType<typeof Student>
+): Promise<{ percent: number; firstIncompleteStep: number | null }> {
+  const uploadedCategories = await StudentDocument.find({
+    ownerId: student._id,
+    category: { $in: REQUIRED_STUDENT_DOCUMENT_CATEGORIES },
+  }).distinct('category');
+  const documentsComplete = REQUIRED_STUDENT_DOCUMENT_CATEGORIES.every((c) => uploadedCategories.includes(c));
+  const activitiesComplete =
+    (student.profile?.activities?.length || 0) > 0 || (student.profile?.achievements?.length || 0) > 0;
+  const step1Complete = Boolean(
+    student.profile?.personal?.mobile &&
+      student.profile?.personal?.schoolName &&
+      student.profile?.personal?.currentGrade
+  );
+  const step2Complete = Boolean(
+    student.profile?.education?.curriculum &&
+      student.profile?.education?.gradYear &&
+      student.profile?.education?.subjects?.length &&
+      student.profile?.education?.intendedCourse
+  );
+
+  // Step order matches the wizard's own steps (1: Personal, 2: Education,
+  // 3: Activities & Achievements, 4: Documents); step 5 (Review) has no
+  // fields of its own, so it's never the "first incomplete step".
+  const stepsComplete = [step1Complete, step2Complete, activitiesComplete, documentsComplete];
+  const firstIncompleteIndex = stepsComplete.findIndex((complete) => !complete);
+  const firstIncompleteStep = firstIncompleteIndex === -1 ? null : firstIncompleteIndex + 1;
+
   const fields = [
-    student.birthdate,
-    student.nationality,
-    student.currentLocation,
     student.profile?.personal?.mobile,
     student.profile?.personal?.schoolName,
     student.profile?.personal?.currentGrade,
@@ -46,9 +86,13 @@ function computeProfileCompletion(student: InstanceType<typeof Student>): number
     student.profile?.education?.gradYear,
     student.profile?.education?.subjects?.length ? 'y' : undefined,
     student.profile?.education?.intendedCourse,
+    activitiesComplete ? 'y' : undefined,
+    documentsComplete ? 'y' : undefined,
   ];
   const filled = fields.filter(Boolean).length;
-  return Math.round((filled / fields.length) * 100);
+  const percent = Math.round((filled / fields.length) * 100);
+
+  return { percent, firstIncompleteStep };
 }
 
 function generateApplicationRef(): string {
@@ -119,9 +163,10 @@ router.get('/me', requireStudent, async (req: StudentAuthedRequest, res) => {
   const student = await Student.findById(req.student!.id).select('-password -__v');
   if (!student) return res.status(404).json({ error: 'Student not found' });
 
-  const [applicationsCount, documentsCount] = await Promise.all([
+  const [applicationsCount, documentsCount, { percent: profileCompletion, firstIncompleteStep }] = await Promise.all([
     Application.countDocuments({ studentId: student._id }),
     StudentDocument.countDocuments({ ownerId: student._id }),
+    computeProfileCompletion(student),
   ]);
 
   res.json({
@@ -129,7 +174,8 @@ router.get('/me', requireStudent, async (req: StudentAuthedRequest, res) => {
     stats: {
       applicationsCount,
       documentsCount,
-      profileCompletion: computeProfileCompletion(student),
+      profileCompletion,
+      firstIncompleteStep,
     },
   });
 });
@@ -395,10 +441,13 @@ router.post('/documents', requireStudent, upload.single('file'), async (req: Stu
 });
 
 router.post('/reviews', requireStudent, async (req: StudentAuthedRequest, res) => {
-  const { universityId, rating, text } = req.body as {
+  const { universityId, rating, text, name, yearOfPassing, idNumber } = req.body as {
     universityId?: string;
     rating?: number;
     text?: string;
+    name?: string;
+    yearOfPassing?: string;
+    idNumber?: string;
   };
 
   if (!universityId || !text?.trim()) {
@@ -408,35 +457,38 @@ router.post('/reviews', requireStudent, async (req: StudentAuthedRequest, res) =
   if (!Number.isFinite(numericRating) || numericRating < 1 || numericRating > 5) {
     return res.status(400).json({ error: 'Rating must be between 1 and 5' });
   }
+  if (!name?.trim() || !yearOfPassing?.trim() || !idNumber?.trim()) {
+    return res.status(400).json({ error: 'Name, year of passing, and ID number are required' });
+  }
 
   const [student, university] = await Promise.all([
-    Student.findById(req.student!.id).select('fullName avatar'),
-    University.findById(universityId).select('aggregateRating aggregateReviewCount'),
+    Student.findById(req.student!.id).select('-password -__v'),
+    University.findById(universityId).select('_id'),
   ]);
   if (!student) return res.status(404).json({ error: 'Student not found' });
   if (!university) return res.status(400).json({ error: 'Selected university not found' });
 
   const review = await Review.create({
     universityId,
-    reviewerName: student.fullName,
+    studentId: student._id,
+    reviewerName: name.trim(),
     reviewerAvatar: student.avatar,
     text: text.trim(),
     rating: numericRating,
     date: new Date(),
     platform: 'Studom',
+    yearOfPassing: yearOfPassing.trim(),
+    idNumber: idNumber.trim(),
+    status: 'pending',
   });
 
-  // Sheet-imported universities already carry a precomputed aggregateRating
-  // / aggregateReviewCount, so a new review has to fold into that weighted
-  // average rather than just recounting from the Review collection (the
-  // detail page prefers these precomputed fields over reviews.length).
-  const previousCount = university.aggregateReviewCount || 0;
-  const previousAvg = university.aggregateRating || 0;
-  const newCount = previousCount + 1;
-  const newAvg = Math.round(((previousAvg * previousCount + numericRating) / newCount) * 10) / 10;
-  university.aggregateReviewCount = newCount;
-  university.aggregateRating = newAvg;
-  await university.save();
+  // The rating only folds into the university's aggregateRating /
+  // aggregateReviewCount once an admin approves it (see /api/admin/reviews),
+  // so a pending or rejected review never affects the public average.
+  if (student.profile.personal.idNumber !== idNumber.trim()) {
+    student.profile.personal.idNumber = idNumber.trim();
+    await student.save();
+  }
 
   res.status(201).json({ review });
 });

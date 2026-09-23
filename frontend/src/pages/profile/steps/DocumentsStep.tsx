@@ -1,6 +1,7 @@
-import { useRef } from 'react'
-import { UploadCloud, Plus, FileCheck2 } from 'lucide-react'
+import { useEffect, useRef, useState } from 'react'
+import { UploadCloud, Plus, FileCheck2, Loader2 } from 'lucide-react'
 import { REQUIRED_DOCUMENTS, type ProfileData } from '../profileTypes'
+import { listStudentDocuments, uploadStudentDocument } from '../../../lib/studentApi'
 
 interface Props {
   data: ProfileData
@@ -9,6 +10,40 @@ interface Props {
 
 export default function DocumentsStep({ data, update }: Props) {
   const inputRefs = useRef<Record<string, HTMLInputElement | null>>({})
+  const [uploadingDoc, setUploadingDoc] = useState<string | null>(null)
+  const [error, setError] = useState<string | null>(null)
+
+  useEffect(() => {
+    let cancelled = false
+    listStudentDocuments()
+      .then((res) => {
+        if (cancelled) return
+        const patch: Record<string, string | null> = {}
+        for (const doc of REQUIRED_DOCUMENTS) {
+          const match = res.items.find((d) => d.category === doc)
+          if (match) patch[doc] = match.name
+        }
+        if (Object.keys(patch).length > 0) update(patch)
+      })
+      .catch(() => {})
+    return () => {
+      cancelled = true
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  async function handleUpload(doc: string, file: File) {
+    setUploadingDoc(doc)
+    setError(null)
+    try {
+      const res = await uploadStudentDocument(file, doc, doc)
+      update({ [doc]: res.document.name })
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Upload failed')
+    } finally {
+      setUploadingDoc(null)
+    }
+  }
 
   return (
     <div>
@@ -24,12 +59,14 @@ export default function DocumentsStep({ data, update }: Props) {
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {REQUIRED_DOCUMENTS.map((doc) => {
             const uploaded = data.documents[doc]
+            const uploading = uploadingDoc === doc
             return (
               <button
                 key={doc}
                 type="button"
+                disabled={uploading}
                 onClick={() => inputRefs.current[doc]?.click()}
-                className="flex flex-col items-center justify-center rounded-xl border-2 border-dashed border-gray-200 px-4 py-8 text-center hover:border-blue-300"
+                className="flex flex-col items-center justify-center rounded-xl border-2 border-dashed border-gray-200 px-4 py-8 text-center hover:border-blue-300 disabled:opacity-60"
               >
                 <input
                   ref={(el) => {
@@ -38,11 +75,15 @@ export default function DocumentsStep({ data, update }: Props) {
                   type="file"
                   accept=".pdf,.jpg,.jpeg,.png"
                   className="hidden"
-                  onChange={(e) =>
-                    update({ [doc]: e.target.files?.[0]?.name ?? null })
-                  }
+                  onChange={(e) => {
+                    const file = e.target.files?.[0]
+                    e.target.value = ''
+                    if (file) handleUpload(doc, file)
+                  }}
                 />
-                {uploaded ? (
+                {uploading ? (
+                  <Loader2 className="h-6 w-6 animate-spin text-blue-500" />
+                ) : uploaded ? (
                   <FileCheck2 className="h-6 w-6 text-green-500" />
                 ) : (
                   <UploadCloud className="h-6 w-6 text-gray-400" />
@@ -51,15 +92,17 @@ export default function DocumentsStep({ data, update }: Props) {
                   {doc}
                 </div>
                 <div className="mt-1 text-xs text-gray-400">
-                  {uploaded ? uploaded : 'Upload PDF, JPG or PNG'}
+                  {uploading ? 'Uploading...' : uploaded ? uploaded : 'Upload PDF, JPG or PNG'}
                 </div>
-                {!uploaded && (
+                {!uploaded && !uploading && (
                   <div className="text-xs text-gray-400">Max size 10MB</div>
                 )}
               </button>
             )
           })}
         </div>
+
+        {error && <p className="mt-4 text-sm text-red-600">{error}</p>}
 
         <button
           type="button"

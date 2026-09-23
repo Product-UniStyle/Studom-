@@ -16,6 +16,7 @@ import Avatar from '../components/ui/Avatar'
 import Modal from '../components/ui/Modal'
 import ContributorModal from '../components/university/ContributorModal'
 import AddReviewModal from '../components/university/AddReviewModal'
+import ArticleDisclaimer from '../components/ui/ArticleDisclaimer'
 import { getInclusionIcon } from '../lib/inclusionIcons'
 import {
   getPublicUniversity,
@@ -42,16 +43,6 @@ export default function UniversityDetailPage() {
   const [activeReview, setActiveReview] = useState<PublicUniversityReview | null>(null)
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null)
   const reviewsScrollRef = useRef<HTMLDivElement>(null)
-
-  function refreshReviews() {
-    if (!id) return
-    getPublicUniversity(id)
-      .then((res) => setUni(res))
-      .catch(() => {})
-    listPublicUniversityReviews(id)
-      .then((res) => setReviews(res.items))
-      .catch(() => {})
-  }
 
   useEffect(() => {
     if (!id) return
@@ -357,7 +348,7 @@ export default function UniversityDetailPage() {
               }}
               className="rounded-lg border border-gray-200 px-4 py-2 text-sm font-medium text-black hover:bg-gray-50"
             >
-              + Add Review
+              + Write a Review
             </button>
           </div>
           {reviews.length === 0 ? (
@@ -460,6 +451,7 @@ export default function UniversityDetailPage() {
           </div>
         </div>
 
+        <ArticleDisclaimer />
       </div>
 
       {showContributorModal && (
@@ -475,10 +467,6 @@ export default function UniversityDetailPage() {
           universityId={uni._id}
           universityName={uni.name}
           onClose={() => setShowReviewModal(false)}
-          onSaved={() => {
-            setShowReviewModal(false)
-            refreshReviews()
-          }}
         />
       )}
 
