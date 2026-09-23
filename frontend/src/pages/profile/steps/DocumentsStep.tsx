@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { UploadCloud, Plus, FileCheck2, Loader2 } from 'lucide-react'
-import { REQUIRED_DOCUMENTS, type ProfileData } from '../profileTypes'
+import { BUILD_PROFILE_DOCUMENT_FOLDER, REQUIRED_DOCUMENTS, type ProfileData } from '../profileTypes'
 import { listStudentDocuments, uploadStudentDocument } from '../../../lib/studentApi'
 
 interface Props {
@@ -15,7 +15,7 @@ export default function DocumentsStep({ data, update }: Props) {
 
   useEffect(() => {
     let cancelled = false
-    listStudentDocuments()
+    listStudentDocuments({ folder: BUILD_PROFILE_DOCUMENT_FOLDER })
       .then((res) => {
         if (cancelled) return
         const patch: Record<string, string | null> = {}
@@ -36,7 +36,7 @@ export default function DocumentsStep({ data, update }: Props) {
     setUploadingDoc(doc)
     setError(null)
     try {
-      const res = await uploadStudentDocument(file, doc, doc)
+      const res = await uploadStudentDocument(file, doc, doc, BUILD_PROFILE_DOCUMENT_FOLDER)
       update({ [doc]: res.document.name })
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Upload failed')

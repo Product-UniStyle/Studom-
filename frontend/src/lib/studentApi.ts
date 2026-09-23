@@ -231,12 +231,40 @@ export interface StudentDocumentItem {
   name: string
   fileUrl: string
   category?: string
+  folder?: string
   status?: DocumentStatus
   date?: string
 }
 
-export async function listStudentDocuments(): Promise<{ items: StudentDocumentItem[]; total: number }> {
-  return studentFetch('/api/student/documents')
+export async function listStudentDocuments(params?: {
+  folder?: string
+}): Promise<{ items: StudentDocumentItem[]; total: number }> {
+  const query = params?.folder ? `?folder=${encodeURIComponent(params.folder)}` : ''
+  return studentFetch(`/api/student/documents${query}`)
+}
+
+export interface DocumentFolderItem {
+  _id: string
+  name: string
+  documentCount: number
+}
+
+export async function listDocumentFolders(): Promise<{ items: DocumentFolderItem[]; uncategorizedCount: number }> {
+  return studentFetch('/api/student/document-folders')
+}
+
+export async function createDocumentFolder(name: string): Promise<{ folder: { name: string } }> {
+  return studentFetch('/api/student/document-folders', {
+    method: 'POST',
+    body: JSON.stringify({ name }),
+  })
+}
+
+export async function renameDocumentFolder(id: string, name: string): Promise<{ folder: { name: string } }> {
+  return studentFetch(`/api/student/document-folders/${id}`, {
+    method: 'PATCH',
+    body: JSON.stringify({ name }),
+  })
 }
 
 export interface SubmittedReview {
@@ -269,13 +297,15 @@ export async function submitReview(
 export async function uploadStudentDocument(
   file: File,
   name: string,
-  category?: string
+  category?: string,
+  folder?: string
 ): Promise<{ document: StudentDocumentItem }> {
   const token = getStudentToken()
   const formData = new FormData()
   formData.append('file', file)
   formData.append('name', name)
   if (category) formData.append('category', category)
+  if (folder) formData.append('folder', folder)
 
   const res = await fetch(`${API_URL}/api/student/documents`, {
     method: 'POST',

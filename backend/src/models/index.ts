@@ -11,6 +11,7 @@ export { default as NewsArticle } from './NewsArticle';
 export { default as BlogPost } from './BlogPost';
 export { default as Application } from './Application';
 export { default as Document } from './Document';
+export { default as DocumentFolder } from './DocumentFolder';
 export { default as EssayQuestion } from './EssayQuestion';
 export { default as Task } from './Task';
 export { default as Contributor } from './Contributor';

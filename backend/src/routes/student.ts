@@ -9,6 +9,7 @@ import Application from '../models/Application';
 import EssayQuestion from '../models/EssayQuestion';
 import Task from '../models/Task';
 import StudentDocument from '../models/Document';
+import DocumentFolder from '../models/DocumentFolder';
 import University from '../models/University';
 import Review from '../models/Review';
 import { requireStudent, StudentAuthedRequest } from '../middleware/studentAuth';
@@ -30,6 +31,11 @@ const REQUIRED_STUDENT_DOCUMENT_CATEGORIES = [
   'Statement of Purpose',
   'Resume / CV',
 ];
+
+// Every document uploaded from the Build Profile wizard's Documents step is
+// auto-filed into this folder, both so students can find them on the
+// Documents page and so completion tracking only counts wizard uploads.
+const BUILD_PROFILE_DOCUMENT_FOLDER = 'Build Your Profile';
 
 // Mongoose's `minimize: true` default strips embedded objects that end up
 // fully empty (e.g. a brand-new student's `preferences`), so restore them
@@ -54,6 +60,7 @@ async function computeProfileCompletion(
 ): Promise<{ percent: number; firstIncompleteStep: number | null }> {
   const uploadedCategories = await StudentDocument.find({
     ownerId: student._id,
+    folder: BUILD_PROFILE_DOCUMENT_FOLDER,
     category: { $in: REQUIRED_STUDENT_DOCUMENT_CATEGORIES },
   }).distinct('category');
   const documentsComplete = REQUIRED_STUDENT_DOCUMENT_CATEGORIES.every((c) => uploadedCategories.includes(c));
@@ -409,14 +416,19 @@ router.get('/tasks', requireStudent, async (req: StudentAuthedRequest, res) => {
 });
 
 router.get('/documents', requireStudent, async (req: StudentAuthedRequest, res) => {
-  const documents = await StudentDocument.find({ ownerId: req.student!.id }).sort({ createdAt: -1 }).lean();
+  const { folder } = req.query as { folder?: string };
+  const filter: Record<string, unknown> = { ownerId: req.student!.id };
+  if (folder === '__none__') filter.folder = { $in: [null, undefined, ''] };
+  else if (folder) filter.folder = folder;
+
+  const documents = await StudentDocument.find(filter).sort({ createdAt: -1 }).lean();
   res.json({ items: documents, total: documents.length });
 });
 
 router.post('/documents', requireStudent, upload.single('file'), async (req: StudentAuthedRequest, res) => {
   if (!req.file) return res.status(400).json({ error: 'No file uploaded (field name must be "file")' });
 
-  const { name, category } = req.body as { name?: string; category?: string };
+  const { name, category, folder } = req.body as { name?: string; category?: string; folder?: string };
   if (!name) return res.status(400).json({ error: 'Document name is required' });
 
   try {
@@ -426,10 +438,18 @@ router.post('/documents', requireStudent, upload.single('file'), async (req: Stu
       req.file.mimetype,
       `students/${req.student!.id}/documents`
     );
+    if (folder?.trim()) {
+      await DocumentFolder.findOneAndUpdate(
+        { ownerId: req.student!.id, name: folder.trim() },
+        { ownerId: req.student!.id, name: folder.trim() },
+        { upsert: true }
+      );
+    }
     const document = await StudentDocument.create({
       ownerId: req.student!.id,
       name,
       category,
+      folder: folder?.trim() || undefined,
       fileUrl,
       status: 'Uploaded',
       date: new Date(),
@@ -438,6 +458,70 @@ router.post('/documents', requireStudent, upload.single('file'), async (req: Stu
   } catch (err) {
     res.status(500).json({ error: err instanceof Error ? err.message : 'Upload failed' });
   }
+});
+
+router.get('/document-folders', requireStudent, async (req: StudentAuthedRequest, res) => {
+  const [folders, counts, uncategorizedCount] = await Promise.all([
+    DocumentFolder.find({ ownerId: req.student!.id }).sort({ createdAt: 1 }).lean(),
+    StudentDocument.aggregate([
+      // Unlike .find(), .aggregate()'s $match is a raw query and does not
+      // auto-cast a string id to ObjectId, so it has to be cast here.
+      { $match: { ownerId: new Types.ObjectId(req.student!.id), folder: { $exists: true, $ne: null } } },
+      { $group: { _id: '$folder', count: { $sum: 1 } } },
+    ]),
+    StudentDocument.countDocuments({
+      ownerId: req.student!.id,
+      $or: [{ folder: { $exists: false } }, { folder: null }, { folder: '' }],
+    }),
+  ]);
+
+  const countMap = new Map(counts.map((c) => [c._id as string, c.count as number]));
+  const items = folders.map((f) => ({
+    _id: f._id,
+    name: f.name,
+    documentCount: countMap.get(f.name) || 0,
+  }));
+
+  res.json({ items, uncategorizedCount });
+});
+
+router.post('/document-folders', requireStudent, async (req: StudentAuthedRequest, res) => {
+  const { name } = req.body as { name?: string };
+  const trimmed = name?.trim();
+  if (!trimmed) return res.status(400).json({ error: 'Folder name is required' });
+
+  const existing = await DocumentFolder.findOne({ ownerId: req.student!.id, name: trimmed });
+  if (existing) return res.status(409).json({ error: 'A folder with this name already exists' });
+
+  const folder = await DocumentFolder.create({ ownerId: req.student!.id, name: trimmed });
+  res.status(201).json({ folder });
+});
+
+router.patch('/document-folders/:id', requireStudent, async (req: StudentAuthedRequest, res) => {
+  const { name } = req.body as { name?: string };
+  const trimmed = name?.trim();
+  if (!trimmed) return res.status(400).json({ error: 'Folder name is required' });
+
+  const folder = await DocumentFolder.findOne({ _id: req.params.id, ownerId: req.student!.id });
+  if (!folder) return res.status(404).json({ error: 'Folder not found' });
+  if (folder.name === BUILD_PROFILE_DOCUMENT_FOLDER) {
+    return res.status(400).json({ error: "This folder is managed by the profile wizard and can't be renamed" });
+  }
+  if (trimmed === folder.name) return res.json({ folder });
+
+  const existing = await DocumentFolder.findOne({
+    ownerId: req.student!.id,
+    name: trimmed,
+    _id: { $ne: folder._id },
+  });
+  if (existing) return res.status(409).json({ error: 'A folder with this name already exists' });
+
+  const previousName = folder.name;
+  folder.name = trimmed;
+  await folder.save();
+  await StudentDocument.updateMany({ ownerId: req.student!.id, folder: previousName }, { folder: trimmed });
+
+  res.json({ folder });
 });
 
 router.post('/reviews', requireStudent, async (req: StudentAuthedRequest, res) => {

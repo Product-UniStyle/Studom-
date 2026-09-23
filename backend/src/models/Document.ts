@@ -9,6 +9,7 @@ export interface IDocument extends MongooseDocument {
   name: string;
   fileUrl: string;
   category?: string;
+  folder?: string;
   status?: DocumentStatus;
   date?: Date;
 }
@@ -20,6 +21,7 @@ const documentSchema = new Schema<IDocument>(
     name: { type: String, required: true },
     fileUrl: { type: String, required: true },
     category: String,
+    folder: String,
     status: { type: String, enum: DOCUMENT_STATUS_VALUES },
     date: Date,
   },

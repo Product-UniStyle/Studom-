@@ -50,6 +50,9 @@ export const REQUIRED_DOCUMENTS = [
   'Other Documents (Optional)',
 ]
 
+// Mirrors BUILD_PROFILE_DOCUMENT_FOLDER in backend/src/routes/student.ts.
+export const BUILD_PROFILE_DOCUMENT_FOLDER = 'Build Your Profile'
+
 export const initialProfileData: ProfileData = {
   personal: {
     fullName: '',
