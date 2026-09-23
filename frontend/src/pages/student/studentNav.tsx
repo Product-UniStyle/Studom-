@@ -1,4 +1,4 @@
-import { Landmark, User, UserPlus, FileText, Folder, Heart, Settings } from 'lucide-react'
+import { Landmark, User, UserPlus, FileText, Folder, Heart, Settings, Lock } from 'lucide-react'
 import type { DashboardNavItem } from '../../components/layout/DashboardLayout'
 
 export const studentNav: DashboardNavItem[] = [
@@ -8,5 +8,6 @@ export const studentNav: DashboardNavItem[] = [
   { label: 'My Applications', to: '/student/applications', icon: FileText },
   { label: 'Favorites', to: '/student/favorites', icon: Heart },
   { label: 'Documents', to: '/student/documents', icon: Folder },
+  { label: 'Change Password', to: '/student/change-password', icon: Lock },
   { label: 'Settings', to: '/student/settings', icon: Settings },
 ]

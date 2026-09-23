@@ -8,7 +8,6 @@ import {
   Languages,
   Bell,
   Palette,
-  Lock,
   ShieldCheck,
   Globe,
   FileText,
@@ -24,14 +23,13 @@ import type { StudentProfile } from '../../lib/studentApi'
 import EditPersonalInfoForm from './EditPersonalInfoForm'
 import EditEmailForm from './EditEmailForm'
 import EditPhoneForm from './EditPhoneForm'
-import ChangePasswordForm from './ChangePasswordForm'
 
 export default function SettingsPage() {
   const navigate = useNavigate()
   const [student, setStudent] = useState<StudentProfile | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  const [openModal, setOpenModal] = useState<'personal' | 'email' | 'phone' | 'password' | null>(null)
+  const [openModal, setOpenModal] = useState<'personal' | 'email' | 'phone' | null>(null)
   const [successMessage, setSuccessMessage] = useState<string | null>(null)
 
   useEffect(() => {
@@ -83,7 +81,6 @@ export default function SettingsPage() {
   ]
 
   const SECURITY_ROWS = [
-    { icon: Lock, title: 'Password', sub: 'Change your account password.', value: '••••••••', onClick: () => { setSuccessMessage(null); setOpenModal('password') } },
     { icon: ShieldCheck, title: 'Two-Factor Authentication', sub: 'Add an extra layer of security to your account.', value: 'Off' },
   ]
 
@@ -170,17 +167,6 @@ export default function SettingsPage() {
         </Modal>
       )}
 
-      {openModal === 'password' && (
-        <Modal title="Change Password" onClose={() => setOpenModal(null)}>
-          <ChangePasswordForm
-            onCancel={() => setOpenModal(null)}
-            onSaved={() => {
-              setOpenModal(null)
-              setSuccessMessage('Password updated successfully.')
-            }}
-          />
-        </Modal>
-      )}
     </DashboardLayout>
   )
 }

@@ -24,6 +24,7 @@ import MyApplicationsPage from './pages/student/MyApplicationsPage'
 import FavoritesPage from './pages/student/FavoritesPage'
 import DocumentsPage from './pages/student/DocumentsPage'
 import SettingsPage from './pages/student/SettingsPage'
+import ChangePasswordPage from './pages/student/ChangePasswordPage'
 import InstitutionDashboardPage from './pages/institution/InstitutionDashboardPage'
 import InstitutionApplicationsPage from './pages/institution/InstitutionApplicationsPage'
 import InstitutionContributorsPage from './pages/institution/InstitutionContributorsPage'
@@ -81,6 +82,7 @@ function App() {
       <Route path="/student/favorites" element={<RequireStudentAuth><FavoritesPage /></RequireStudentAuth>} />
       <Route path="/student/documents" element={<RequireStudentAuth><DocumentsPage /></RequireStudentAuth>} />
       <Route path="/student/settings" element={<RequireStudentAuth><SettingsPage /></RequireStudentAuth>} />
+      <Route path="/student/change-password" element={<RequireStudentAuth><ChangePasswordPage /></RequireStudentAuth>} />
 
       <Route path="/institution/dashboard" element={<RequireInstitutionAuth><InstitutionDashboardPage /></RequireInstitutionAuth>} />
       <Route path="/institution/applications" element={<RequireInstitutionAuth><InstitutionApplicationsPage /></RequireInstitutionAuth>} />
