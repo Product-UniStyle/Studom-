@@ -9,8 +9,17 @@ import { getPublicUniversityFacets, listPublicUniversities } from '../lib/public
 import { getStudentToken } from '../lib/studentApi'
 import { getFavoriteIds, setFavoriteIds } from '../lib/favorites'
 import type { PublicUniversityListItem } from '../lib/publicApi'
+import { ADDITIONAL_FILTER_NARRATIVES } from '../data/additionalFilterNarratives'
+import { useTypedNarrative, renderTypedSegments } from '../lib/useTypedNarrative'
 
-const ADDITIONAL_FILTERS = ['QS Ranking', 'Cost of Living', 'Student Population']
+const ADDITIONAL_FILTERS = [
+  'QS Ranking',
+  'Tuition Fees',
+  'Student Population',
+  'Student-to-Faculty Ratio',
+  'International Student %',
+  'Scholarships',
+]
 
 const MODE_OPTIONS = ['Online', 'Offline', 'Online/Offline', 'Home Tuition', 'Private Tutor']
 
@@ -177,6 +186,12 @@ export default function UniversitySearchPage() {
     updateParams({ applied: '1' }, { resetPage: true })
   }
 
+  const narrative = isTuition ? null : ADDITIONAL_FILTER_NARRATIVES[additional] || ADDITIONAL_FILTER_NARRATIVES.All
+  const showNarrative = Boolean(narrative && applied)
+  const { introLen, poweredLen, ctaLen, done } = useTypedNarrative(showNarrative ? narrative : null)
+  // Results appear only after the narrative has finished typing (Tuition has no narrative).
+  const showResults = !narrative || done
+
   return (
     <PageShell>
       <div className="mx-auto max-w-[1440px] px-[6.5rem] py-8">
@@ -214,7 +229,7 @@ export default function UniversitySearchPage() {
           <FilterDropdown
             label={isTuition ? 'Mode' : 'Additional Filters'}
             value={additional}
-            placeholder={isTuition ? 'Select mode' : 'QS Ranking, Cost of Living, Student Population'}
+            placeholder={isTuition ? 'Select mode' : 'QS Ranking, Tuition Fees, Student Population...'}
             options={isTuition ? MODE_OPTIONS : ['All', ...ADDITIONAL_FILTERS]}
             onChange={(v) =>
               updateParams(
@@ -247,13 +262,8 @@ export default function UniversitySearchPage() {
           </div>
         ) : (
           <div className="mt-8">
-            <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-start">
-              <div>
-                <h1 className="text-2xl font-bold text-black">{heading}</h1>
-                <p className="mt-1 text-sm text-gray-500">
-                  {total} result{total === 1 ? '' : 's'}
-                </p>
-              </div>
+            <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
+              <h1 className="text-2xl font-bold text-black">{heading}</h1>
               <div className="relative w-full sm:w-72">
                 <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
                 <input
@@ -266,10 +276,26 @@ export default function UniversitySearchPage() {
                 />
               </div>
             </div>
+            {narrative ? (
+              showNarrative && (
+                <div className="mt-2 space-y-2 text-sm leading-relaxed text-gray-600">
+                  <p>{renderTypedSegments(narrative.intro, introLen)}</p>
+                  {poweredLen > 0 && <p>{renderTypedSegments(narrative.powered, poweredLen)}</p>}
+                  {ctaLen > 0 && <p>{renderTypedSegments(narrative.cta, ctaLen)}</p>}
+                </div>
+              )
+            ) : (
+              <p className="mt-1 text-sm text-gray-500">
+                {total} result{total === 1 ? '' : 's'}
+              </p>
+            )}
 
-            {error && <p className="mt-6 text-sm text-red-600">{error}</p>}
+            {showResults && error && <p className="mt-6 text-sm text-red-600">{error}</p>}
 
-            {loading ? (
+            {!showResults ? (
+              // Reserve the results' space while the narrative types so the footer doesn't jump up under the text
+              <div className="min-h-[80vh]" aria-hidden />
+            ) : loading ? (
               <p className="mt-10 text-center text-gray-400">Loading...</p>
             ) : items.length === 0 ? (
               <p className="mt-10 text-center text-gray-400">No results found.</p>
@@ -317,11 +343,9 @@ export default function UniversitySearchPage() {
                         <span className="flex items-center gap-1 truncate">
                           <MapPin className="h-3 w-3 shrink-0" /> {u.city || u.country || '-'}
                         </span>
-                        {additional === 'Cost of Living' ? (
+                        {additional === 'QS Ranking' ? (
                           <span className="shrink-0 whitespace-nowrap rounded-full bg-white/20 px-2 py-0.5 backdrop-blur">
-                            {u.costOfLiving
-                              ? `Cost of Living ${u.costOfLiving.toLocaleString()}`
-                              : 'Cost of Living N/A'}
+                            {u.qsRank ? `QS Rank ${u.qsRank}` : 'Not QS Ranked'}
                           </span>
                         ) : additional === 'Student Population' ? (
                           <span className="shrink-0 whitespace-nowrap rounded-full bg-white/20 px-2 py-0.5 backdrop-blur">
@@ -329,9 +353,21 @@ export default function UniversitySearchPage() {
                               ? `Population ${u.studentPopulation.toLocaleString()}`
                               : 'Population N/A'}
                           </span>
-                        ) : additional === 'QS Ranking' ? (
+                        ) : additional === 'Tuition Fees' ? (
                           <span className="shrink-0 whitespace-nowrap rounded-full bg-white/20 px-2 py-0.5 backdrop-blur">
-                            {u.qsRank ? `QS Rank ${u.qsRank}` : 'Not QS Ranked'}
+                            Tuition Fees N/A
+                          </span>
+                        ) : additional === 'Student-to-Faculty Ratio' ? (
+                          <span className="shrink-0 whitespace-nowrap rounded-full bg-white/20 px-2 py-0.5 backdrop-blur">
+                            Ratio N/A
+                          </span>
+                        ) : additional === 'International Student %' ? (
+                          <span className="shrink-0 whitespace-nowrap rounded-full bg-white/20 px-2 py-0.5 backdrop-blur">
+                            International % N/A
+                          </span>
+                        ) : additional === 'Scholarships' ? (
+                          <span className="shrink-0 whitespace-nowrap rounded-full bg-white/20 px-2 py-0.5 backdrop-blur">
+                            Scholarships N/A
                           </span>
                         ) : null}
                       </div>
@@ -341,11 +377,13 @@ export default function UniversitySearchPage() {
               </div>
             )}
 
-            <Pagination
-              page={page}
-              totalPages={totalPages}
-              onChange={(p) => updateParams({ page: String(p) })}
-            />
+            {showResults && (
+              <Pagination
+                page={page}
+                totalPages={totalPages}
+                onChange={(p) => updateParams({ page: String(p) })}
+              />
+            )}
           </div>
         )}
       </div>
