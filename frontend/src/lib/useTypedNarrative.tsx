@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import type { AdditionalFilterNarrative, NarrativeSegment } from '../data/additionalFilterNarratives'
 
 // Mirrors the Nomads project's `animateTypedText` (AiSearchResults.jsx): a
@@ -28,7 +28,15 @@ function typeLine(length: number, setLength: (n: number) => void, onDone?: () =>
   return id
 }
 
-export function useTypedNarrative(narrative: AdditionalFilterNarrative | null) {
+// `instant` skips the animation and shows the full text at once (used when the
+// user comes back to a search they've already seen typed). `onDone` fires once
+// a typing run finishes.
+export function useTypedNarrative(
+  narrative: AdditionalFilterNarrative | null,
+  { instant = false, onDone }: { instant?: boolean; onDone?: () => void } = {}
+) {
+  const onDoneRef = useRef(onDone)
+  onDoneRef.current = onDone
   const [introLen, setIntroLen] = useState(0)
   const [poweredLen, setPoweredLen] = useState(0)
   const [ctaLen, setCtaLen] = useState(0)
@@ -39,14 +47,26 @@ export function useTypedNarrative(narrative: AdditionalFilterNarrative | null) {
   useEffect(() => {
     if (!narrative) return
 
+    if (instant) {
+      setIntroLen(segmentsLength(narrative.intro))
+      setPoweredLen(segmentsLength(narrative.powered))
+      setCtaLen(segmentsLength(narrative.cta))
+      setDoneFor(narrative)
+      return
+    }
+
     let poweredId = -1
     let ctaId = -1
+    setDoneFor(null)
     setPoweredLen(0)
     setCtaLen(0)
 
     const introId = typeLine(segmentsLength(narrative.intro), setIntroLen, () => {
       poweredId = typeLine(segmentsLength(narrative.powered), setPoweredLen, () => {
-        ctaId = typeLine(segmentsLength(narrative.cta), setCtaLen, () => setDoneFor(narrative))
+        ctaId = typeLine(segmentsLength(narrative.cta), setCtaLen, () => {
+          setDoneFor(narrative)
+          onDoneRef.current?.()
+        })
       })
     })
 
@@ -55,7 +75,7 @@ export function useTypedNarrative(narrative: AdditionalFilterNarrative | null) {
       window.clearInterval(poweredId)
       window.clearInterval(ctaId)
     }
-  }, [narrative])
+  }, [narrative, instant])
 
   return { introLen, poweredLen, ctaLen, done: narrative !== null && doneFor === narrative }
 }

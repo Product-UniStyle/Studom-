@@ -41,6 +41,7 @@ const TYPE_LABELS: Record<string, string> = {
 }
 
 const PAGE_SIZE = 20
+const NARRATIVE_PLAYED_KEY = 'studom.searchNarrativePlayed'
 
 export default function UniversitySearchPage() {
   const [searchParams, setSearchParams] = useSearchParams()
@@ -197,12 +198,39 @@ export default function UniversitySearchPage() {
       return
     }
     setFilterError(false)
+    // A fresh search click replays the typing effect.
+    try {
+      sessionStorage.removeItem(NARRATIVE_PLAYED_KEY)
+    } catch {
+      // ignore
+    }
+    setPlayedKey(null)
     updateParams({ applied: '1' }, { resetPage: true })
   }
 
   const narrative = isTuition ? null : ADDITIONAL_FILTER_NARRATIVES[additional] || ADDITIONAL_FILTER_NARRATIVES.All
   const showNarrative = Boolean(narrative && applied)
-  const { introLen, poweredLen, ctaLen, done } = useTypedNarrative(showNarrative ? narrative : null)
+  // Remember which filter combination has already been typed, so coming back
+  // (e.g. Back from a detail page) shows the text at once instead of replaying.
+  const comboKey = [type, country, location, field, additional].join('|')
+  const [playedKey, setPlayedKey] = useState<string | null>(() => {
+    try {
+      return sessionStorage.getItem(NARRATIVE_PLAYED_KEY)
+    } catch {
+      return null
+    }
+  })
+  const { introLen, poweredLen, ctaLen, done } = useTypedNarrative(showNarrative ? narrative : null, {
+    instant: playedKey === comboKey,
+    onDone: () => {
+      try {
+        sessionStorage.setItem(NARRATIVE_PLAYED_KEY, comboKey)
+      } catch {
+        // storage unavailable — replay on Back is acceptable
+      }
+      setPlayedKey(comboKey)
+    },
+  })
   // Results appear only after the narrative has finished typing (Tuition has no narrative).
   const showResults = !narrative || done
 
