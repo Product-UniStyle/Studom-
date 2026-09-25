@@ -315,14 +315,14 @@ export default function UniversitySearchPage() {
                         toggleFavorite(u._id)
                       }}
                       aria-label={favorites.has(u._id) ? 'Remove from favourites' : 'Add to favourites'}
-                      className="absolute right-3 top-3 z-10 flex h-8 w-8 items-center justify-center rounded-full bg-white shadow hover:bg-gray-50"
+                      className="absolute right-3 top-3 z-10 flex h-8 w-8 items-center justify-center rounded-full bg-white/20 backdrop-blur hover:bg-white/30"
                     >
                       <Heart
-                        className={`h-4 w-4 ${favorites.has(u._id) ? 'fill-red-500 text-red-500' : 'text-gray-600'}`}
+                        className={`h-4 w-4 ${favorites.has(u._id) ? 'fill-red-500 text-red-500' : 'text-white'}`}
                       />
                     </button>
                     {additional === 'QS Ranking' && (
-                      <div className="absolute left-3 top-3 z-10 flex h-8 min-w-8 items-center justify-center rounded-md bg-white px-2 text-sm font-bold text-black shadow">
+                      <div className="absolute left-3 top-3 z-10 flex h-8 min-w-8 items-center justify-center rounded-md bg-white/20 px-2 text-sm font-bold text-white backdrop-blur">
                         #
                         {isQsSorted && u.qsRank
                           ? (page - 1) * PAGE_SIZE + i + 1
