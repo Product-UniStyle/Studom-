@@ -179,7 +179,7 @@ export default function UniversityDetailPage() {
             <SafeImage
               src={uni.logo}
               alt={uni.name}
-              // className="h-40 w-40 rounded-md border border-gray-100 object-contain p-1"
+              className="h-auto max-h-28 w-auto max-w-[240px] object-contain"
             />
           </div>
           <div className="flex gap-4">

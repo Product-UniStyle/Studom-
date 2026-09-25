@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { ChevronDown } from 'lucide-react'
+import { ChevronDown, Loader2 } from 'lucide-react'
 
 export default function FilterDropdown({
   label,
@@ -7,12 +7,14 @@ export default function FilterDropdown({
   placeholder,
   options,
   onChange,
+  loading = false,
 }: {
   label: string
   value: string
   placeholder: string
   options: string[]
   onChange: (v: string) => void
+  loading?: boolean
 }) {
   const [open, setOpen] = useState(false)
   const containerRef = useRef<HTMLDivElement>(null)
@@ -41,7 +43,16 @@ export default function FilterDropdown({
       </button>
       {open && (
         <div className="absolute left-0 top-full z-20 mt-2 max-h-64 w-full min-w-[12rem] overflow-auto rounded-xl border border-gray-100 bg-white p-1.5 text-sm shadow-lg">
-          {options.map((opt) => (
+          {loading && (
+            <div className="flex items-center justify-center gap-2 px-3 py-3 text-gray-400">
+              <Loader2 className="h-4 w-4 animate-spin" />
+              <span>Loading...</span>
+            </div>
+          )}
+          {!loading && options.length === 0 && (
+            <div className="px-3 py-3 text-center text-gray-400">No options</div>
+          )}
+          {!loading && options.map((opt) => (
             <button
               key={opt}
               type="button"

@@ -101,8 +101,11 @@ export default function UniversitySearchPage() {
   const [cities, setCities] = useState<string[]>([])
   const [fields, setFields] = useState<string[]>([])
   const [grades, setGrades] = useState<string[]>([])
+  const [facetsLoading, setFacetsLoading] = useState(true)
+  const [citiesLoading, setCitiesLoading] = useState(true)
 
   useEffect(() => {
+    setFacetsLoading(true)
     getPublicUniversityFacets({ type: type || undefined })
       .then((res) => {
         setCountries(res.countries)
@@ -110,6 +113,7 @@ export default function UniversitySearchPage() {
         setGrades(res.grades)
       })
       .catch(() => {})
+      .finally(() => setFacetsLoading(false))
     // Reset dependent filters only when the type is switched. On the first
     // mount (refresh, or Back from a detail page) the URL already holds the
     // user's filters, so keep them and only fill in a missing default country.
@@ -126,9 +130,19 @@ export default function UniversitySearchPage() {
   }, [type])
 
   useEffect(() => {
+    let cancelled = false
+    setCitiesLoading(true)
     getPublicUniversityFacets({ type: type || undefined, country: country || undefined })
-      .then((res) => setCities(res.cities))
+      .then((res) => {
+        if (!cancelled) setCities(res.cities)
+      })
       .catch(() => {})
+      .finally(() => {
+        if (!cancelled) setCitiesLoading(false)
+      })
+    return () => {
+      cancelled = true
+    }
   }, [type, country])
 
   useEffect(() => {
@@ -201,6 +215,7 @@ export default function UniversitySearchPage() {
             label="Country"
             value={country}
             placeholder="Select country"
+            loading={facetsLoading}
             options={country && !countries.includes(country) ? [country, ...countries] : countries}
             onChange={(v) => {
               setFilterError(false)
@@ -211,6 +226,7 @@ export default function UniversitySearchPage() {
             label="Location"
             value={location}
             placeholder="Select location"
+            loading={citiesLoading}
             options={cities}
             onChange={(v) => {
               setFilterError(false)
@@ -221,6 +237,7 @@ export default function UniversitySearchPage() {
             label={isSchool ? 'Grades' : 'Field of Study'}
             value={field}
             placeholder={isSchool ? 'Select grade' : 'Select field of study'}
+            loading={facetsLoading}
             options={['All', ...(isSchool ? grades : fields)]}
             onChange={(v) => {
               updateParams({ field: v === 'All' ? undefined : v }, { resetPage: true })
