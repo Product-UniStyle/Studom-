@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom'
 import { Globe } from 'lucide-react'
 
 function FacebookIcon(props: React.SVGProps<SVGSVGElement>) {
@@ -46,11 +47,11 @@ export default function Footer() {
             <div className="flex flex-col gap-4 text-sm text-gray-200">
               <span>ABOUT</span>
               <span>CAREER</span>
-              <span>FAQS</span>
+              <Link to="/faqs">FAQS</Link>
             </div>
             <div className="flex flex-col gap-4 text-sm text-gray-200">
-              <span>PRIVACY</span>
-              <span>T&amp;C</span>
+              <Link to="/privacy">PRIVACY</Link>
+              <Link to="/terms">T&amp;C</Link>
               <span>CONTACT</span>
             </div>
           </div>
@@ -69,9 +70,9 @@ export default function Footer() {
       <div className="border-t border-gray-800">
         <div className="mx-auto flex max-w-[1440px] flex-col items-center justify-between gap-4 px-[6.5rem] py-4 font-footerNav text-xs font-extralight text-gray-400 lg:flex-row">
           <div className="flex items-center gap-4">
-            <span>Privacy</span>
+            <Link to="/privacy">Privacy</Link>
             <span>·</span>
-            <span>Terms</span>
+            <Link to="/terms">Terms</Link>
             <span>·</span>
             <span>Sitemap</span>
             <span>·</span>

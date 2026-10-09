@@ -32,6 +32,9 @@ import InstitutionUniversityPagePage from './pages/institution/InstitutionUniver
 import InstitutionSettingsPage from './pages/institution/InstitutionSettingsPage'
 import AdminLoginPage from './pages/admin/AdminLoginPage'
 import AdminUploadPage from './pages/admin/AdminUploadPage'
+import PrivacyPolicyPage from './pages/PrivacyPolicyPage'
+import TermsPage from './pages/TermsPage'
+import FAQsPage from './pages/FAQsPage'
 import RequireStudentAuth from './components/auth/RequireStudentAuth'
 import RequireInstitutionAuth from './components/auth/RequireInstitutionAuth'
 import ScrollToTop from './components/ScrollToTop'
@@ -92,6 +95,10 @@ function App() {
 
       <Route path="/admin/login" element={<AdminLoginPage />} />
       <Route path="/admin" element={<AdminUploadPage />} />
+
+      <Route path="/privacy" element={<PrivacyPolicyPage />} />
+      <Route path="/terms" element={<TermsPage />} />
+      <Route path="/faqs" element={<FAQsPage />} />
       </Routes>
     </>
   )
