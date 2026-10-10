@@ -11,6 +11,7 @@ import {
 } from 'lucide-react'
 import PageShell from '../components/layout/PageShell'
 import TextField from '../components/form/TextField'
+import TextArea from '../components/form/TextArea'
 import SafeImage from '../components/ui/SafeImage'
 import Avatar from '../components/ui/Avatar'
 import Modal from '../components/ui/Modal'
@@ -279,15 +280,7 @@ export default function UniversityDetailPage() {
               </p>
               <TextField label="Full Name" placeholder="" />
               <TextField label="Email" type="email" placeholder="" className="mt-4" />
-              <div className="mt-4">
-                <label className="mb-1.5 block text-base font-medium text-gray-900">
-                  Your Message
-                </label>
-                <textarea
-                  rows={4}
-                  className="w-full rounded-lg border border-gray-200 px-4 py-3 text-base focus:border-brand-blue focus:outline-none"
-                />
-              </div>
+              <TextArea label="Your Message" rows={4} className="mt-4" />
               <button className="mt-4 w-full rounded-lg bg-brand-blue py-3 text-base font-semibold text-white hover:bg-brand-blue/90">
                 Send Message
               </button>

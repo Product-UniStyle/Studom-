@@ -1,6 +1,7 @@
 import { Link, useNavigate } from 'react-router-dom'
 import { CheckCircle2, XCircle } from 'lucide-react'
 import PageShell from '../../components/layout/PageShell'
+import TextArea from '../../components/form/TextArea'
 import { useApplyFlow } from '../../context/ApplyFlowContext'
 
 export default function EssayQuestionsPage() {
@@ -42,11 +43,11 @@ export default function EssayQuestionsPage() {
                     ({q.universityName})
                   </span>
                 </label>
-                <textarea
+                <TextArea
                   rows={4}
                   value={q.answer}
                   onChange={(e) => updateEssay(q.id, e.target.value)}
-                  className="mt-2 w-full rounded-lg border border-gray-200 px-4 py-3 text-sm focus:border-brand-blue focus:outline-none"
+                  className="mt-2"
                 />
               </div>
             ))

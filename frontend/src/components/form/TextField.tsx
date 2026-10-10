@@ -31,6 +31,7 @@ export default function TextField({
 
   return (
     <div className={className}>
+      {label && <div className="h-5" aria-hidden="true" />}
       <div className="relative">
         {icon && (
           <span className="pointer-events-none absolute left-0 top-1/2 -translate-y-1/2 text-gray-400">
@@ -40,7 +41,7 @@ export default function TextField({
         <input
           id={inputId}
           type={inputType}
-          placeholder={placeholder ?? ' '}
+          placeholder={label ? ' ' : placeholder ?? ' '}
           className={cn(
             'peer block w-full appearance-none rounded-none border-0 border-b-2 border-gray-200 bg-transparent py-2.5 text-sm text-gray-800 focus:border-brand-blue focus:outline-none focus:ring-0',
             icon ? 'pl-8' : 'px-0',
@@ -52,7 +53,7 @@ export default function TextField({
           <label
             htmlFor={inputId}
             className={cn(
-              'pointer-events-none absolute top-2.5 -z-10 origin-[0] -translate-y-4 scale-75 text-sm text-gray-500 duration-150 peer-placeholder-shown:translate-y-0 peer-placeholder-shown:scale-100 peer-focus:-translate-y-4 peer-focus:scale-75 peer-focus:text-brand-blue',
+              'pointer-events-none absolute -top-5 text-sm font-medium text-gray-900 duration-150 peer-placeholder-shown:top-2.5 peer-focus:-top-5 peer-focus:text-brand-blue',
               icon ? 'left-8' : 'left-0'
             )}
           >

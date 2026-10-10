@@ -3,6 +3,7 @@ import { Upload } from 'lucide-react'
 import Modal from '../ui/Modal'
 import TextField from '../form/TextField'
 import SelectField from '../form/SelectField'
+import TextArea from '../form/TextArea'
 import { submitContributorApplication } from '../../lib/publicApi'
 
 const YEAR_OPTIONS = ['Year 1', 'Year 2', 'Year 3', 'Year 4', 'Postgraduate']
@@ -90,17 +91,11 @@ export default function ContributorModal({ universityId, universityName, onClose
             />
           </div>
 
-          <div>
-            <label className="mb-1.5 block text-sm font-medium text-gray-900">
-              Why do you want to become a Contributor?
-            </label>
-            <textarea
-              name="reason"
-              rows={2}
-              placeholder="Share a short reason (1-2 lines)"
-              className="w-full rounded-lg border border-gray-200 px-4 py-3 text-sm focus:border-brand-blue focus:outline-none"
-            />
-          </div>
+          <TextArea
+            label="Why do you want to become a Contributor?"
+            name="reason"
+            rows={2}
+          />
 
           <div>
             <label className="mb-1.5 block text-sm font-medium text-gray-900">

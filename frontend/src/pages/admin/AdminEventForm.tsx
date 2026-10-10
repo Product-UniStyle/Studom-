@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import TextField from '../../components/form/TextField'
 import SelectField from '../../components/form/SelectField'
+import TextArea from '../../components/form/TextArea'
 import ImageUploadField from './ImageUploadField'
 import UniversityPicker from './UniversityPicker'
 import { createEvent, updateEvent, uploadArticleCoverImage } from '../../lib/adminApi'
@@ -118,15 +119,7 @@ export default function AdminEventForm({ event, onSaved, onCancel }: AdminEventF
 
       <TextField label="Seats Info" name="seatsInfo" defaultValue={event?.seatsInfo} placeholder="e.g. Limited seats" />
 
-      <div>
-        <label className="mb-1.5 block text-sm font-medium text-gray-900">About / Description</label>
-        <textarea
-          name="aboutDescription"
-          rows={5}
-          defaultValue={event?.aboutDescription}
-          className="w-full rounded-lg border border-gray-200 px-4 py-3 text-sm text-gray-800 focus:border-brand-blue focus:outline-none"
-        />
-      </div>
+      <TextArea label="About / Description" name="aboutDescription" rows={5} defaultValue={event?.aboutDescription} />
 
       <div className="grid grid-cols-1 gap-4">
         <TextField label="Who Can Attend" name="whoCanAttend" defaultValue={event?.whoCanAttend} />

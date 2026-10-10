@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import TextField from '../../components/form/TextField'
 import SelectField from '../../components/form/SelectField'
+import TextArea from '../../components/form/TextArea'
 import ImageUploadField from './ImageUploadField'
 import GalleryUploadField from './GalleryUploadField'
 import { listUniversityReviews, updateUniversity, uploadImage } from '../../lib/adminApi'
@@ -192,15 +193,12 @@ export default function AdminUniversityForm({ university, onSaved, onCancel }: A
         hint="Split out from Grade — exam prep / subject lists that were mixed into that column (e.g. JEE, NEET, Maths & Science)"
       />
 
-      <div>
-        <label className="mb-1.5 block text-sm font-medium text-gray-900">About (paragraphs, blank line between)</label>
-        <textarea
-          name="about"
-          rows={5}
-          defaultValue={university.detail?.about?.join('\n\n')}
-          className="w-full rounded-lg border border-gray-200 px-4 py-3 text-sm text-gray-800 focus:border-brand-blue focus:outline-none"
-        />
-      </div>
+      <TextArea
+        label="About (paragraphs, blank line between)"
+        name="about"
+        rows={5}
+        defaultValue={university.detail?.about?.join('\n\n')}
+      />
 
       <GalleryUploadField name="gallery" defaultValue={university.detail?.gallery} universityName={university.name} />
 
@@ -220,19 +218,13 @@ export default function AdminUniversityForm({ university, onSaved, onCancel }: A
         </div>
       )}
 
-      <div>
-        <label className="mb-1.5 block text-sm font-medium text-gray-900">Additional Essay Questions (one per line)</label>
-        <textarea
-          name="essayQuestions"
-          rows={4}
-          defaultValue={manualEssayQuestions.map((q) => q.question).join('\n')}
-          placeholder="e.g. Who are you?&#10;What are your interests?"
-          className="w-full rounded-lg border border-gray-200 px-4 py-3 text-sm text-gray-800 focus:border-brand-blue focus:outline-none"
-        />
-        <p className="mt-1 text-xs text-gray-400">
-          Shown to students applying to this university in the apply flow&apos;s Essay Questions step.
-        </p>
-      </div>
+      <TextArea
+        label="Additional Essay Questions (one per line)"
+        name="essayQuestions"
+        rows={4}
+        defaultValue={manualEssayQuestions.map((q) => q.question).join('\n')}
+        hint="Shown to students applying to this university in the apply flow's Essay Questions step."
+      />
 
       <hr className="border-gray-100" />
 

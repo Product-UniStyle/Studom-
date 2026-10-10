@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { Star } from 'lucide-react'
 import Modal from '../ui/Modal'
 import TextField from '../form/TextField'
+import TextArea from '../form/TextArea'
 import { getStudentMe, submitReview } from '../../lib/studentApi'
 
 interface AddReviewModalProps {
@@ -133,16 +134,12 @@ export default function AddReviewModal({ universityId, universityName, onClose }
           </div>
         </div>
 
-        <div>
-          <label className="mb-1.5 block text-sm font-medium text-gray-900">Your Review</label>
-          <textarea
-            rows={4}
-            value={text}
-            onChange={(e) => setText(e.target.value)}
-            placeholder="What did you like or dislike? What should other students know?"
-            className="w-full rounded-lg border border-gray-200 px-4 py-3 text-sm focus:border-brand-blue focus:outline-none"
-          />
-        </div>
+        <TextArea
+          label="Your Review"
+          rows={4}
+          value={text}
+          onChange={(e) => setText(e.target.value)}
+        />
 
         {error && <p className="text-sm text-red-600">{error}</p>}
 

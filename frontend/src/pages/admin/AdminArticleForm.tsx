@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Plus, Trash2, ArrowUp, ArrowDown, ExternalLink } from 'lucide-react'
 import TextField from '../../components/form/TextField'
+import TextArea from '../../components/form/TextArea'
 import ImageUploadField from './ImageUploadField'
 import { updateArticle, uploadArticleCoverImage, uploadArticleSectionImage } from '../../lib/adminApi'
 import type { ArticleDetail, ArticleKind, ArticleSection } from '../../lib/adminApi'
@@ -102,15 +103,7 @@ export default function AdminArticleForm({ kind, article, onSaved, onCancel }: A
         />
       </div>
 
-      <div>
-        <label className="mb-1.5 block text-sm font-medium text-gray-900">Content</label>
-        <textarea
-          name="content"
-          rows={6}
-          defaultValue={article.content}
-          className="w-full rounded-lg border border-gray-200 px-4 py-3 text-sm text-gray-800 focus:border-brand-blue focus:outline-none"
-        />
-      </div>
+      <TextArea label="Content" name="content" rows={6} defaultValue={article.content} />
 
       <div>
         <div className="mb-2 flex items-center justify-between">
@@ -163,11 +156,10 @@ export default function AdminArticleForm({ kind, article, onSaved, onCancel }: A
                   </div>
                 </div>
                 <div className="space-y-2">
-                  <input
+                  <TextField
                     value={s.title || ''}
                     onChange={(e) => updateSection(i, { title: e.target.value })}
                     placeholder="Section title (optional)"
-                    className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm text-gray-800 focus:border-brand-blue focus:outline-none"
                   />
                   <ImageUploadField
                     label="Section Image (optional)"
@@ -176,12 +168,11 @@ export default function AdminArticleForm({ kind, article, onSaved, onCancel }: A
                     onUpload={(file) => uploadArticleSectionImage(file, article.title, kind)}
                     onChange={(url) => updateSection(i, { image: url })}
                   />
-                  <textarea
+                  <TextArea
                     value={s.content}
                     onChange={(e) => updateSection(i, { content: e.target.value })}
                     rows={3}
                     placeholder="Section content"
-                    className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm text-gray-800 focus:border-brand-blue focus:outline-none"
                   />
                 </div>
               </div>
