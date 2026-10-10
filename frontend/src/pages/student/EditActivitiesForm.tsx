@@ -83,25 +83,24 @@ export default function EditActivitiesForm({ student, onCancel, onSaved }: Props
               </div>
               <div className="space-y-2">
                 <TextField
-                  label=""
-                  placeholder="Activity name"
+                  label="Activity Name"
                   value={a.name}
                   onChange={(e) => setActivity(a.key, { name: e.target.value })}
                 />
                 <TextField
-                  label=""
-                  placeholder="Role"
+                  label="Role"
                   value={a.role || ''}
                   onChange={(e) => setActivity(a.key, { role: e.target.value })}
                 />
                 <SelectField
+                  label="Year"
                   placeholder="Year"
                   options={YEARS}
                   defaultValue={a.year}
                   onChange={(e) => setActivity(a.key, { year: e.target.value })}
                 />
                 <TextField
-                  label=""
+                  label="Description"
                   placeholder="One-line description"
                   value={a.description || ''}
                   onChange={(e) => setActivity(a.key, { description: e.target.value })}
@@ -134,25 +133,26 @@ export default function EditActivitiesForm({ student, onCancel, onSaved }: Props
               </div>
               <div className="space-y-2">
                 <TextField
-                  label=""
-                  placeholder="Achievement title"
+                  label="Achievement Title"
                   value={a.title}
                   onChange={(e) => setAchievement(a.key, { title: e.target.value })}
                 />
                 <SelectField
+                  label="Level"
                   placeholder="Level"
                   options={LEVELS}
                   defaultValue={a.level}
                   onChange={(e) => setAchievement(a.key, { level: e.target.value })}
                 />
                 <SelectField
+                  label="Year"
                   placeholder="Year"
                   options={YEARS}
                   defaultValue={a.year}
                   onChange={(e) => setAchievement(a.key, { year: e.target.value })}
                 />
                 <TextField
-                  label=""
+                  label="Description"
                   placeholder="One-line description"
                   value={a.description || ''}
                   onChange={(e) => setAchievement(a.key, { description: e.target.value })}

@@ -84,33 +84,29 @@ export default function ActivitiesStep({ data, update }: Props) {
               </div>
               <div className="space-y-3">
                 <TextField
-                  label=""
-                  placeholder="Activity name"
+                  label="Activity Name"
                   value={a.name}
                   onChange={(e) => setActivity(a.id, { name: e.target.value })}
-                  className="[&>label]:hidden"
                 />
                 <TextField
-                  label=""
-                  placeholder="Role"
+                  label="Role"
                   value={a.role}
                   onChange={(e) => setActivity(a.id, { role: e.target.value })}
-                  className="[&>label]:hidden"
                 />
                 <SelectField
+                  label="Year"
                   placeholder="Year"
                   options={YEARS}
                   value={a.year}
                   onChange={(e) => setActivity(a.id, { year: e.target.value })}
                 />
                 <TextField
-                  label=""
+                  label="Description"
                   placeholder="One-line description"
                   value={a.description}
                   onChange={(e) =>
                     setActivity(a.id, { description: e.target.value })
                   }
-                  className="[&>label]:hidden"
                 />
               </div>
             </div>
@@ -142,15 +138,14 @@ export default function ActivitiesStep({ data, update }: Props) {
               </div>
               <div className="space-y-3">
                 <TextField
-                  label=""
-                  placeholder="Achievement title"
+                  label="Achievement Title"
                   value={a.title}
                   onChange={(e) =>
                     setAchievement(a.id, { title: e.target.value })
                   }
-                  className="[&>label]:hidden"
                 />
                 <SelectField
+                  label="Level"
                   placeholder="Level"
                   options={LEVELS}
                   value={a.level}
@@ -159,19 +154,19 @@ export default function ActivitiesStep({ data, update }: Props) {
                   }
                 />
                 <SelectField
+                  label="Year"
                   placeholder="Year"
                   options={YEARS}
                   value={a.year}
                   onChange={(e) => setAchievement(a.id, { year: e.target.value })}
                 />
                 <TextField
-                  label=""
+                  label="Description"
                   placeholder="One-line description"
                   value={a.description}
                   onChange={(e) =>
                     setAchievement(a.id, { description: e.target.value })
                   }
-                  className="[&>label]:hidden"
                 />
               </div>
             </div>
