@@ -46,7 +46,7 @@ export default function EssayQuestionsPage() {
                   rows={4}
                   value={q.answer}
                   onChange={(e) => updateEssay(q.id, e.target.value)}
-                  className="mt-2 w-full rounded-lg border border-gray-200 px-4 py-3 text-sm focus:border-blue-500 focus:outline-none"
+                  className="mt-2 w-full rounded-lg border border-gray-200 px-4 py-3 text-sm focus:border-brand-blue focus:outline-none"
                 />
               </div>
             ))
@@ -113,7 +113,7 @@ export default function EssayQuestionsPage() {
           <button
             onClick={() => navigate('/apply/review')}
             disabled={!profileCompleted}
-            className="rounded-full bg-black px-8 py-3 text-sm font-semibold text-white hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-black"
+            className="rounded-full bg-brand-blue px-8 py-3 text-sm font-semibold text-white hover:bg-brand-blue/90 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-brand-blue"
           >
             Review Application
           </button>

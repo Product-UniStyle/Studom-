@@ -65,7 +65,7 @@ export default function UniversityPicker({ name, label = 'Host University', defa
           }}
           onFocus={() => setOpen(true)}
           placeholder="Search for a university..."
-          className="w-full rounded-lg border border-gray-200 py-3 pl-9 pr-4 text-sm text-gray-800 focus:border-blue-500 focus:outline-none"
+          className="w-full rounded-lg border border-gray-200 py-3 pl-9 pr-4 text-sm text-gray-800 focus:border-brand-blue focus:outline-none"
         />
       </div>
 

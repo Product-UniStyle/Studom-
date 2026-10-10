@@ -81,7 +81,7 @@ export default function ReviewApplicationPage() {
             </div>
             <button
               onClick={() => navigate('/apply/select')}
-              className="rounded-lg border border-blue-500 px-4 py-1.5 text-sm font-medium text-blue-600 hover:bg-blue-50"
+              className="rounded-lg border border-brand-blue px-4 py-1.5 text-sm font-medium text-brand-blue hover:bg-brand-blue/10"
             >
               Edit
             </button>
@@ -116,7 +116,7 @@ export default function ReviewApplicationPage() {
             </span>
             <button
               onClick={() => navigate('/profile/build')}
-              className="ml-auto rounded-lg border border-blue-500 px-4 py-1.5 text-sm font-medium text-blue-600 hover:bg-blue-50"
+              className="ml-auto rounded-lg border border-brand-blue px-4 py-1.5 text-sm font-medium text-brand-blue hover:bg-brand-blue/10"
             >
               Edit
             </button>
@@ -173,7 +173,7 @@ export default function ReviewApplicationPage() {
                 </div>
                 <button
                   onClick={() => navigate('/apply/essays')}
-                  className="shrink-0 rounded-lg border border-blue-500 px-4 py-1.5 text-sm font-medium text-blue-600 hover:bg-blue-50"
+                  className="shrink-0 rounded-lg border border-brand-blue px-4 py-1.5 text-sm font-medium text-brand-blue hover:bg-brand-blue/10"
                 >
                   Edit
                 </button>
@@ -211,7 +211,7 @@ export default function ReviewApplicationPage() {
           <button
             onClick={handleSubmit}
             disabled={submitting || selectedUniversities.length === 0}
-            className="rounded-full bg-black px-8 py-3 text-sm font-semibold text-white hover:bg-gray-800 disabled:opacity-50"
+            className="rounded-full bg-brand-blue px-8 py-3 text-sm font-semibold text-white hover:bg-brand-blue/90 disabled:opacity-50"
           >
             {submitting ? 'Submitting...' : 'Submit Applications'}
           </button>
@@ -244,7 +244,7 @@ function ReviewRow({
       </div>
       <button
         onClick={onEdit}
-        className="shrink-0 rounded-lg border border-blue-500 px-4 py-1.5 text-sm font-medium text-blue-600 hover:bg-blue-50"
+        className="shrink-0 rounded-lg border border-brand-blue px-4 py-1.5 text-sm font-medium text-brand-blue hover:bg-brand-blue/10"
       >
         Edit
       </button>

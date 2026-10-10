@@ -145,7 +145,7 @@ export default function InstitutionUniversityPagePage() {
               )}
               <Link
                 to={`/universities/${university.slug || university._id}`}
-                className="mt-4 flex items-center justify-center gap-2 rounded-lg bg-blue-600 py-3 text-sm font-semibold text-white hover:bg-blue-700"
+                className="mt-4 flex items-center justify-center gap-2 rounded-lg bg-brand-blue py-3 text-sm font-semibold text-white hover:bg-brand-blue/90"
               >
                 <Eye className="h-4 w-4" /> View Public Page
               </Link>

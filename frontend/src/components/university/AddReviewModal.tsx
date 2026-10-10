@@ -72,7 +72,7 @@ export default function AddReviewModal({ universityId, universityName, onClose }
           </p>
           <button
             onClick={onClose}
-            className="rounded-lg bg-black px-5 py-2.5 text-sm font-semibold text-white hover:bg-gray-800"
+            className="rounded-lg bg-brand-blue px-5 py-2.5 text-sm font-semibold text-white hover:bg-brand-blue/90"
           >
             Done
           </button>
@@ -140,7 +140,7 @@ export default function AddReviewModal({ universityId, universityName, onClose }
             value={text}
             onChange={(e) => setText(e.target.value)}
             placeholder="What did you like or dislike? What should other students know?"
-            className="w-full rounded-lg border border-gray-200 px-4 py-3 text-sm focus:border-blue-500 focus:outline-none"
+            className="w-full rounded-lg border border-gray-200 px-4 py-3 text-sm focus:border-brand-blue focus:outline-none"
           />
         </div>
 
@@ -157,7 +157,7 @@ export default function AddReviewModal({ universityId, universityName, onClose }
           <button
             type="submit"
             disabled={submitting}
-            className="rounded-lg bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-blue-700 disabled:opacity-50"
+            className="rounded-lg bg-brand-blue px-5 py-2.5 text-sm font-semibold text-white hover:bg-brand-blue/90 disabled:opacity-50"
           >
             {submitting ? 'Submitting...' : 'Submit Review'}
           </button>

@@ -317,7 +317,7 @@ export default function UniversitySearchPage() {
                     updateParams({ q: e.target.value }, { resetPage: true })
                   }}
                   placeholder="Search universities..."
-                  className="w-full rounded-full border border-gray-200 py-2.5 pl-9 pr-4 text-sm focus:border-blue-500 focus:outline-none"
+                  className="w-full rounded-full border border-gray-200 py-2.5 pl-9 pr-4 text-sm focus:border-brand-blue focus:outline-none"
                 />
               </div>
             </div>
@@ -455,7 +455,7 @@ export default function UniversitySearchPage() {
               <button
                 type="button"
                 onClick={() => navigate('/student/login')}
-                className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700"
+                className="rounded-lg bg-brand-blue px-4 py-2 text-sm font-semibold text-white hover:bg-brand-blue/90"
               >
                 Log in
               </button>

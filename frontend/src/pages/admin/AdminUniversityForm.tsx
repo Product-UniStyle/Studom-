@@ -198,7 +198,7 @@ export default function AdminUniversityForm({ university, onSaved, onCancel }: A
           name="about"
           rows={5}
           defaultValue={university.detail?.about?.join('\n\n')}
-          className="w-full rounded-lg border border-gray-200 px-4 py-3 text-sm text-gray-800 focus:border-blue-500 focus:outline-none"
+          className="w-full rounded-lg border border-gray-200 px-4 py-3 text-sm text-gray-800 focus:border-brand-blue focus:outline-none"
         />
       </div>
 
@@ -227,7 +227,7 @@ export default function AdminUniversityForm({ university, onSaved, onCancel }: A
           rows={4}
           defaultValue={manualEssayQuestions.map((q) => q.question).join('\n')}
           placeholder="e.g. Who are you?&#10;What are your interests?"
-          className="w-full rounded-lg border border-gray-200 px-4 py-3 text-sm text-gray-800 focus:border-blue-500 focus:outline-none"
+          className="w-full rounded-lg border border-gray-200 px-4 py-3 text-sm text-gray-800 focus:border-brand-blue focus:outline-none"
         />
         <p className="mt-1 text-xs text-gray-400">
           Shown to students applying to this university in the apply flow&apos;s Essay Questions step.
@@ -289,7 +289,7 @@ export default function AdminUniversityForm({ university, onSaved, onCancel }: A
         <button
           type="submit"
           disabled={saving}
-          className="rounded-lg bg-black px-5 py-2.5 text-sm font-semibold text-white hover:bg-gray-800 disabled:opacity-50"
+          className="rounded-lg bg-brand-blue px-5 py-2.5 text-sm font-semibold text-white hover:bg-brand-blue/90 disabled:opacity-50"
         >
           {saving ? 'Saving...' : 'Save changes'}
         </button>

@@ -108,7 +108,7 @@ export default function EventDetailPage() {
           </div>
 
           <aside className="h-fit rounded-2xl border border-gray-200 p-5">
-            <button className="w-full rounded-lg bg-black py-3 text-sm font-semibold text-white hover:bg-gray-800">
+            <button className="w-full rounded-lg bg-brand-blue py-3 text-sm font-semibold text-white hover:bg-brand-blue/90">
               Register
             </button>
             <button

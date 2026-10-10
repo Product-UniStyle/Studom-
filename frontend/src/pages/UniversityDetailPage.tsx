@@ -285,10 +285,10 @@ export default function UniversityDetailPage() {
                 </label>
                 <textarea
                   rows={4}
-                  className="w-full rounded-lg border border-gray-200 px-4 py-3 text-base focus:border-blue-500 focus:outline-none"
+                  className="w-full rounded-lg border border-gray-200 px-4 py-3 text-base focus:border-brand-blue focus:outline-none"
                 />
               </div>
-              <button className="mt-4 w-full rounded-lg bg-blue-600 py-3 text-base font-semibold text-white hover:bg-blue-700">
+              <button className="mt-4 w-full rounded-lg bg-brand-blue py-3 text-base font-semibold text-white hover:bg-brand-blue/90">
                 Send Message
               </button>
             </div>
@@ -296,7 +296,7 @@ export default function UniversityDetailPage() {
             <div className="rounded-xl border border-gray-100 p-6 shadow-sm">
               <Link
                 to="/profile/build"
-                className="block w-full rounded-lg bg-blue-600 py-3 text-center text-base font-semibold text-white hover:bg-blue-700"
+                className="block w-full rounded-lg bg-brand-blue py-3 text-center text-base font-semibold text-white hover:bg-brand-blue/90"
               >
                 Build Your Profile
               </Link>

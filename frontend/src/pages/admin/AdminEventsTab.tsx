@@ -76,7 +76,7 @@ export default function AdminEventsTab() {
         <h2 className="text-lg font-semibold text-black">Events ({total})</h2>
         <button
           onClick={openCreate}
-          className="flex items-center gap-1.5 rounded-lg bg-black px-3.5 py-2 text-xs font-semibold text-white hover:bg-gray-800"
+          className="flex items-center gap-1.5 rounded-lg bg-brand-blue px-3.5 py-2 text-xs font-semibold text-white hover:bg-brand-blue/90"
         >
           <Plus className="h-3.5 w-3.5" /> Add Event
         </button>
@@ -92,7 +92,7 @@ export default function AdminEventsTab() {
               setPage(1)
             }}
             placeholder="Search by title..."
-            className="w-full rounded-lg border border-gray-200 py-2.5 pl-9 pr-3 text-sm focus:border-blue-500 focus:outline-none"
+            className="w-full rounded-lg border border-gray-200 py-2.5 pl-9 pr-3 text-sm focus:border-brand-blue focus:outline-none"
           />
         </div>
 

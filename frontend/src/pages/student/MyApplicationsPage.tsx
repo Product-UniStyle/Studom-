@@ -117,7 +117,7 @@ export default function MyApplicationsPage() {
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Search universities"
-            className="w-full rounded-full border border-gray-200 py-2.5 pl-9 pr-4 text-sm focus:border-blue-500 focus:outline-none"
+            className="w-full rounded-full border border-gray-200 py-2.5 pl-9 pr-4 text-sm focus:border-brand-blue focus:outline-none"
           />
         </div>
         <div className="flex gap-3">
@@ -174,7 +174,7 @@ export default function MyApplicationsPage() {
                 </div>
                 <button
                   onClick={() => setSelectedId(a._id)}
-                  className="rounded-lg border border-blue-500 px-4 py-2 text-sm font-medium text-blue-600 hover:bg-blue-50"
+                  className="rounded-lg border border-brand-blue px-4 py-2 text-sm font-medium text-brand-blue hover:bg-brand-blue/10"
                 >
                   View Details
                 </button>
@@ -265,7 +265,7 @@ export default function MyApplicationsPage() {
                         className="flex items-center justify-between rounded-lg border border-gray-100 px-4 py-2.5 text-sm hover:bg-gray-50"
                       >
                         <span className="font-medium text-black">{d.name}</span>
-                        <span className="text-blue-600">View →</span>
+                        <span className="text-brand-blue">View →</span>
                       </a>
                     ))}
                   </div>
@@ -302,7 +302,7 @@ function StatCard({
   color: 'blue' | 'green' | 'purple'
 }) {
   const colorClass = {
-    blue: 'bg-blue-50 text-blue-600',
+    blue: 'bg-blue-50 text-brand-blue',
     green: 'bg-green-50 text-green-600',
     purple: 'bg-purple-50 text-purple-600',
   }[color]

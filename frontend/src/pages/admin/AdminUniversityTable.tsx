@@ -75,7 +75,7 @@ export default function AdminUniversityTable({ refreshKey }: { refreshKey: numbe
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search by name..."
-            className="w-full rounded-lg border border-gray-200 py-2.5 pl-9 pr-3 text-sm focus:border-blue-500 focus:outline-none"
+            className="w-full rounded-lg border border-gray-200 py-2.5 pl-9 pr-3 text-sm focus:border-brand-blue focus:outline-none"
           />
         </div>
       </div>

@@ -61,7 +61,7 @@ export default function EditPersonalInfoForm({ student, onCancel, onSaved }: Pro
         <button
           type="submit"
           disabled={saving}
-          className="rounded-lg bg-black px-5 py-2.5 text-sm font-semibold text-white hover:bg-gray-800 disabled:opacity-50"
+          className="rounded-lg bg-brand-blue px-5 py-2.5 text-sm font-semibold text-white hover:bg-brand-blue/90 disabled:opacity-50"
         >
           {saving ? 'Saving...' : 'Save Changes'}
         </button>

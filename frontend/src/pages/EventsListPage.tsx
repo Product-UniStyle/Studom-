@@ -68,7 +68,7 @@ export default function EventsListPage() {
   return (
     <PageShell>
       <div className="mx-auto max-w-[1440px] px-[6.5rem] py-10">
-        <h1 className="text-3xl font-bold text-blue-600">Events</h1>
+        <h1 className="text-3xl font-bold text-brand-blue">Events</h1>
 
         <div className="mt-6 flex flex-wrap items-center gap-3">
           <div className="flex shrink-0 rounded-xl bg-gray-100 p-1">
@@ -80,7 +80,7 @@ export default function EventsListPage() {
                   setPage(1)
                 }}
                 className={`rounded-lg px-4 py-2 text-sm font-medium ${
-                  tab === t ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-600 hover:text-black'
+                  tab === t ? 'bg-white text-brand-blue shadow-sm' : 'text-gray-600 hover:text-black'
                 }`}
               >
                 {t === 'upcoming' ? 'Upcoming Events' : 'Past Events'}
@@ -97,7 +97,7 @@ export default function EventsListPage() {
                 setPage(1)
               }}
               placeholder="Search events..."
-              className="w-full rounded-xl border border-gray-200 py-2.5 pl-9 pr-4 text-sm focus:border-blue-500 focus:outline-none"
+              className="w-full rounded-xl border border-gray-200 py-2.5 pl-9 pr-4 text-sm focus:border-brand-blue focus:outline-none"
             />
           </div>
 
@@ -108,7 +108,7 @@ export default function EventsListPage() {
                 setCategory(e.target.value)
                 setPage(1)
               }}
-              className="cursor-pointer appearance-none rounded-xl border border-gray-200 py-2.5 pl-4 pr-8 text-sm text-gray-700 focus:border-blue-500 focus:outline-none"
+              className="cursor-pointer appearance-none rounded-xl border border-gray-200 py-2.5 pl-4 pr-8 text-sm text-gray-700 focus:border-brand-blue focus:outline-none"
             >
               <option value="">All Categories</option>
               {categories.map((c) => (
@@ -128,7 +128,7 @@ export default function EventsListPage() {
                   onClick={() => setDateSort(s)}
                   className={`rounded-xl border px-3.5 py-2.5 text-xs font-medium ${
                     dateSort === s
-                      ? 'border-blue-500 text-blue-600'
+                      ? 'border-brand-blue text-brand-blue'
                       : 'border-gray-200 text-gray-600 hover:bg-gray-50'
                   }`}
                 >

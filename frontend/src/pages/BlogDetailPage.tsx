@@ -72,7 +72,7 @@ export default function BlogDetailPage() {
   return (
     <PageShell>
       <div className="mx-auto max-w-[1440px] px-[6.5rem] py-10">
-        <h1 className="text-3xl font-bold text-blue-600">Blog</h1>
+        <h1 className="text-3xl font-bold text-brand-blue">Blog</h1>
 
         {loading ? (
           <p className="mt-10 text-center text-gray-400">Loading...</p>
@@ -80,7 +80,7 @@ export default function BlogDetailPage() {
           <p className="mt-10 text-center text-red-600">{error || 'Article not found.'}</p>
         ) : (
           <div className="mt-6 rounded-2xl border border-gray-100 p-6 sm:p-10">
-            <Link to="/blog" className="flex items-center gap-1.5 text-sm font-medium text-blue-600 hover:underline">
+            <Link to="/blog" className="flex items-center gap-1.5 text-sm font-medium text-brand-blue hover:underline">
               <ArrowLeft className="h-4 w-4" /> Back to Blog
             </Link>
 
@@ -128,7 +128,7 @@ export default function BlogDetailPage() {
                 href={article.sourceLink}
                 target="_blank"
                 rel="noreferrer"
-                className="mt-8 inline-flex items-center gap-2 rounded-lg border border-blue-500 px-5 py-2.5 text-sm font-medium text-blue-600 hover:bg-blue-50"
+                className="mt-8 inline-flex items-center gap-2 rounded-lg border border-brand-blue px-5 py-2.5 text-sm font-medium text-brand-blue hover:bg-brand-blue/10"
               >
                 Read Original Article <ExternalLink className="h-4 w-4" />
               </a>

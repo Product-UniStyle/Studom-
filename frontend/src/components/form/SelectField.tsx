@@ -29,7 +29,7 @@ export default function SelectField({
         <select
           defaultValue={defaultValue ?? ''}
           className={cn(
-            'w-full appearance-none rounded-lg border border-gray-200 px-4 py-3 pr-10 text-sm text-gray-700 focus:border-blue-500 focus:outline-none',
+            'w-full appearance-none rounded-none border-0 border-b-2 border-gray-200 bg-transparent px-0 py-2.5 pr-6 text-sm text-gray-700 focus:border-brand-blue focus:outline-none',
             !defaultValue && 'text-gray-400'
           )}
           {...rest}
@@ -45,7 +45,7 @@ export default function SelectField({
             </option>
           ))}
         </select>
-        <ChevronDown className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+        <ChevronDown className="pointer-events-none absolute right-0 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
       </div>
     </div>
   )

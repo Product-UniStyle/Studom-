@@ -119,7 +119,7 @@ export default function AdminImportModal({ title, description, importFn, onClose
           disabled={!file || loading || !report}
           className={`flex-1 rounded-lg py-3 text-sm font-semibold disabled:opacity-40 ${
             report
-              ? 'bg-black text-white hover:bg-gray-800'
+              ? 'bg-brand-blue text-white hover:bg-brand-blue/90'
               : 'bg-gray-100 text-gray-400'
           }`}
         >

@@ -65,7 +65,7 @@ export default function StudentLogin() {
           <button
             type="submit"
             disabled={submitting}
-            className="block w-full rounded-lg bg-black py-3.5 text-center text-sm font-semibold text-white hover:bg-gray-800 disabled:opacity-50"
+            className="block w-full rounded-lg bg-brand-blue py-3.5 text-center text-sm font-semibold text-white hover:bg-brand-blue/90 disabled:opacity-50"
           >
             {submitting ? 'Logging in...' : 'Login'}
           </button>

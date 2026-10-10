@@ -151,7 +151,7 @@ export default function InstitutionApplicationsPage() {
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Search by student name or email"
-            className="w-full rounded-lg border border-gray-200 py-2.5 pl-9 pr-4 text-sm focus:border-blue-500 focus:outline-none"
+            className="w-full rounded-lg border border-gray-200 py-2.5 pl-9 pr-4 text-sm focus:border-brand-blue focus:outline-none"
           />
         </div>
         <FakeSelect label="All Courses" />
@@ -243,7 +243,7 @@ export default function InstitutionApplicationsPage() {
                       value={detail.status}
                       disabled={statusSaving}
                       onChange={(e) => handleStatusChange(e.target.value as ApplicationStatus)}
-                      className="appearance-none rounded-lg border border-gray-200 py-2 pl-3 pr-8 text-sm text-gray-700 focus:border-blue-500 focus:outline-none disabled:opacity-50"
+                      className="appearance-none rounded-lg border border-gray-200 py-2 pl-3 pr-8 text-sm text-gray-700 focus:border-brand-blue focus:outline-none disabled:opacity-50"
                     >
                       {STATUS_OPTIONS.map((s) => (
                         <option key={s} value={s}>

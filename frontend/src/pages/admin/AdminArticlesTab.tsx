@@ -85,7 +85,7 @@ export default function AdminArticlesTab() {
           <button
             onClick={() => setKind('news')}
             className={`rounded-lg px-4 py-2 text-sm font-semibold ${
-              kind === 'news' ? 'bg-black text-white' : 'border border-gray-300 text-gray-700 hover:bg-gray-50'
+              kind === 'news' ? 'bg-brand-blue text-white' : 'border border-gray-300 text-gray-700 hover:bg-gray-50'
             }`}
           >
             News
@@ -93,7 +93,7 @@ export default function AdminArticlesTab() {
           <button
             onClick={() => setKind('blogs')}
             className={`rounded-lg px-4 py-2 text-sm font-semibold ${
-              kind === 'blogs' ? 'bg-black text-white' : 'border border-gray-300 text-gray-700 hover:bg-gray-50'
+              kind === 'blogs' ? 'bg-brand-blue text-white' : 'border border-gray-300 text-gray-700 hover:bg-gray-50'
             }`}
           >
             Blogs
@@ -101,7 +101,7 @@ export default function AdminArticlesTab() {
         </div>
         <button
           onClick={() => setShowImportModal(true)}
-          className="flex items-center gap-1.5 rounded-lg bg-black px-3.5 py-2 text-xs font-semibold text-white hover:bg-gray-800"
+          className="flex items-center gap-1.5 rounded-lg bg-brand-blue px-3.5 py-2 text-xs font-semibold text-white hover:bg-brand-blue/90"
         >
           <UploadCloud className="h-3.5 w-3.5" /> Import {kindLabel} Sheet
         </button>
@@ -121,7 +121,7 @@ export default function AdminArticlesTab() {
                 setPage(1)
               }}
               placeholder="Search by title..."
-              className="w-full rounded-lg border border-gray-200 py-2.5 pl-9 pr-3 text-sm focus:border-blue-500 focus:outline-none"
+              className="w-full rounded-lg border border-gray-200 py-2.5 pl-9 pr-3 text-sm focus:border-brand-blue focus:outline-none"
             />
           </div>
         </div>

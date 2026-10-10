@@ -99,7 +99,7 @@ export default function AdminUsersTab() {
         <h2 className="text-lg font-semibold text-black">Staff Users</h2>
         <button
           onClick={() => setFormOpen(true)}
-          className="flex items-center gap-1.5 rounded-lg bg-black px-3.5 py-2 text-xs font-semibold text-white hover:bg-gray-800"
+          className="flex items-center gap-1.5 rounded-lg bg-brand-blue px-3.5 py-2 text-xs font-semibold text-white hover:bg-brand-blue/90"
         >
           <Plus className="h-3.5 w-3.5" /> Add User
         </button>
@@ -175,7 +175,7 @@ export default function AdminUsersTab() {
               </p>
               <button
                 onClick={closeForm}
-                className="rounded-lg bg-black px-5 py-2.5 text-sm font-semibold text-white hover:bg-gray-800"
+                className="rounded-lg bg-brand-blue px-5 py-2.5 text-sm font-semibold text-white hover:bg-brand-blue/90"
               >
                 Done
               </button>
@@ -203,7 +203,7 @@ export default function AdminUsersTab() {
                 <button
                   type="submit"
                   disabled={formLoading}
-                  className="rounded-lg bg-black px-5 py-2.5 text-sm font-semibold text-white hover:bg-gray-800 disabled:opacity-50"
+                  className="rounded-lg bg-brand-blue px-5 py-2.5 text-sm font-semibold text-white hover:bg-brand-blue/90 disabled:opacity-50"
                 >
                   {formLoading ? 'Creating...' : 'Create User'}
                 </button>

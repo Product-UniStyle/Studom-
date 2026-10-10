@@ -140,7 +140,7 @@ export default function SelectUniversitiesPage() {
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder="Search universities..."
-              className="w-full rounded-full border border-gray-200 py-2.5 pl-9 pr-4 text-sm focus:border-blue-500 focus:outline-none"
+              className="w-full rounded-full border border-gray-200 py-2.5 pl-9 pr-4 text-sm focus:border-brand-blue focus:outline-none"
             />
           </div>
           <div className="flex items-center gap-4">
@@ -150,7 +150,7 @@ export default function SelectUniversitiesPage() {
             <button
               onClick={() => navigate('/apply/essays')}
               disabled={selectedUniversities.length === 0}
-              className="whitespace-nowrap rounded-full bg-black px-8 py-3 text-sm font-semibold text-white hover:bg-gray-800 disabled:opacity-40"
+              className="whitespace-nowrap rounded-full bg-brand-blue px-8 py-3 text-sm font-semibold text-white hover:bg-brand-blue/90 disabled:opacity-40"
             >
               Proceed
             </button>

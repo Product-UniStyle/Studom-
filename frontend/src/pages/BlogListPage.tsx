@@ -75,7 +75,7 @@ export default function BlogListPage() {
                 setPage(1)
               }}
               placeholder="Search blogs..."
-              className="w-full rounded-lg border border-gray-200 py-2.5 pl-9 pr-4 text-sm focus:border-blue-500 focus:outline-none"
+              className="w-full rounded-lg border border-gray-200 py-2.5 pl-9 pr-4 text-sm focus:border-brand-blue focus:outline-none"
             />
           </div>
           <div className="flex w-full flex-col gap-3 sm:w-auto sm:flex-row sm:items-center">
@@ -86,7 +86,7 @@ export default function BlogListPage() {
                   setLocation(e.target.value)
                   setPage(1)
                 }}
-                className="w-full cursor-pointer appearance-none rounded-lg border border-gray-200 py-2.5 pl-4 pr-8 text-sm text-gray-700 focus:border-blue-500 focus:outline-none"
+                className="w-full cursor-pointer appearance-none rounded-lg border border-gray-200 py-2.5 pl-4 pr-8 text-sm text-gray-700 focus:border-brand-blue focus:outline-none"
               >
                 <option value="">All Locations</option>
                 {locations.map((c) => (
@@ -106,7 +106,7 @@ export default function BlogListPage() {
                     setSort(e.target.value as 'latest' | 'oldest')
                     setPage(1)
                   }}
-                  className="cursor-pointer appearance-none rounded-lg border border-gray-200 py-2 pl-3 pr-8 text-sm text-gray-700 focus:border-blue-500 focus:outline-none"
+                  className="cursor-pointer appearance-none rounded-lg border border-gray-200 py-2 pl-3 pr-8 text-sm text-gray-700 focus:border-brand-blue focus:outline-none"
                 >
                   <option value="latest">Latest</option>
                   <option value="oldest">Oldest</option>

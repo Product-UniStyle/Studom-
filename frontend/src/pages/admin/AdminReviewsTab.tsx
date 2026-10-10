@@ -57,7 +57,7 @@ export default function AdminReviewsTab() {
               key={t.key}
               onClick={() => setTab(t.key)}
               className={`rounded-lg px-3 py-1.5 text-xs font-semibold transition-colors ${
-                tab === t.key ? 'bg-black text-white' : 'text-gray-500 hover:text-black'
+                tab === t.key ? 'bg-brand-blue text-white' : 'text-gray-500 hover:text-black'
               }`}
             >
               {t.label}

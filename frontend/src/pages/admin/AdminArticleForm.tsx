@@ -108,7 +108,7 @@ export default function AdminArticleForm({ kind, article, onSaved, onCancel }: A
           name="content"
           rows={6}
           defaultValue={article.content}
-          className="w-full rounded-lg border border-gray-200 px-4 py-3 text-sm text-gray-800 focus:border-blue-500 focus:outline-none"
+          className="w-full rounded-lg border border-gray-200 px-4 py-3 text-sm text-gray-800 focus:border-brand-blue focus:outline-none"
         />
       </div>
 
@@ -167,7 +167,7 @@ export default function AdminArticleForm({ kind, article, onSaved, onCancel }: A
                     value={s.title || ''}
                     onChange={(e) => updateSection(i, { title: e.target.value })}
                     placeholder="Section title (optional)"
-                    className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm text-gray-800 focus:border-blue-500 focus:outline-none"
+                    className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm text-gray-800 focus:border-brand-blue focus:outline-none"
                   />
                   <ImageUploadField
                     label="Section Image (optional)"
@@ -181,7 +181,7 @@ export default function AdminArticleForm({ kind, article, onSaved, onCancel }: A
                     onChange={(e) => updateSection(i, { content: e.target.value })}
                     rows={3}
                     placeholder="Section content"
-                    className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm text-gray-800 focus:border-blue-500 focus:outline-none"
+                    className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm text-gray-800 focus:border-brand-blue focus:outline-none"
                   />
                 </div>
               </div>
@@ -218,7 +218,7 @@ export default function AdminArticleForm({ kind, article, onSaved, onCancel }: A
         <button
           type="submit"
           disabled={saving}
-          className="rounded-lg bg-black px-5 py-2.5 text-sm font-semibold text-white hover:bg-gray-800 disabled:opacity-50"
+          className="rounded-lg bg-brand-blue px-5 py-2.5 text-sm font-semibold text-white hover:bg-brand-blue/90 disabled:opacity-50"
         >
           {saving ? 'Saving...' : 'Save changes'}
         </button>

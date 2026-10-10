@@ -78,7 +78,7 @@ export default function NewsListPage() {
                 setPage(1)
               }}
               placeholder="Search news..."
-              className="w-full rounded-lg border border-gray-200 py-2.5 pl-9 pr-4 text-sm focus:border-blue-500 focus:outline-none"
+              className="w-full rounded-lg border border-gray-200 py-2.5 pl-9 pr-4 text-sm focus:border-brand-blue focus:outline-none"
             />
           </div>
           <label className="flex items-center gap-2 text-sm text-gray-600">
@@ -87,7 +87,7 @@ export default function NewsListPage() {
               <select
                 value={sort}
                 onChange={(e) => setSort(e.target.value as 'latest' | 'oldest')}
-                className="cursor-pointer appearance-none rounded-lg border border-gray-200 py-2 pl-3 pr-8 text-sm text-gray-700 focus:border-blue-500 focus:outline-none"
+                className="cursor-pointer appearance-none rounded-lg border border-gray-200 py-2 pl-3 pr-8 text-sm text-gray-700 focus:border-brand-blue focus:outline-none"
               >
                 <option value="latest">Latest</option>
                 <option value="oldest">Oldest</option>

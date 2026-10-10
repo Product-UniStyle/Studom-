@@ -122,7 +122,7 @@ export default function StudentDashboardPage() {
             <div className="divide-y divide-gray-100">
               {tasks.map((t) => (
                 <div key={t._id} className="flex items-center gap-3 py-3">
-                  <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-blue-50 text-blue-600">
+                  <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-blue-50 text-brand-blue">
                     <ClipboardCheck className="h-4 w-4" />
                   </div>
                   <div className="min-w-0 flex-1">
@@ -144,7 +144,7 @@ export default function StudentDashboardPage() {
                     </button>
                     <Link
                       to="/student/documents"
-                      className="rounded-lg border border-blue-500 px-3 py-1 text-center text-xs font-medium text-blue-600 hover:bg-blue-50"
+                      className="rounded-lg border border-brand-blue px-3 py-1 text-center text-xs font-medium text-brand-blue hover:bg-brand-blue/10"
                     >
                       Upload Documents
                     </Link>
@@ -171,7 +171,7 @@ function StatCard({
 }) {
   return (
     <div className="flex items-center gap-4 rounded-2xl border border-gray-200 p-6">
-      <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-blue-50 text-blue-600">
+      <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-blue-50 text-brand-blue">
         <Icon className="h-6 w-6" />
       </div>
       <div>

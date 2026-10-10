@@ -66,7 +66,7 @@ export default function PublicUniversityPicker({
           }}
           onFocus={() => setOpen(true)}
           placeholder="Search for your university..."
-          className="w-full rounded-lg border border-gray-200 py-3 pl-10 pr-4 text-sm text-gray-800 placeholder:text-gray-400 focus:border-blue-500 focus:outline-none"
+          className="w-full rounded-none border-0 border-b-2 border-gray-200 bg-transparent py-3 pl-10 pr-4 text-sm text-gray-800 placeholder:text-gray-400 focus:border-brand-blue focus:outline-none"
         />
       </div>
 

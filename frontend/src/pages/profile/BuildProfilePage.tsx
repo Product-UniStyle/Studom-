@@ -290,7 +290,7 @@ export default function BuildProfilePage() {
               {step < 5 ? (
                 <button
                   onClick={handleContinue}
-                  className="flex items-center gap-2 rounded-full bg-black px-6 py-2.5 text-sm font-semibold text-white hover:bg-gray-800"
+                  className="flex items-center gap-2 rounded-full bg-brand-blue px-6 py-2.5 text-sm font-semibold text-white hover:bg-brand-blue/90"
                 >
                   {step === 1 ? 'Continue' : 'Next'}
                   {step > 1 && <ArrowRight className="h-4 w-4" />}
@@ -299,7 +299,7 @@ export default function BuildProfilePage() {
                 <button
                   onClick={handleSaveProfile}
                   disabled={saving}
-                  className="flex items-center gap-2 rounded-full bg-black px-6 py-2.5 text-sm font-semibold text-white hover:bg-gray-800 disabled:opacity-50"
+                  className="flex items-center gap-2 rounded-full bg-brand-blue px-6 py-2.5 text-sm font-semibold text-white hover:bg-brand-blue/90 disabled:opacity-50"
                 >
                   {saving ? 'Saving...' : 'Save Profile'} <ArrowRight className="h-4 w-4" />
                 </button>

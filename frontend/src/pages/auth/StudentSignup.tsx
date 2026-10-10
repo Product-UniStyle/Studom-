@@ -94,7 +94,7 @@ export default function StudentSignup() {
           <button
             type="submit"
             disabled={submitting}
-            className="w-full rounded-lg bg-black py-3.5 text-sm font-semibold text-white hover:bg-gray-800 disabled:opacity-50"
+            className="w-full rounded-lg bg-brand-blue py-3.5 text-sm font-semibold text-white hover:bg-brand-blue/90 disabled:opacity-50"
           >
             {submitting ? 'Creating account...' : 'Create Account'}
           </button>

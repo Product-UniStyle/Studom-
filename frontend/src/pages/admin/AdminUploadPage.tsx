@@ -57,7 +57,7 @@ export default function AdminUploadPage() {
                   key={t.key}
                   onClick={() => setTab(t.key)}
                   className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm font-medium transition-colors ${
-                    tab === t.key ? 'bg-black text-white' : 'text-gray-500 hover:text-black'
+                    tab === t.key ? 'bg-brand-blue text-white' : 'text-gray-500 hover:text-black'
                   }`}
                 >
                   <t.icon className="h-4 w-4" /> {t.label}
@@ -82,7 +82,7 @@ export default function AdminUploadPage() {
               <div className="flex gap-3">
                 <button
                   onClick={() => setActiveImport('main')}
-                  className="flex items-center gap-1.5 rounded-lg bg-black px-3.5 py-2 text-xs font-semibold text-white hover:bg-gray-800"
+                  className="flex items-center gap-1.5 rounded-lg bg-brand-blue px-3.5 py-2 text-xs font-semibold text-white hover:bg-brand-blue/90"
                 >
                   <UploadCloud className="h-3.5 w-3.5" /> Import MAIN Sheet
                 </button>

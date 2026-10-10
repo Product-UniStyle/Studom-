@@ -87,13 +87,13 @@ export default function HomePage() {
           <div className="mt-8 flex flex-col items-center justify-center gap-4 sm:flex-row">
             <Link
               to="/profile/build"
-              className="rounded-lg bg-black px-6 py-3 text-sm font-semibold text-white hover:bg-gray-800"
+              className="rounded-lg bg-brand-blue px-6 py-3 text-sm font-semibold text-white hover:bg-brand-blue/90"
             >
               Build Your Profile
             </Link>
             <Link
               to="/apply/select"
-              className="rounded-lg bg-black px-6 py-3 text-sm font-semibold text-white hover:bg-gray-800"
+              className="rounded-lg bg-brand-blue px-6 py-3 text-sm font-semibold text-white hover:bg-brand-blue/90"
             >
               Apply to Universities
             </Link>

@@ -149,13 +149,13 @@ export default function ApplicationSubmittedPage() {
         <p className="mx-auto mt-3 max-w-xl text-sm text-gray-500">
           Thank you for applying through Studom. We've received your
           application and sent a confirmation email to{' '}
-          <span className="font-medium text-blue-600">{student.email}</span>.
+          <span className="font-medium text-brand-blue">{student.email}</span>.
         </p>
 
         <div className="mt-8 flex flex-col items-center justify-center gap-4 sm:flex-row">
           <button
             onClick={() => setShowSummaryModal(true)}
-            className="flex items-center gap-2 rounded-lg bg-blue-600 px-6 py-3 text-sm font-semibold text-white hover:bg-blue-700"
+            className="flex items-center gap-2 rounded-lg bg-brand-blue px-6 py-3 text-sm font-semibold text-white hover:bg-brand-blue/90"
           >
             <FileText className="h-4 w-4" /> View Application Summary
           </button>
@@ -253,7 +253,7 @@ export default function ApplicationSubmittedPage() {
             )}
             <Link
               to="/student/applications"
-              className="mt-4 inline-block text-sm font-medium text-blue-600"
+              className="mt-4 inline-block text-sm font-medium text-brand-blue"
             >
               View all applications →
             </Link>
@@ -262,7 +262,7 @@ export default function ApplicationSubmittedPage() {
 
         <div className="mt-10 flex flex-col items-center justify-between gap-4 rounded-2xl bg-gray-50 p-6 text-left sm:flex-row">
           <div className="flex items-center gap-4">
-            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-blue-100 text-blue-600">
+            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-blue-100 text-brand-blue">
               <Heart className="h-5 w-5" />
             </div>
             <div>
@@ -275,7 +275,7 @@ export default function ApplicationSubmittedPage() {
               </div>
             </div>
           </div>
-          <button className="shrink-0 rounded-lg bg-blue-600 px-6 py-3 text-sm font-semibold text-white hover:bg-blue-700">
+          <button className="shrink-0 rounded-lg bg-brand-blue px-6 py-3 text-sm font-semibold text-white hover:bg-brand-blue/90">
             Explore Community
           </button>
         </div>
@@ -351,7 +351,7 @@ export default function ApplicationSubmittedPage() {
                     </div>
                     <button
                       onClick={() => setSelectedId(a._id)}
-                      className="rounded-lg border border-blue-500 px-4 py-2 text-sm font-medium text-blue-600 hover:bg-blue-50"
+                      className="rounded-lg border border-brand-blue px-4 py-2 text-sm font-medium text-brand-blue hover:bg-brand-blue/10"
                     >
                       View Details
                     </button>
@@ -362,7 +362,7 @@ export default function ApplicationSubmittedPage() {
           )}
           <Link
             to="/student/applications"
-            className="mt-4 inline-block text-sm font-medium text-blue-600"
+            className="mt-4 inline-block text-sm font-medium text-brand-blue"
           >
             Go to My Applications page →
           </Link>
@@ -444,7 +444,7 @@ export default function ApplicationSubmittedPage() {
                         className="flex items-center justify-between rounded-lg border border-gray-100 px-4 py-2.5 text-sm hover:bg-gray-50"
                       >
                         <span className="font-medium text-black">{d.name}</span>
-                        <span className="text-blue-600">View →</span>
+                        <span className="text-brand-blue">View →</span>
                       </a>
                     ))}
                   </div>
@@ -490,7 +490,7 @@ function SummaryRow({
   return (
     <div className="flex items-center justify-between border-b border-gray-100 py-2.5 text-sm last:border-0">
       <span className="text-gray-500">{label}</span>
-      <span className={link ? 'font-medium text-blue-600' : 'text-black'}>
+      <span className={link ? 'font-medium text-brand-blue' : 'text-black'}>
         {value}
       </span>
     </div>

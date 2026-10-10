@@ -154,7 +154,7 @@ export default function DocumentsPage() {
                 setFolderName('')
                 setFolderModal('create')
               }}
-              className="flex items-center gap-2 whitespace-nowrap rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-blue-700"
+              className="flex items-center gap-2 whitespace-nowrap rounded-lg bg-brand-blue px-4 py-2.5 text-sm font-semibold text-white hover:bg-brand-blue/90"
             >
               <FolderPlus className="h-4 w-4" /> Add Folder
             </button>
@@ -171,7 +171,7 @@ export default function DocumentsPage() {
               {folders.map((f) => (
                 <div
                   key={f._id}
-                  className="group relative flex flex-col items-start gap-3 rounded-2xl border border-gray-200 p-5 text-left hover:border-blue-300 hover:bg-blue-50/40"
+                  className="group relative flex flex-col items-start gap-3 rounded-2xl border border-gray-200 p-5 text-left hover:border-blue-300 hover:bg-brand-blue/10/40"
                 >
                   {f.name !== BUILD_PROFILE_DOCUMENT_FOLDER && (
                     <button
@@ -187,7 +187,7 @@ export default function DocumentsPage() {
                     </button>
                   )}
                   <button onClick={() => setActiveFolder(f.name)} className="flex w-full flex-col items-start gap-3">
-                    <div className="flex h-11 w-11 items-center justify-center rounded-full bg-blue-50 text-blue-600">
+                    <div className="flex h-11 w-11 items-center justify-center rounded-full bg-blue-50 text-brand-blue">
                       <Folder className="h-5 w-5" />
                     </div>
                     <div>
@@ -202,7 +202,7 @@ export default function DocumentsPage() {
               {uncategorizedCount > 0 && (
                 <button
                   onClick={() => setActiveFolder(UNCATEGORIZED)}
-                  className="flex flex-col items-start gap-3 rounded-2xl border border-gray-200 p-5 text-left hover:border-blue-300 hover:bg-blue-50/40"
+                  className="flex flex-col items-start gap-3 rounded-2xl border border-gray-200 p-5 text-left hover:border-blue-300 hover:bg-brand-blue/10/40"
                 >
                   <div className="flex h-11 w-11 items-center justify-center rounded-full bg-gray-100 text-gray-500">
                     <Folder className="h-5 w-5" />
@@ -256,13 +256,13 @@ export default function DocumentsPage() {
                   value={query}
                   onChange={(e) => setQuery(e.target.value)}
                   placeholder="Search documents..."
-                  className="w-full rounded-full border border-gray-200 py-2.5 pl-9 pr-4 text-sm focus:border-blue-500 focus:outline-none"
+                  className="w-full rounded-full border border-gray-200 py-2.5 pl-9 pr-4 text-sm focus:border-brand-blue focus:outline-none"
                 />
               </div>
               <button
                 onClick={() => fileInputRef.current?.click()}
                 disabled={uploading}
-                className="flex items-center gap-2 whitespace-nowrap rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-blue-700 disabled:opacity-50"
+                className="flex items-center gap-2 whitespace-nowrap rounded-lg bg-brand-blue px-4 py-2.5 text-sm font-semibold text-white hover:bg-brand-blue/90 disabled:opacity-50"
               >
                 <Upload className="h-4 w-4" /> {uploading ? 'Uploading...' : 'Upload Document'}
               </button>
@@ -331,7 +331,7 @@ export default function DocumentsPage() {
                           ) : (
                             <button
                               onClick={() => fileInputRef.current?.click()}
-                              className="rounded-lg border border-blue-500 px-3 py-1.5 text-xs font-medium text-blue-600 hover:bg-blue-50"
+                              className="rounded-lg border border-brand-blue px-3 py-1.5 text-xs font-medium text-brand-blue hover:bg-brand-blue/10"
                             >
                               Upload
                             </button>
@@ -369,7 +369,7 @@ export default function DocumentsPage() {
               <button
                 type="submit"
                 disabled={folderSaving}
-                className="rounded-lg bg-black px-5 py-2.5 text-sm font-semibold text-white hover:bg-gray-800 disabled:opacity-50"
+                className="rounded-lg bg-brand-blue px-5 py-2.5 text-sm font-semibold text-white hover:bg-brand-blue/90 disabled:opacity-50"
               >
                 {folderSaving ? 'Saving...' : folderModal === 'create' ? 'Create Folder' : 'Save'}
               </button>
@@ -393,7 +393,7 @@ function StatCard({
   color: 'blue' | 'orange' | 'purple'
 }) {
   const colorClass = {
-    blue: 'bg-blue-50 text-blue-600',
+    blue: 'bg-blue-50 text-brand-blue',
     orange: 'bg-orange-50 text-orange-600',
     purple: 'bg-purple-50 text-purple-600',
   }[color]
