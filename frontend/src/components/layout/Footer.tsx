@@ -31,7 +31,7 @@ export default function Footer() {
       <div className="mx-auto max-w-[1440px] px-[6.5rem] py-14">
         <div className="flex flex-col justify-between gap-10 md:flex-row">
           <div>
-            <div className="font-logo text-3xl">Studom</div>
+            <img src="/logo.png" alt="Studom" className="h-10 w-auto" />
             <div className="mt-4 max-w-xs font-footerAddress text-sm leading-relaxed text-gray-300">
               Studom
               <br />
