@@ -107,16 +107,21 @@ function generateApplicationRef(): string {
 }
 
 router.post('/signup', async (req, res) => {
-  const { fullName, email, password, birthdate, currentStage } = req.body as {
+  const { fullName, email, password, birthdate, currentStage, mobile, countryOfResidence } = req.body as {
     fullName?: string;
     email?: string;
     password?: string;
     birthdate?: string;
     currentStage?: CurrentStage;
+    mobile?: string;
+    countryOfResidence?: string;
   };
 
   if (!fullName || !email || !password || !currentStage) {
     return res.status(400).json({ error: 'Full name, email, password, and current stage are required' });
+  }
+  if (!mobile || !countryOfResidence) {
+    return res.status(400).json({ error: 'Mobile number and country of residence are required' });
   }
   if (password.length < 6) {
     return res.status(400).json({ error: 'Password must be at least 6 characters' });
@@ -138,6 +143,7 @@ router.post('/signup', async (req, res) => {
     password: passwordHash,
     birthdate: birthdate ? new Date(birthdate) : undefined,
     currentStage,
+    profile: { personal: { mobile, countryOfResidence } },
   });
 
   const token = jwt.sign({ sub: student._id.toString(), email: student.email }, secret, {

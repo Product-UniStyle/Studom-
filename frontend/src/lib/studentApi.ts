@@ -46,6 +46,8 @@ export async function studentSignup(input: {
   password: string
   birthdate?: string
   currentStage: CurrentStage
+  mobile?: string
+  countryOfResidence?: string
 }): Promise<void> {
   const res = await fetch(`${API_URL}/api/student/signup`, {
     method: 'POST',

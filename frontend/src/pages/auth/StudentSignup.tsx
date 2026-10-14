@@ -6,6 +6,8 @@ import TextField from '../../components/form/TextField'
 import SelectField from '../../components/form/SelectField'
 import { studentSignup } from '../../lib/studentApi'
 import type { CurrentStage } from '../../lib/studentApi'
+import { DIAL_CODE_OPTIONS } from '../../data/countryCodes'
+import { COUNTRIES } from '../../data/countries'
 
 const CURRENT_STAGES: CurrentStage[] = [
   'School Student',
@@ -21,6 +23,9 @@ export default function StudentSignup() {
   const [password, setPassword] = useState('')
   const [birthdate, setBirthdate] = useState('')
   const [currentStage, setCurrentStage] = useState<CurrentStage | ''>('')
+  const [mobileCountryCode, setMobileCountryCode] = useState('')
+  const [mobile, setMobile] = useState('')
+  const [countryOfResidence, setCountryOfResidence] = useState('')
   const [error, setError] = useState<string | null>(null)
   const [submitting, setSubmitting] = useState(false)
 
@@ -31,9 +36,25 @@ export default function StudentSignup() {
       setError('Please select your current stage')
       return
     }
+    if (!mobileCountryCode || !mobile.trim()) {
+      setError('Please enter your mobile number')
+      return
+    }
+    if (!countryOfResidence) {
+      setError('Please select your country of residence')
+      return
+    }
     setSubmitting(true)
     try {
-      await studentSignup({ fullName, email, password, birthdate: birthdate || undefined, currentStage })
+      await studentSignup({
+        fullName,
+        email,
+        password,
+        birthdate: birthdate || undefined,
+        currentStage,
+        mobile: `${mobileCountryCode} ${mobile.trim()}`,
+        countryOfResidence,
+      })
       navigate('/student/dashboard')
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Signup failed')
@@ -87,6 +108,35 @@ export default function StudentSignup() {
             required
             onChange={(e) => setCurrentStage(e.target.value as CurrentStage)}
             options={CURRENT_STAGES}
+          />
+          <div>
+            <label className="mb-1.5 block text-sm font-medium text-gray-900">
+              Mobile Number <span className="text-red-500">*</span>
+            </label>
+            <div className="flex gap-2">
+              <SelectField
+                className="w-24 shrink-0"
+                placeholder="Code"
+                options={DIAL_CODE_OPTIONS}
+                defaultValue={mobileCountryCode}
+                onChange={(e) => setMobileCountryCode(e.target.value)}
+              />
+              <TextField
+                className="flex-1"
+                type="tel"
+                value={mobile}
+                onChange={(e) => setMobile(e.target.value)}
+                placeholder="Enter your mobile number"
+              />
+            </div>
+          </div>
+          <SelectField
+            label="Country of Residence"
+            placeholder="Select country"
+            required
+            defaultValue={countryOfResidence}
+            onChange={(e) => setCountryOfResidence(e.target.value)}
+            options={COUNTRIES}
           />
 
           {error && <p className="text-sm text-red-600">{error}</p>}
