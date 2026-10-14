@@ -11,7 +11,7 @@ import {
 } from 'lucide-react'
 import PageShell from '../components/layout/PageShell'
 import TextField from '../components/form/TextField'
-import TextArea from '../components/form/TextArea'
+import SelectField from '../components/form/SelectField'
 import SafeImage from '../components/ui/SafeImage'
 import Avatar from '../components/ui/Avatar'
 import Modal from '../components/ui/Modal'
@@ -29,6 +29,18 @@ import type {
 } from '../lib/publicApi'
 import { getStudentToken, getStudentMe } from '../lib/studentApi'
 import type { StudentProfile } from '../lib/studentApi'
+import { DIAL_CODE_OPTIONS } from '../data/countryCodes'
+
+const CONNECT_REASONS = [
+  'General Enquiry',
+  'University Admissions',
+  'Application Support',
+  'University Partnership',
+  'Business Collaboration',
+  'Technical Support',
+  'Feedback & Suggestions',
+  'Other',
+]
 
 export default function UniversityDetailPage() {
   const { id } = useParams<{ id: string }>()
@@ -252,7 +264,7 @@ export default function UniversityDetailPage() {
                 )}
               </div>
             </div>
-            <div className="mt-4 space-y-4 text-lg font-medium leading-relaxed text-gray-600">
+            <div className="mt-4 space-y-4 text-base font-medium leading-relaxed text-gray-600">
               {about.length > 0 ? (
                 about.map((p, i) => <p key={i}>{p}</p>)
               ) : (
@@ -260,16 +272,27 @@ export default function UniversityDetailPage() {
               )}
             </div>
             {website && (
-              <Link
-                to={website}
+              <a
+                href={website}
+                target="_blank"
+                rel="noopener noreferrer"
                 className="mt-4 inline-block text-sm font-medium text-brand-blue"
               >
                 View Website →
-              </Link>
+              </a>
             )}
           </div>
 
           <div className="space-y-6">
+            <div className="rounded-xl border border-gray-100 p-6 shadow-sm">
+              <Link
+                to="/profile/build"
+                className="block w-full rounded-lg bg-brand-blue py-3 text-center text-base font-semibold text-white hover:bg-brand-blue/90"
+              >
+                Build Your Profile
+              </Link>
+            </div>
+
             <div className="rounded-xl border border-gray-100 p-6 shadow-sm">
               <h2 className="mb-4 text-lg font-bold tracking-wide text-black">
                 CONNECT WITH US
@@ -279,20 +302,25 @@ export default function UniversityDetailPage() {
                 university team directly.
               </p>
               <TextField label="Full Name" placeholder="" />
-              <TextField label="Email" type="email" placeholder="" className="mt-4" />
-              <TextArea label="Your Message" rows={4} className="mt-4" />
+              <TextField label="Email Address" type="email" placeholder="" className="mt-4" />
+              <div className="mt-4">
+                <label className="mb-1.5 block text-sm font-medium text-gray-900">
+                  Mobile Number
+                </label>
+                <div className="flex gap-2">
+                  <SelectField className="w-24 shrink-0" placeholder="Code" options={DIAL_CODE_OPTIONS} />
+                  <TextField className="flex-1" type="tel" />
+                </div>
+              </div>
+              <SelectField
+                label="Reason for Connection"
+                placeholder="Select a reason"
+                options={CONNECT_REASONS}
+                className="mt-4"
+              />
               <button className="mt-4 w-full rounded-lg bg-brand-blue py-3 text-base font-semibold text-white hover:bg-brand-blue/90">
                 Send Message
               </button>
-            </div>
-
-            <div className="rounded-xl border border-gray-100 p-6 shadow-sm">
-              <Link
-                to="/profile/build"
-                className="block w-full rounded-lg bg-brand-blue py-3 text-center text-base font-semibold text-white hover:bg-brand-blue/90"
-              >
-                Build Your Profile
-              </Link>
             </div>
           </div>
         </div>

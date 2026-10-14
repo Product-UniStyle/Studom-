@@ -296,14 +296,14 @@ export default function UniversitySearchPage() {
         {!applied || !country || !location ? (
           <div className="flex flex-col items-center justify-center py-32 text-center">
             <Landmark className="h-16 w-16 text-gray-300" strokeWidth={1} />
-            <h2 className="mt-6 text-2xl font-bold text-black">
+            <h2 className="mt-6 font-script text-2xl font-bold text-black">
               Please fill in the filters
             </h2>
-            <p className="mt-2 text-gray-500">
-              {filterError
-                ? 'Country and location are required to search.'
-                : 'Choose a country and location to explore universities.'}
-            </p>
+            {filterError && (
+              <p className="mt-2 font-script text-gray-500">
+                Country and location are required to search.
+              </p>
+            )}
           </div>
         ) : (
           <div className="mt-8">
