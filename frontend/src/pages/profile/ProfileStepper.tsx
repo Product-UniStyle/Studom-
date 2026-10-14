@@ -23,7 +23,7 @@ export default function ProfileStepper({ current }: { current: number }) {
                 className={cn(
                   'flex h-9 w-9 shrink-0 items-center justify-center rounded-full border-2 text-sm font-semibold',
                   done && 'border-green-500 bg-green-500 text-white',
-                  active && 'border-blue-500 text-blue-600',
+                  active && 'border-blue-500 text-brand-blue',
                   !done && !active && 'border-gray-300 text-gray-400'
                 )}
               >
@@ -41,7 +41,7 @@ export default function ProfileStepper({ current }: { current: number }) {
             <div
               className={cn(
                 'mt-2 max-w-[6.5rem] text-center text-xs font-medium',
-                active ? 'text-blue-600' : done ? 'text-black' : 'text-gray-400'
+                active ? 'text-brand-blue' : done ? 'text-black' : 'text-gray-400'
               )}
             >
               {label}

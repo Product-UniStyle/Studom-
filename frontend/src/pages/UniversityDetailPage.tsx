@@ -185,23 +185,23 @@ export default function UniversityDetailPage() {
           </div>
           <div className="flex gap-4">
             <div className="flex items-center gap-3 rounded-xl border border-gray-100 px-5 py-3">
-              <Award className="h-6 w-6 text-blue-900" />
+              <Award className="h-6 w-6 text-brand-blue" />
               <div>
                 <div className="flex items-center gap-1 text-xs text-gray-500">
                   QS Ranking
                 </div>
-                <div className="text-lg font-bold text-blue-900">
+                <div className="text-lg font-bold text-brand-blue">
                   {uni.qsRank ?? 'Not Ranked'}
                 </div>
               </div>
             </div>
             <div className="flex items-center gap-3 rounded-xl border border-gray-100 px-5 py-3">
-              <Landmark className="h-6 w-6 text-blue-900" />
+              <Landmark className="h-6 w-6 text-brand-blue" />
               <div>
                 <div className="flex items-center gap-1 text-xs text-gray-500">
                   University Origin
                 </div>
-                <div className="text-lg font-bold text-blue-900">
+                <div className="text-lg font-bold text-brand-blue">
                   {uni.origin || '-'}
                 </div>
               </div>
@@ -212,15 +212,15 @@ export default function UniversityDetailPage() {
         {/* About + quick apply */}
         <div className="mt-10 grid grid-cols-1 gap-10 lg:grid-cols-3">
           <div className="lg:col-span-2">
-            <div className="flex items-center justify-between border-b border-blue-600 pb-2">
-              <h2 className="text-lg font-bold tracking-wide text-blue-900">
+            <div className="flex items-center justify-between border-b border-brand-blue pb-2">
+              <h2 className="text-lg font-bold tracking-wide text-brand-blue">
                 ABOUT UNIVERSITY
               </h2>
-              <div className="relative flex items-center gap-1 text-sm text-blue-600">
+              <div className="relative flex items-center gap-1 text-sm text-brand-blue">
                 <button
                   type="button"
                   onClick={() => setShowContributorInfo((v) => !v)}
-                  className="text-blue-600 hover:text-blue-800"
+                  className="text-brand-blue hover:text-brand-blue/80"
                 >
                   <Info className="h-3.5 w-3.5" />
                 </button>
@@ -262,7 +262,7 @@ export default function UniversityDetailPage() {
             {website && (
               <Link
                 to={website}
-                className="mt-4 inline-block text-sm font-medium text-blue-600"
+                className="mt-4 inline-block text-sm font-medium text-brand-blue"
               >
                 View Website →
               </Link>

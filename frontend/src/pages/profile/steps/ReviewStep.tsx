@@ -165,7 +165,7 @@ export default function ReviewStep({ data, goToStep }: Props) {
         ))}
 
         <div className="flex items-start gap-3 rounded-xl bg-blue-50 p-4">
-          <ShieldCheck className="mt-0.5 h-5 w-5 shrink-0 text-blue-600" />
+          <ShieldCheck className="mt-0.5 h-5 w-5 shrink-0 text-brand-blue" />
           <div>
             <div className="text-sm font-semibold text-black">
               Your information is safe with us.

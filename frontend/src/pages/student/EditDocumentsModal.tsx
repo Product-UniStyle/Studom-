@@ -64,7 +64,7 @@ export default function EditDocumentsModal({ documents, onCancel, onSaved }: Pro
 
       {error && <p className="text-sm text-red-600">{error}</p>}
 
-      <Link to="/student/documents" className="block text-sm font-medium text-blue-600">
+      <Link to="/student/documents" className="block text-sm font-medium text-brand-blue">
         Manage all documents →
       </Link>
 

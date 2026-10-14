@@ -33,7 +33,7 @@ export default function DashboardLayout({
       <div className="mx-auto flex w-full max-w-[1440px] flex-1 gap-8 px-[6.5rem] py-8">
         <aside className="hidden w-64 shrink-0 flex-col md:flex">
           <div className="mb-8 flex items-center gap-3">
-            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-blue-50 text-blue-600">
+            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-blue-50 text-brand-blue">
               <span className="text-lg font-semibold">
                 {userName.charAt(0)}
               </span>
@@ -54,7 +54,7 @@ export default function DashboardLayout({
                   to={item.to}
                   className={cn(
                     'flex items-center gap-3 rounded-lg px-4 py-3 text-sm font-medium text-gray-600 hover:bg-gray-50',
-                    active && 'bg-blue-50 text-blue-600'
+                    active && 'bg-blue-50 text-brand-blue'
                   )}
                 >
                   <Icon className="h-5 w-5" />
@@ -65,14 +65,14 @@ export default function DashboardLayout({
           </nav>
 
           <div className="mt-8 rounded-xl border border-gray-200 p-4">
-            <div className="mb-2 flex h-9 w-9 items-center justify-center rounded-full bg-blue-50 text-blue-600">
+            <div className="mb-2 flex h-9 w-9 items-center justify-center rounded-full bg-blue-50 text-brand-blue">
               <Headphones className="h-4 w-4" />
             </div>
             <div className="text-sm font-semibold text-black">Need Help?</div>
             <div className="mt-1 text-xs text-gray-500">
               Our support team is here to help you with anything.
             </div>
-            <div className="mt-2 text-xs font-medium text-blue-600">
+            <div className="mt-2 text-xs font-medium text-brand-blue">
               Contact Support &gt;
             </div>
           </div>

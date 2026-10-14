@@ -77,7 +77,7 @@ export default function FavoritesPage() {
       {universities.length === 0 ? (
         <div className="mt-10 text-center text-gray-400">
           <p>You haven't favorited any universities yet.</p>
-          <Link to="/search?type=universities" className="mt-2 inline-block text-sm font-medium text-blue-600 hover:underline">
+          <Link to="/search?type=universities" className="mt-2 inline-block text-sm font-medium text-brand-blue hover:underline">
             Browse universities →
           </Link>
         </div>

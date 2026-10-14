@@ -87,7 +87,7 @@ export default function InstitutionSettingsPage() {
             className="flex items-start justify-between gap-4 rounded-2xl border border-gray-200 p-6 text-left hover:bg-gray-50"
           >
             <div className="flex items-start gap-4">
-              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-blue-50 text-blue-600">
+              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-blue-50 text-brand-blue">
                 <s.icon className="h-5 w-5" />
               </div>
               <div>

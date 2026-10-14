@@ -29,7 +29,7 @@ export default function StudentLogin() {
   return (
     <PageShell hideFooter>
       <div className="mx-auto max-w-2xl px-6 py-16 md:px-10">
-        <h1 className="font-script whitespace-nowrap text-center text-lg text-blue-600 sm:text-xl md:text-2xl">
+        <h1 className="font-script whitespace-nowrap text-center text-lg text-brand-blue sm:text-xl md:text-2xl">
           Login to Your Studom Account
         </h1>
 
@@ -54,7 +54,7 @@ export default function StudentLogin() {
               icon={<Lock className="h-4 w-4" />}
             />
             <div className="mt-2 text-right">
-              <Link to="#" className="text-sm text-blue-600">
+              <Link to="#" className="text-sm text-brand-blue">
                 Forgot Password?
               </Link>
             </div>
@@ -72,7 +72,7 @@ export default function StudentLogin() {
 
           <p className="text-center text-sm text-gray-600">
             Don't have an account?{' '}
-            <Link to="/student/signup" className="font-medium text-blue-600">
+            <Link to="/student/signup" className="font-medium text-brand-blue">
               Sign up here
             </Link>
           </p>

@@ -160,7 +160,7 @@ export default function InstitutionApplicationsPage() {
         <button className="flex items-center gap-2 rounded-lg border border-gray-200 px-4 py-2.5 text-sm text-gray-600">
           <SlidersHorizontal className="h-4 w-4" /> More Filters
         </button>
-        <button onClick={() => setQuery('')} className="text-sm font-medium text-blue-600">
+        <button onClick={() => setQuery('')} className="text-sm font-medium text-brand-blue">
           Clear
         </button>
       </div>
@@ -209,7 +209,7 @@ export default function InstitutionApplicationsPage() {
                     <div className="flex items-center gap-2">
                       <button
                         onClick={() => setSelectedId(a._id)}
-                        className="text-sm font-medium text-blue-600"
+                        className="text-sm font-medium text-brand-blue"
                       >
                         View Application →
                       </button>
@@ -310,7 +310,7 @@ export default function InstitutionApplicationsPage() {
                         className="flex items-center justify-between rounded-lg border border-gray-100 px-4 py-2.5 text-sm hover:bg-gray-50"
                       >
                         <span className="font-medium text-black">{d.name}</span>
-                        <span className="text-blue-600">View →</span>
+                        <span className="text-brand-blue">View →</span>
                       </a>
                     ))}
                   </div>
@@ -349,7 +349,7 @@ function StatCard({
   color: 'blue' | 'orange' | 'green' | 'red'
 }) {
   const colorClass = {
-    blue: 'bg-blue-50 text-blue-600',
+    blue: 'bg-blue-50 text-brand-blue',
     orange: 'bg-orange-50 text-orange-600',
     green: 'bg-green-50 text-green-600',
     red: 'bg-red-50 text-red-600',

@@ -62,7 +62,7 @@ export default function NewsListPage() {
   return (
     <PageShell>
       <div className="mx-auto max-w-[1440px] px-[6.5rem] py-10">
-        <h1 className="text-3xl font-bold text-blue-600">News</h1>
+        <h1 className="text-3xl font-bold text-brand-blue">News</h1>
         <p className="mt-2 max-w-2xl text-sm text-gray-500">
           Stay updated with the latest education news, university updates, policy changes, scholarships, and
           opportunities across the Middle East.
@@ -116,7 +116,7 @@ export default function NewsListPage() {
                     <div className="min-w-0 flex-1">
                       <div className="flex flex-wrap items-center gap-2 text-xs">
                         {n.type && (
-                          <span className="rounded-full bg-blue-50 px-2.5 py-1 font-medium text-blue-600">
+                          <span className="rounded-full bg-blue-50 px-2.5 py-1 font-medium text-brand-blue">
                             {n.type}
                           </span>
                         )}
@@ -124,21 +124,21 @@ export default function NewsListPage() {
                       </div>
                       <Link
                         to={`/news/${n.slug || n._id}`}
-                        className="mt-1.5 block text-lg font-semibold text-blue-700 hover:underline"
+                        className="mt-1.5 block text-lg font-semibold text-brand-blue hover:underline"
                       >
                         {n.title}
                       </Link>
                       <div className="mt-2 flex items-center justify-between gap-3">
-                        <Link to={`/news/${n.slug || n._id}`} className="text-sm font-medium text-blue-600 hover:underline">
+                        <Link to={`/news/${n.slug || n._id}`} className="text-sm font-medium text-brand-blue hover:underline">
                           Read more →
                         </Link>
                         <button
                           onClick={() => toggleSave(n._id)}
                           className={`flex shrink-0 items-center gap-1.5 text-sm font-medium ${
-                            saved.has(n._id) ? 'text-blue-600' : 'text-gray-500 hover:text-black'
+                            saved.has(n._id) ? 'text-brand-blue' : 'text-gray-500 hover:text-black'
                           }`}
                         >
-                          <Bookmark className={`h-4 w-4 ${saved.has(n._id) ? 'fill-blue-600' : ''}`} />
+                          <Bookmark className={`h-4 w-4 ${saved.has(n._id) ? 'fill-brand-blue' : ''}`} />
                           {saved.has(n._id) ? 'Saved' : 'Save'}
                         </button>
                       </div>
@@ -162,7 +162,7 @@ export default function NewsListPage() {
                     key={n}
                     onClick={() => setPage(n)}
                     className={`flex h-9 w-9 items-center justify-center rounded-full text-sm font-medium ${
-                      n === page ? 'bg-blue-600 text-white' : 'border border-gray-200 text-gray-600'
+                      n === page ? 'bg-brand-blue text-white' : 'border border-gray-200 text-gray-600'
                     }`}
                   >
                     {n}

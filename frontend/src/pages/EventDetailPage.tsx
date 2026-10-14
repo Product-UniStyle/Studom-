@@ -74,7 +74,7 @@ export default function EventDetailPage() {
     <PageShell>
       <div className="mx-auto max-w-[1440px] px-[6.5rem] py-8">
         <div className="text-sm text-gray-500">
-          <Link to="/events" className="text-blue-600 hover:underline">
+          <Link to="/events" className="text-brand-blue hover:underline">
             Events
           </Link>{' '}
           / {event.title}
@@ -88,7 +88,7 @@ export default function EventDetailPage() {
             {event.universityId && (
               <p className="mt-1 text-sm text-gray-500">
                 Hosted by{' '}
-                <Link to={`/universities/${event.universityId.slug || event.universityId._id}`} className="font-medium text-blue-600 hover:underline">
+                <Link to={`/universities/${event.universityId.slug || event.universityId._id}`} className="font-medium text-brand-blue hover:underline">
                   {event.universityId.name}
                 </Link>
               </p>
@@ -164,7 +164,7 @@ export default function EventDetailPage() {
               <ul className="space-y-3 text-sm text-gray-600">
                 {event.whatToExpect.map((w, i) => (
                   <li key={i} className="flex items-start gap-2">
-                    <span className="mt-0.5 h-1.5 w-1.5 shrink-0 rounded-full bg-blue-600" />
+                    <span className="mt-0.5 h-1.5 w-1.5 shrink-0 rounded-full bg-brand-blue" />
                     {w.text}
                   </li>
                 ))}

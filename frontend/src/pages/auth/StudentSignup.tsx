@@ -45,7 +45,7 @@ export default function StudentSignup() {
   return (
     <PageShell hideFooter>
       <div className="mx-auto max-w-2xl px-6 py-16 md:px-10">
-        <h1 className="font-script whitespace-nowrap text-center text-lg text-blue-600 sm:text-xl md:text-2xl">
+        <h1 className="font-script whitespace-nowrap text-center text-lg text-brand-blue sm:text-xl md:text-2xl">
           Create Your Studom Account
         </h1>
 
@@ -101,7 +101,7 @@ export default function StudentSignup() {
 
           <p className="text-center text-sm text-gray-600">
             Already have an account?{' '}
-            <Link to="/student/login" className="font-medium text-blue-600">
+            <Link to="/student/login" className="font-medium text-brand-blue">
               Log in here
             </Link>
           </p>

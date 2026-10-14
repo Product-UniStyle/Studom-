@@ -97,7 +97,7 @@ export default function InstitutionUniversityPagePage() {
             {SECTIONS.map((s) => (
               <div key={s.title} className="flex items-center justify-between gap-4 py-3">
                 <div className="flex items-center gap-3">
-                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-blue-50 text-blue-600">
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-blue-50 text-brand-blue">
                     <s.icon className="h-5 w-5" />
                   </div>
                   <div>
@@ -107,7 +107,7 @@ export default function InstitutionUniversityPagePage() {
                     <div className="text-xs text-gray-500">{s.sub}</div>
                   </div>
                 </div>
-                <button className="shrink-0 text-sm font-medium text-blue-600">
+                <button className="shrink-0 text-sm font-medium text-brand-blue">
                   {s.action}
                 </button>
               </div>
@@ -172,7 +172,7 @@ function StatCard({
 }) {
   return (
     <div className="rounded-2xl border border-gray-200 p-5">
-      <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-full bg-blue-50 text-blue-600">
+      <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-full bg-blue-50 text-brand-blue">
         <Icon className="h-5 w-5" />
       </div>
       <div className="text-2xl font-bold text-black">{value}</div>

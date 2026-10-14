@@ -172,7 +172,7 @@ export default function ApplicationSubmittedPage() {
             <div className="space-y-5">
               {NEXT_STEPS.map((s) => (
                 <div key={s.title} className="flex items-start gap-3">
-                  <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-blue-600 text-white">
+                  <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-brand-blue text-white">
                     <s.icon className="h-4 w-4" />
                   </div>
                   <div>
@@ -205,9 +205,9 @@ export default function ApplicationSubmittedPage() {
             <SummaryRow label="Essay Responses" value={String(essays.length)} />
             <SummaryRow label="Documents Uploaded" value={String(stats.documentsCount)} />
             <SummaryRow label="Profile Completion" value={`${stats.profileCompletion}%`} />
-            <div className="mt-4 rounded-lg bg-blue-50 px-3 py-2.5 text-xs text-blue-700">
+            <div className="mt-4 rounded-lg bg-blue-50 px-3 py-2.5 text-xs text-brand-blue">
               You can track the status of your application anytime from your{' '}
-              <Link to="/student/dashboard" className="underline hover:text-blue-800">
+              <Link to="/student/dashboard" className="underline hover:text-brand-blue/80">
                 dashboard
               </Link>
               .

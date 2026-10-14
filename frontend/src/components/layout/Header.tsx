@@ -84,7 +84,7 @@ export default function Header() {
               profileTo="/student/profile"
               icon={<User className="h-4 w-4" />}
               iconBg="bg-blue-50"
-              iconColor="text-blue-600"
+              iconColor="text-brand-blue"
               onLogout={() => {
                 clearStudentToken()
                 setStudentName(null)

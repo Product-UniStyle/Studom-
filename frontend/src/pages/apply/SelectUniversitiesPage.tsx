@@ -124,7 +124,7 @@ export default function SelectUniversitiesPage() {
         </div>
 
         <div className="mt-8">
-          <h1 className="font-script text-3xl text-blue-600">
+          <h1 className="font-script text-3xl text-brand-blue">
             Apply to Universities
           </h1>
           <p className="mt-1 text-sm text-gray-500">
@@ -144,7 +144,7 @@ export default function SelectUniversitiesPage() {
             />
           </div>
           <div className="flex items-center gap-4">
-            <span className="whitespace-nowrap rounded-full bg-blue-50 px-3 py-1.5 text-sm font-medium text-blue-600">
+            <span className="whitespace-nowrap rounded-full bg-blue-50 px-3 py-1.5 text-sm font-medium text-brand-blue">
               {selectedUniversities.length} selected
             </span>
             <button

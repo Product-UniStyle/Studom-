@@ -29,7 +29,7 @@ export default function InstitutionLogin() {
   return (
     <PageShell hideFooter>
       <div className="mx-auto max-w-2xl px-6 py-16 md:px-10">
-        <h1 className="font-script whitespace-nowrap text-center text-lg text-blue-600 sm:text-xl md:text-2xl">
+        <h1 className="font-script whitespace-nowrap text-center text-lg text-brand-blue sm:text-xl md:text-2xl">
           Login to Your Institution Account
         </h1>
 
@@ -54,7 +54,7 @@ export default function InstitutionLogin() {
               icon={<Lock className="h-4 w-4" />}
             />
             <div className="mt-2 text-right">
-              <Link to="#" className="text-sm text-blue-600">
+              <Link to="#" className="text-sm text-brand-blue">
                 Forgot Password?
               </Link>
             </div>
@@ -80,7 +80,7 @@ export default function InstitutionLogin() {
             Don't have an account?{' '}
             <Link
               to="/institution/signup"
-              className="font-medium text-blue-600 underline"
+              className="font-medium text-brand-blue underline"
             >
               Sign up here
             </Link>

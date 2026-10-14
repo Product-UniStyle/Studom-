@@ -44,7 +44,7 @@ export default function InstitutionSignup() {
   return (
     <PageShell hideFooter>
       <div className="mx-auto max-w-2xl px-6 py-16 md:px-10">
-        <h1 className="font-script whitespace-nowrap text-center text-lg text-blue-600 sm:text-xl md:text-2xl">
+        <h1 className="font-script whitespace-nowrap text-center text-lg text-brand-blue sm:text-xl md:text-2xl">
           Create Your Institution Account
         </h1>
 
@@ -110,7 +110,7 @@ export default function InstitutionSignup() {
             Already have an account?{' '}
             <Link
               to="/institution/login"
-              className="font-medium text-blue-600 underline"
+              className="font-medium text-brand-blue underline"
             >
               Log in here
             </Link>

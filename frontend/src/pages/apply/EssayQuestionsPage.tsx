@@ -14,7 +14,7 @@ export default function EssayQuestionsPage() {
       <div className="mx-auto max-w-4xl px-[6.5rem] py-10">
         <div className="flex items-start justify-between">
           <div>
-            <h1 className="font-script text-3xl text-blue-600">
+            <h1 className="font-script text-3xl text-brand-blue">
               Additional Essay Questions
             </h1>
             <p className="mt-2 text-sm text-gray-500">
@@ -22,7 +22,7 @@ export default function EssayQuestionsPage() {
               with the universities listed next to the question.
             </p>
           </div>
-          <span className="whitespace-nowrap rounded-full bg-blue-50 px-3 py-1.5 text-sm font-medium text-blue-600">
+          <span className="whitespace-nowrap rounded-full bg-blue-50 px-3 py-1.5 text-sm font-medium text-brand-blue">
             {essays.length} questions
           </span>
         </div>

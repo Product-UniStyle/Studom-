@@ -51,7 +51,7 @@ export default function ChangePasswordPage() {
 
       <div className="mt-8 flex items-center justify-between rounded-2xl border border-gray-200 p-6">
         <div className="flex items-start gap-3">
-          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-blue-50 text-blue-600">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-blue-50 text-brand-blue">
             <Lock className="h-5 w-5" />
           </div>
           <div>

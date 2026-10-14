@@ -192,7 +192,7 @@ export default function InstitutionContributorsPage() {
                 href={selected.proofUrl}
                 target="_blank"
                 rel="noreferrer"
-                className="inline-block text-sm font-medium text-blue-600 hover:underline"
+                className="inline-block text-sm font-medium text-brand-blue hover:underline"
               >
                 View uploaded proof →
               </a>
@@ -246,7 +246,7 @@ function StatCard({
   color: 'blue' | 'orange' | 'green' | 'red'
 }) {
   const colorClass = {
-    blue: 'bg-blue-50 text-blue-600',
+    blue: 'bg-blue-50 text-brand-blue',
     orange: 'bg-orange-50 text-orange-600',
     green: 'bg-green-50 text-green-600',
     red: 'bg-red-50 text-red-600',

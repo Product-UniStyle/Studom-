@@ -193,7 +193,7 @@ export default function ReviewApplicationPage() {
             <span className="text-gray-300">|</span>
             <span>Profile {stats.profileCompletion}% complete</span>
           </div>
-          <div className="mt-4 rounded-lg bg-blue-50 px-4 py-3 text-sm text-blue-700">
+          <div className="mt-4 rounded-lg bg-blue-50 px-4 py-3 text-sm text-brand-blue">
             Only the essay responses required by each university will be
             shared with that university.
           </div>

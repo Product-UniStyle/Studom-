@@ -205,7 +205,7 @@ export default function EventsListPage() {
                 key={n}
                 onClick={() => setPage(n)}
                 className={`flex h-9 w-9 items-center justify-center rounded-full text-sm font-medium ${
-                  n === page ? 'bg-blue-600 text-white' : 'border border-gray-200 text-gray-600'
+                  n === page ? 'bg-brand-blue text-white' : 'border border-gray-200 text-gray-600'
                 }`}
               >
                 {n}

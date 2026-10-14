@@ -130,12 +130,12 @@ export default function MyProfilePage() {
             <ul className="space-y-2 text-sm text-gray-700">
               {activities.map((a) => (
                 <li key={a.name} className="flex items-center gap-2">
-                  <Check className="h-4 w-4 text-blue-600" /> {a.name}
+                  <Check className="h-4 w-4 text-brand-blue" /> {a.name}
                 </li>
               ))}
               {achievements.map((a) => (
                 <li key={a.title} className="flex items-center gap-2">
-                  <Check className="h-4 w-4 text-blue-600" /> {a.title}
+                  <Check className="h-4 w-4 text-brand-blue" /> {a.title}
                 </li>
               ))}
             </ul>
@@ -245,7 +245,7 @@ function StatCard({
 }) {
   return (
     <div className="flex items-center gap-4 rounded-2xl border border-gray-200 p-6">
-      <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-blue-50 text-blue-600">
+      <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-blue-50 text-brand-blue">
         <Icon className="h-6 w-6" />
       </div>
       <div>

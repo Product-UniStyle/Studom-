@@ -60,7 +60,7 @@ export default function BlogListPage() {
   return (
     <PageShell>
       <div className="mx-auto max-w-[1440px] px-[6.5rem] py-10">
-        <h1 className="text-3xl font-bold text-blue-600">Blog</h1>
+        <h1 className="text-3xl font-bold text-brand-blue">Blog</h1>
         <p className="mt-2 max-w-2xl text-sm text-gray-500">
           Insights, guides, and tips to help you navigate your education journey and student life in the Middle East.
         </p>
@@ -140,7 +140,7 @@ export default function BlogListPage() {
                   )}
                 </div>
                 <div className="p-4">
-                  <h3 className="font-semibold text-blue-700 group-hover:underline">{b.title}</h3>
+                  <h3 className="font-semibold text-brand-blue group-hover:underline">{b.title}</h3>
                   {b.source && <p className="mt-1 text-xs text-gray-500">Source - {b.source}</p>}
                   <div className="mt-2 flex items-center gap-2 text-xs text-gray-400">
                     <span className="flex h-5 w-5 items-center justify-center rounded-full bg-gray-200 text-[10px] font-medium text-gray-600">
@@ -170,7 +170,7 @@ export default function BlogListPage() {
                 key={n}
                 onClick={() => setPage(n)}
                 className={`flex h-9 w-9 items-center justify-center rounded-full text-sm font-medium ${
-                  n === page ? 'bg-blue-600 text-white' : 'border border-gray-200 text-gray-600'
+                  n === page ? 'bg-brand-blue text-white' : 'border border-gray-200 text-gray-600'
                 }`}
               >
                 {n}

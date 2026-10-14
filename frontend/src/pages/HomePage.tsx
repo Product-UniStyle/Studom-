@@ -37,7 +37,7 @@ export default function HomePage() {
       {/* Hero */}
       <section className="mx-auto max-w-[1440px] px-[6.5rem] pb-10 pt-14">
         <div className="grid grid-cols-1 items-center gap-10 lg:grid-cols-2">
-          <h1 className="font-script text-4xl leading-[1.5] text-blue-600 sm:text-[2.75rem] sm:leading-[1.5]">
+          <h1 className="font-script text-4xl leading-[1.5] text-brand-blue sm:text-[2.75rem] sm:leading-[1.5]">
             One platform to discover, plan &amp; apply to institutions while
             building the Middle East's largest student community.
           </h1>
@@ -69,7 +69,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      <p className="mx-auto whitespace-nowrap px-[6.5rem] pb-14 text-center font-script text-sm text-blue-600">
+      <p className="mx-auto whitespace-nowrap px-[6.5rem] pb-14 text-center font-script text-sm text-brand-blue">
         Of the students, by the students, for the students. All information
         has been obtained from open sources.
       </p>
@@ -77,7 +77,7 @@ export default function HomePage() {
       {/* CTA */}
       <section className="mx-auto max-w-[1440px] px-[6.5rem] pb-16">
         <div className="rounded-3xl bg-gray-50 px-6 py-8 text-center">
-          <h2 className="font-script text-3xl text-blue-600 sm:text-4xl">
+          <h2 className="font-script text-3xl text-brand-blue sm:text-4xl">
             Apply to any university at once
           </h2>
           <p className="mx-auto mt-8 max-w-xl text-sm text-gray-600">

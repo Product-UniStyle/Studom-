@@ -83,7 +83,7 @@ export default function InstitutionDashboardPage() {
       contentClassName="font-poppins"
     >
       <p className="text-sm text-gray-500">Welcome back,</p>
-      <h1 className="text-2xl font-bold text-blue-600">
+      <h1 className="text-2xl font-bold text-brand-blue">
         {account.universityName}
       </h1>
       <p className="mt-1 text-sm text-gray-500">
@@ -101,7 +101,7 @@ export default function InstitutionDashboardPage() {
         <div className="rounded-2xl border border-gray-200 p-6">
           <div className="mb-4 flex items-center justify-between">
             <h2 className="font-semibold text-black">Recent Applications</h2>
-            <Link to="/institution/applications" className="text-sm font-medium text-blue-600">
+            <Link to="/institution/applications" className="text-sm font-medium text-brand-blue">
               View all applications →
             </Link>
           </div>
@@ -132,7 +132,7 @@ export default function InstitutionDashboardPage() {
         <div className="rounded-2xl border border-gray-200 p-6">
           <div className="mb-4 flex items-center justify-between">
             <h2 className="font-semibold text-black">Contributor Requests</h2>
-            <Link to="/institution/contributors" className="text-sm font-medium text-blue-600">
+            <Link to="/institution/contributors" className="text-sm font-medium text-brand-blue">
               View all requests →
             </Link>
           </div>
@@ -164,14 +164,14 @@ export default function InstitutionDashboardPage() {
       <div className="mt-6 rounded-2xl border border-gray-200 p-6">
         <div className="mb-4 flex items-center justify-between">
           <h2 className="font-semibold text-black">Manage University Page</h2>
-          <Link to="/institution/university-page" className="text-sm font-medium text-blue-600">
+          <Link to="/institution/university-page" className="text-sm font-medium text-brand-blue">
             Preview Public Page ↗
           </Link>
         </div>
         <div className="grid grid-cols-2 gap-6 sm:grid-cols-3 lg:grid-cols-6">
           {MANAGE_SECTIONS.map((s) => (
             <div key={s.title} className="text-center">
-              <div className="mx-auto flex h-11 w-11 items-center justify-center rounded-full bg-blue-50 text-blue-600">
+              <div className="mx-auto flex h-11 w-11 items-center justify-center rounded-full bg-blue-50 text-brand-blue">
                 <s.icon className="h-5 w-5" />
               </div>
               <div className="mt-2 text-sm font-medium text-black">{s.title}</div>
@@ -200,7 +200,7 @@ function StatCard({
   color: 'blue' | 'orange' | 'green' | 'purple'
 }) {
   const colorClass = {
-    blue: 'bg-blue-50 text-blue-600',
+    blue: 'bg-blue-50 text-brand-blue',
     orange: 'bg-orange-50 text-orange-600',
     green: 'bg-green-50 text-green-600',
     purple: 'bg-purple-50 text-purple-600',
@@ -212,7 +212,7 @@ function StatCard({
       </div>
       <div className="text-sm text-gray-500">{label}</div>
       <div className="text-2xl font-bold text-black">{value}</div>
-      <Link to={to} className="mt-2 inline-block text-sm font-medium text-blue-600">
+      <Link to={to} className="mt-2 inline-block text-sm font-medium text-brand-blue">
         {linkLabel} →
       </Link>
     </div>

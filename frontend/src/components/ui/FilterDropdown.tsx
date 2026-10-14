@@ -61,7 +61,7 @@ export default function FilterDropdown({
                 setOpen(false)
               }}
               className={`block w-full truncate rounded-lg px-3 py-2 text-left hover:bg-gray-50 ${
-                opt === value ? 'bg-blue-50 font-medium text-blue-600' : 'text-black'
+                opt === value ? 'bg-blue-50 font-medium text-brand-blue' : 'text-black'
               }`}
             >
               {opt}

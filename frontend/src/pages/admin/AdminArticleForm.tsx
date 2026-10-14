@@ -113,7 +113,7 @@ export default function AdminArticleForm({ kind, article, onSaved, onCancel }: A
           <button
             type="button"
             onClick={addSection}
-            className="flex items-center gap-1 text-xs font-medium text-blue-600 hover:text-blue-700"
+            className="flex items-center gap-1 text-xs font-medium text-brand-blue hover:text-brand-blue/80"
           >
             <Plus className="h-3.5 w-3.5" /> Add Section
           </button>
