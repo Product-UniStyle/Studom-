@@ -38,9 +38,9 @@ export default function HomePage() {
       <section className="mx-auto max-w-[1440px] px-[6.5rem] pb-10 pt-14">
         <div className="grid grid-cols-1 items-center gap-10 lg:grid-cols-2">
           <div className="min-w-0 [container-type:inline-size]">
-            <h1 className="font-script text-[2rem] leading-[1.5] text-black">
-              <span className="block whitespace-nowrap">Find where you belong!</span>
-              <span className="mt-4 block whitespace-nowrap">Apply across UAE with confidence.</span>
+            <h1 className="font-script font-bold leading-[1.5] text-black">
+              <span className="block whitespace-nowrap text-[8.5cqw]">Find where you belong!</span>
+              <span className="mt-6 block whitespace-nowrap text-[5.65cqw]">Apply across UAE with confidence.</span>
             </h1>
           </div>
           <SafeImage
@@ -79,10 +79,10 @@ export default function HomePage() {
       {/* CTA */}
       <section className="mx-auto max-w-[1440px] px-[6.5rem] pb-16">
         <SafeImage
-          src="/studom-journey.jpeg"
+          src="/studom-journey.png"
           alt="Your Studom journey: discover Studom, explore universities, shortlist your choices, build your profile, and apply to universities."
-          width={1600}
-          height={585}
+          width={1847}
+          height={601}
           loading="lazy"
           className="mb-10 h-auto w-full rounded-3xl"
         />

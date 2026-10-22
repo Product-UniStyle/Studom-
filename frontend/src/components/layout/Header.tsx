@@ -57,7 +57,7 @@ export default function Header() {
     <header className="w-full border-b border-gray-200 bg-white">
       <div className="mx-auto grid max-w-[1440px] grid-cols-[1fr_auto_1fr] items-center px-[6.5rem] py-4">
         <Link to="/" className="justify-self-start shrink-0">
-          <img src="/logo.png" alt="Studom" className="h-14 w-auto" />
+          <img src="/logo.png" alt="Studom" className="h-12 w-auto" />
         </Link>
 
         <nav className="hidden items-center gap-8 justify-self-center md:flex">
