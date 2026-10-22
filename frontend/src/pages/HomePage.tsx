@@ -79,14 +79,14 @@ export default function HomePage() {
       {/* CTA */}
       <section className="mx-auto max-w-[1440px] px-[6.5rem] pb-16">
         <SafeImage
-          src="/studom-journey.png"
+          src="/studom-journey.jpeg"
           alt="Your Studom journey: discover Studom, explore universities, shortlist your choices, build your profile, and apply to universities."
-          width={1847}
-          height={601}
+          width={1600}
+          height={533}
           loading="lazy"
           className="mb-10 h-auto w-full rounded-3xl"
         />
-        <div className="rounded-3xl bg-gray-50 px-6 py-8 text-center">
+        <div className="rounded-3xl bg-[#FEFEFE] px-6 py-8 text-center">
           <h2 className="font-script text-3xl text-brand-blue sm:text-4xl">
             Apply to any university at once
           </h2>
