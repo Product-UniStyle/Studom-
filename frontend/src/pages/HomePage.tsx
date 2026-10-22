@@ -37,11 +37,12 @@ export default function HomePage() {
       {/* Hero */}
       <section className="mx-auto max-w-[1440px] px-[6.5rem] pb-10 pt-14">
         <div className="grid grid-cols-1 items-center gap-10 lg:grid-cols-2">
-          <h1 className="font-script text-4xl leading-[1.5] text-black sm:text-[2.75rem] sm:leading-[1.5]">
-            Find where you belong!
-            <br />
-            Apply across UAE with confidence.
-          </h1>
+          <div className="min-w-0 [container-type:inline-size]">
+            <h1 className="font-script text-[2rem] leading-[1.5] text-black">
+              <span className="block whitespace-nowrap">Find where you belong!</span>
+              <span className="mt-4 block whitespace-nowrap">Apply across UAE with confidence.</span>
+            </h1>
+          </div>
           <SafeImage
             src="/hero-students.jpg"
             alt="Students collaborating"
