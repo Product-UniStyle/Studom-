@@ -31,15 +31,15 @@ export default function Footer() {
       <div className="mx-auto max-w-[1440px] px-[6.5rem] py-14">
         <div className="flex flex-col justify-between gap-10 md:flex-row">
           <div>
-            <img src="/logo.png" alt="Studom" className="h-10 w-auto" />
+            <img src="/logo.png" alt="Studom" className="h-12 w-auto" />
             <div className="mt-4 max-w-xs font-footerAddress text-sm leading-relaxed text-gray-300">
               {/* Studom
               <br /> */}
-              BIZ Nest Co-Working, Sunteck Kanaka Park,
+              {/* BIZ Nest Co-Working, Sunteck Kanaka Park,
               <br />
               Panjim, Goa - India 403001
-              <br />
-              response@studom.com
+              <br /> */}
+              {/* response@studom.com */}
             </div>
           </div>
 
