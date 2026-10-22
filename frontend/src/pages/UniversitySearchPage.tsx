@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { Link, useNavigate, useSearchParams } from 'react-router-dom'
-import { Search, MapPin, Landmark, Heart } from 'lucide-react'
+import { Search, Heart } from 'lucide-react'
 import PageShell from '../components/layout/PageShell'
 import SafeImage from '../components/ui/SafeImage'
 import Pagination from '../components/ui/Pagination'
@@ -295,7 +295,11 @@ export default function UniversitySearchPage() {
 
         {!applied || !country || !location ? (
           <div className="flex flex-col items-center justify-center py-32 text-center">
-            <Landmark className="h-16 w-16 text-gray-300" strokeWidth={1} />
+            <SafeImage
+              src="/university-filters.png"
+              alt="University building"
+              className="h-auto w-64 max-w-full object-contain"
+            />
             <h2 className="mt-6 font-script text-2xl font-bold text-black">
               Please fill in the filters
             </h2>
@@ -380,13 +384,13 @@ export default function UniversitySearchPage() {
                       className="h-full w-full object-cover transition duration-300 group-hover:scale-105"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/10 to-transparent" />
-                    <div className="absolute bottom-0 left-0 right-0 p-4 text-white">
-                      <div className="truncate text-sm font-semibold leading-snug">
+                    <div className="absolute bottom-0 left-0 right-0 p-4 text-center text-white">
+                      <div className="truncate text-xl font-semibold leading-snug">
                         {u.name}
                       </div>
-                      <div className="mt-2 flex items-center justify-between gap-2 text-xs">
-                        <span className="flex items-center gap-1 truncate">
-                          <MapPin className="h-3 w-3 shrink-0" /> {u.city || u.country || '-'}
+                      <div className="mt-2 flex flex-wrap items-center justify-center gap-2 text-xs">
+                        <span className="truncate">
+                          {u.city || u.country || '-'}
                         </span>
                         {additional === 'QS Ranking' ? (
                           <span className="shrink-0 whitespace-nowrap rounded-full bg-white/20 px-2 py-0.5 backdrop-blur">
