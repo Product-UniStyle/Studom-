@@ -37,12 +37,13 @@ export default function HomePage() {
       {/* Hero */}
       <section className="mx-auto max-w-[1440px] px-[6.5rem] pb-10 pt-14">
         <div className="grid grid-cols-1 items-center gap-10 lg:grid-cols-2">
-          <h1 className="font-script text-4xl leading-[1.5] text-brand-blue sm:text-[2.75rem] sm:leading-[1.5]">
-            One platform to discover, plan &amp; apply to institutions while
-            building the Middle East's largest student community.
+          <h1 className="font-script text-4xl leading-[1.5] text-black sm:text-[2.75rem] sm:leading-[1.5]">
+            Find where you belong!
+            <br />
+            Apply across UAE with confidence.
           </h1>
           <SafeImage
-            src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=1200&q=80"
+            src="/hero-students.jpg"
             alt="Students collaborating"
             className="h-72 w-full rounded-2xl object-cover shadow-sm sm:h-96"
           />
@@ -76,6 +77,14 @@ export default function HomePage() {
 
       {/* CTA */}
       <section className="mx-auto max-w-[1440px] px-[6.5rem] pb-16">
+        <SafeImage
+          src="/studom-journey.jpeg"
+          alt="Your Studom journey: discover Studom, explore universities, shortlist your choices, build your profile, and apply to universities."
+          width={1600}
+          height={585}
+          loading="lazy"
+          className="mb-10 h-auto w-full rounded-3xl"
+        />
         <div className="rounded-3xl bg-gray-50 px-6 py-8 text-center">
           <h2 className="font-script text-3xl text-brand-blue sm:text-4xl">
             Apply to any university at once
