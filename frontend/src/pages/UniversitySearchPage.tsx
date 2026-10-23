@@ -34,10 +34,10 @@ const TYPE_PARAM_MAP: Record<string, string> = {
 }
 
 const TYPE_LABELS: Record<string, string> = {
-  School: 'schools',
-  University: 'universities',
-  Tuition: 'tuition centres',
-  College: 'colleges',
+  School: 'Schools',
+  University: 'Universities',
+  Tuition: 'Tuition Centres',
+  College: 'Colleges',
 }
 
 const PAGE_SIZE = 20
@@ -187,9 +187,9 @@ export default function UniversitySearchPage() {
     if (field !== 'All') {
       return isSchool
         ? `Top schools for ${field} in ${location || 'all locations'}`
-        : `Top universities for ${field} in ${location || 'all locations'}`
+        : `Top Universities for ${field} in ${location || 'all locations'}`
     }
-    return `Top universities in ${location || 'all locations'}`
+    return `Top Universities in ${location || 'all locations'}`
   }, [type, field, location, isSchool])
 
   const handleSearch = () => {
@@ -312,7 +312,7 @@ export default function UniversitySearchPage() {
         ) : (
           <div className="mt-8">
             <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
-              <h1 className="text-2xl font-bold text-black">{heading}</h1>
+              <h1 className="font-script text-2xl font-bold text-black">{heading}</h1>
               <div className="relative w-full sm:w-72">
                 <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
                 <input
@@ -327,7 +327,7 @@ export default function UniversitySearchPage() {
             </div>
             {narrative ? (
               showNarrative && (
-                <div className="mt-2 space-y-2 text-sm leading-relaxed text-gray-600">
+                <div className="mt-2 space-y-2 font-script text-sm leading-relaxed text-gray-600">
                   <p>{renderTypedSegments(narrative.intro, introLen)}</p>
                   {poweredLen > 0 && <p>{renderTypedSegments(narrative.powered, poweredLen)}</p>}
                   {ctaLen > 0 && <p>{renderTypedSegments(narrative.cta, ctaLen)}</p>}
