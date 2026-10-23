@@ -33,7 +33,7 @@ export const ADDITIONAL_FILTER_NARRATIVES: Record<string, AdditionalFilterNarrat
       'Curated below are universities that best match your overall preferences across ranking, affordability, student environment and opportunities.'
     ),
     powered: powered(
-      'QS Ranking, Tuition Fees, Student Population, Student-to-Faculty Ratio, International Student %, and Scholarships'
+      '🏆 QS Ranking, 💰 Tuition Fees, 👥 Student Population, 🧑‍🏫 Student-to-Faculty Ratio, 🌍 International Student %, and 🎓 Scholarships'
     ),
     cta: cta('Compare the strongest overall matches in one place.'),
   },

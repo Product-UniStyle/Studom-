@@ -182,15 +182,13 @@ export default function UniversitySearchPage() {
 
   const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE))
 
-  const heading = useMemo(() => {
-    if (type) return `Top ${TYPE_LABELS[type] || type} in ${location || 'all locations'}`
+  const headingPrefix = useMemo(() => {
+    if (type) return `Top ${TYPE_LABELS[type] || type} in `
     if (field !== 'All') {
-      return isSchool
-        ? `Top schools for ${field} in ${location || 'all locations'}`
-        : `Top Universities for ${field} in ${location || 'all locations'}`
+      return isSchool ? `Top schools for ${field} in ` : `Top Universities for ${field} in `
     }
-    return `Top Universities in ${location || 'all locations'}`
-  }, [type, field, location, isSchool])
+    return `Top Universities in `
+  }, [type, field, isSchool])
 
   const handleSearch = () => {
     if (!country || !location) {
@@ -312,7 +310,10 @@ export default function UniversitySearchPage() {
         ) : (
           <div className="mt-8">
             <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
-              <h1 className="font-script text-2xl font-bold text-black">{heading}</h1>
+              <h1 className="font-script text-2xl font-bold text-black">
+                {headingPrefix}
+                <span className="text-3xl">{location || 'all locations'}</span>
+              </h1>
               <div className="relative w-full sm:w-72">
                 <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
                 <input
