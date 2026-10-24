@@ -9,6 +9,7 @@ interface TextFieldProps extends InputHTMLAttributes<HTMLInputElement> {
   icon?: ReactNode
   hint?: string
   rightIcon?: ReactNode
+  labelClassName?: string
 }
 
 export default function TextField({
@@ -18,6 +19,7 @@ export default function TextField({
   hint,
   rightIcon,
   className,
+  labelClassName,
   type = 'text',
   id,
   placeholder,
@@ -54,7 +56,8 @@ export default function TextField({
             htmlFor={inputId}
             className={cn(
               'pointer-events-none absolute -top-5 text-sm font-medium text-gray-900 duration-150 peer-placeholder-shown:top-2.5 peer-focus:-top-5 peer-focus:text-brand-blue',
-              icon ? 'left-8' : 'left-0'
+              icon ? 'left-8' : 'left-0',
+              labelClassName
             )}
           >
             {label} {required && <span className="text-red-500">*</span>}

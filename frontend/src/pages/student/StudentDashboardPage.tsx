@@ -53,7 +53,7 @@ export default function StudentDashboardPage() {
 
   return (
     <DashboardLayout navItems={studentNav} userName={student.fullName} userRole="Student">
-      <h1 className="text-2xl font-bold text-black">Welcome back, {student.fullName.split(' ')[0]}! 👋</h1>
+      <h1 className="text-2xl font-bold uppercase text-black">Welcome back, {student.fullName.split(' ')[0]}! 👋</h1>
       <p className="mt-1 text-sm text-gray-500">
         Here's a simple overview of your applications.
       </p>
@@ -66,7 +66,7 @@ export default function StudentDashboardPage() {
 
       <div className="mt-8 grid grid-cols-1 gap-6 lg:grid-cols-2">
         <div className="rounded-2xl border border-gray-200 p-6">
-          <h2 className="mb-4 font-semibold text-black">My Applications</h2>
+          <h2 className="mb-4 font-semibold uppercase text-black">My Applications</h2>
           {applications.length === 0 ? (
             <p className="py-6 text-center text-sm text-gray-400">
               You haven't applied to any universities yet.
@@ -115,7 +115,7 @@ export default function StudentDashboardPage() {
         </div>
 
         <div className="rounded-2xl border border-gray-200 p-6">
-          <h2 className="mb-4 font-semibold text-black">Upcoming Tasks</h2>
+          <h2 className="mb-4 font-semibold uppercase text-black">Upcoming Tasks</h2>
           {tasks.length === 0 ? (
             <p className="py-6 text-center text-sm text-gray-400">No upcoming tasks.</p>
           ) : (

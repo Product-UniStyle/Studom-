@@ -72,7 +72,7 @@ export default function BlogDetailPage() {
   return (
     <PageShell>
       <div className="mx-auto max-w-[1440px] px-[6.5rem] py-10">
-        <h1 className="text-3xl font-bold text-brand-blue">Blog</h1>
+        <h1 className="text-3xl font-bold uppercase text-brand-blue">Blog</h1>
 
         {loading ? (
           <p className="mt-10 text-center text-gray-400">Loading...</p>

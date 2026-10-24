@@ -38,7 +38,7 @@ export default function ChangePasswordPage() {
 
   return (
     <DashboardLayout navItems={studentNav} userName={fullName} userRole="Student">
-      <h1 className="text-2xl font-bold text-black">Change Password</h1>
+      <h1 className="text-2xl font-bold uppercase text-black">Change Password</h1>
       <p className="mt-1 text-sm text-gray-500">
         Update the password you use to sign in to your account.
       </p>

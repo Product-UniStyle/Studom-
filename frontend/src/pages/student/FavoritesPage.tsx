@@ -67,7 +67,7 @@ export default function FavoritesPage() {
 
   return (
     <DashboardLayout navItems={studentNav} userName={student.fullName} userRole="Student">
-      <h1 className="text-2xl font-bold text-black">Favorites</h1>
+      <h1 className="text-2xl font-bold uppercase text-black">Favorites</h1>
       <p className="mt-1 text-sm text-gray-500">
         Universities you've saved for later.
       </p>

@@ -98,7 +98,7 @@ export default function MyApplicationsPage() {
 
   return (
     <DashboardLayout navItems={studentNav} userName={student.fullName} userRole="Student">
-      <h1 className="text-2xl font-bold text-black">My Applications</h1>
+      <h1 className="text-2xl font-bold uppercase text-black">My Applications</h1>
       <p className="mt-1 text-sm text-gray-500">
         Track and manage all your university applications in one place.
       </p>

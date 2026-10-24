@@ -62,7 +62,7 @@ export default function NewsListPage() {
   return (
     <PageShell>
       <div className="mx-auto max-w-[1440px] px-[6.5rem] py-10">
-        <h1 className="text-3xl font-bold text-brand-blue">News</h1>
+        <h1 className="text-3xl font-bold uppercase text-brand-blue">News</h1>
         <p className="mt-2 max-w-2xl text-sm text-gray-500">
           Stay updated with the latest education news, university updates, policy changes, scholarships, and
           opportunities across the Middle East.

@@ -11,7 +11,7 @@ import {
 } from 'lucide-react'
 import PageShell from '../components/layout/PageShell'
 import TextField from '../components/form/TextField'
-import SelectField from '../components/form/SelectField'
+import FloatingSelectField from '../components/form/FloatingSelectField'
 import SafeImage from '../components/ui/SafeImage'
 import Avatar from '../components/ui/Avatar'
 import Modal from '../components/ui/Modal'
@@ -186,45 +186,17 @@ export default function UniversityDetailPage() {
           </div>
         )}
 
-        {/* Title + stats */}
-        <div className="mt-8 grid grid-cols-1 gap-10 lg:grid-cols-3 lg:items-center">
-          <div className="flex items-center justify-center lg:col-span-2">
-            <SafeImage
-              src={uni.logo}
-              alt={uni.name}
-              className="h-auto max-h-28 w-auto max-w-[240px] object-contain"
-            />
-          </div>
-          <div className="flex gap-4">
-            <div className="flex items-center gap-3 rounded-xl border border-gray-100 px-5 py-3">
-              <Award className="h-6 w-6 text-brand-blue" />
-              <div>
-                <div className="flex items-center gap-1 text-xs text-gray-500">
-                  QS Ranking
-                </div>
-                <div className="text-lg font-bold text-brand-blue">
-                  {uni.qsRank ?? 'Not Ranked'}
-                </div>
-              </div>
+        {/* University logo and About heading, with independently aligned stats */}
+        <div className="mt-8 flex flex-col gap-10 lg:flex-row lg:items-end">
+          <div className="min-w-0 flex-1">
+            <div className="flex items-center justify-center">
+              <SafeImage
+                src={uni.logo}
+                alt={uni.name}
+                className="h-auto max-h-28 w-auto max-w-[240px] object-contain"
+              />
             </div>
-            <div className="flex items-center gap-3 rounded-xl border border-gray-100 px-5 py-3">
-              <Landmark className="h-6 w-6 text-brand-blue" />
-              <div>
-                <div className="flex items-center gap-1 text-xs text-gray-500">
-                  University Origin
-                </div>
-                <div className="text-lg font-bold text-brand-blue">
-                  {uni.origin || '-'}
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* About + quick apply */}
-        <div className="mt-10 grid grid-cols-1 gap-10 lg:grid-cols-3">
-          <div className="lg:col-span-2">
-            <div className="flex items-center justify-between border-b border-brand-blue pb-2">
+            <div className="mt-10 flex items-center justify-between border-b border-brand-blue pb-2">
               <h2 className="text-lg font-bold tracking-wide text-brand-blue">
                 ABOUT UNIVERSITY
               </h2>
@@ -241,7 +213,7 @@ export default function UniversityDetailPage() {
                   onClick={() => setShowContributorModal(true)}
                   className="hover:underline"
                 >
-                  Become a Contributor
+                  BECOME A CONTRIBUTOR
                 </button>
                 {showContributorInfo && (
                   <div className="absolute right-0 top-full z-10 mt-2 w-72 rounded-xl bg-gray-800 p-4 text-white shadow-lg">
@@ -264,7 +236,41 @@ export default function UniversityDetailPage() {
                 )}
               </div>
             </div>
-            <div className="mt-4 space-y-4 text-base font-medium leading-relaxed text-gray-600">
+          </div>
+          <div className="w-full rounded-xl border border-gray-100 p-6 shadow-sm lg:mb-2 lg:w-[calc((100%_-_5rem)/3)] lg:shrink-0">
+            <div className="flex items-center gap-6">
+              <div className="flex items-center gap-3">
+                <Award className="h-6 w-6 text-brand-blue" />
+                <div>
+                  <div className="text-xs text-gray-500">QS RANKING</div>
+                  <div className="text-lg font-bold text-brand-blue">
+                    {uni.qsRank ?? 'Not Ranked'}
+                  </div>
+                </div>
+              </div>
+              <div className="h-10 w-px shrink-0 bg-gray-200" />
+              <div className="flex items-center gap-3">
+                <Landmark className="h-6 w-6 text-brand-blue" />
+                <div>
+                  <div className="text-xs text-gray-500">UNIVERSITY ORIGIN</div>
+                  <div className="text-lg font-bold text-brand-blue">{uni.origin || '-'}</div>
+                </div>
+              </div>
+            </div>
+            <div className="my-4 border-t border-gray-100" />
+            <Link
+              to="/profile/build"
+              className="block w-full rounded-lg bg-brand-blue py-3 text-center text-base font-semibold text-white hover:bg-brand-blue/90"
+            >
+              Build Your Profile
+            </Link>
+          </div>
+        </div>
+
+        {/* About + connect */}
+        <div className="mt-4 grid grid-cols-1 gap-10 lg:mt-2 lg:grid-cols-3">
+          <div className="lg:col-span-2">
+            <div className="space-y-4 text-base font-medium leading-relaxed text-gray-600">
               {about.length > 0 ? (
                 about.map((p, i) => <p key={i}>{p}</p>)
               ) : (
@@ -285,36 +291,35 @@ export default function UniversityDetailPage() {
 
           <div className="space-y-6">
             <div className="rounded-xl border border-gray-100 p-6 shadow-sm">
-              <Link
-                to="/profile/build"
-                className="block w-full rounded-lg bg-brand-blue py-3 text-center text-base font-semibold text-white hover:bg-brand-blue/90"
-              >
-                Build Your Profile
-              </Link>
-            </div>
-
-            <div className="rounded-xl border border-gray-100 p-6 shadow-sm">
-              <h2 className="mb-4 text-lg font-bold tracking-wide text-black">
+              <h2 className="mb-4 text-center font-bold tracking-wide text-black">
                 CONNECT WITH US
               </h2>
               <p className="mb-4 text-base text-gray-500">
                 Have questions or need more information? Reach out to the
                 university team directly.
               </p>
-              <TextField label="Full Name" placeholder="" />
-              <TextField label="Email Address" type="email" placeholder="" className="mt-4" />
-              <div className="mt-4">
-                <label className="mb-1.5 block text-sm font-medium text-gray-900">
-                  Mobile Number
-                </label>
-                <div className="flex gap-2">
-                  <SelectField className="w-24 shrink-0" placeholder="Code" options={DIAL_CODE_OPTIONS} />
-                  <TextField className="flex-1" type="tel" />
+              <TextField label="Full Name" placeholder="" labelClassName="text-gray-400" />
+              <TextField
+                label="Email Address"
+                type="email"
+                placeholder=""
+                className="mt-4"
+                labelClassName="text-gray-400"
+              />
+              <div className="mt-4 flex gap-2">
+                <div className="w-24 shrink-0">
+                  <FloatingSelectField label="Code" options={DIAL_CODE_OPTIONS} />
                 </div>
+                <div className="mt-5 w-px shrink-0 self-stretch bg-gray-300" aria-hidden="true" />
+                <TextField
+                  className="flex-1"
+                  type="tel"
+                  label="Mobile Number"
+                  labelClassName="text-gray-400"
+                />
               </div>
-              <SelectField
-                label="Reason for Connection"
-                placeholder="Select a reason"
+              <FloatingSelectField
+                label="Reason to Connect"
                 options={CONNECT_REASONS}
                 className="mt-4"
               />
@@ -328,7 +333,7 @@ export default function UniversityDetailPage() {
         {/* Inclusions */}
         {inclusions.length > 0 && (
           <div className="mt-14">
-            <h2 className="mb-6 text-lg font-bold text-black">
+            <h2 className="mb-6 text-lg font-bold uppercase text-black">
               What inclusions does {uni.name} offer
             </h2>
             <div className="grid grid-cols-2 gap-x-8 gap-y-6 sm:grid-cols-3 md:grid-cols-5">
@@ -348,7 +353,7 @@ export default function UniversityDetailPage() {
         {/* Reviews */}
         <div className="mt-14">
           <div className="flex items-center justify-between">
-            <h2 className="flex items-center gap-2 text-lg font-bold text-black">
+            <h2 className="flex items-center gap-2 text-lg font-bold uppercase text-black">
               Student Reviews
               {avgRating != null && (
                 <span className="flex items-center gap-1 text-yellow-500">

@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { Upload } from 'lucide-react'
 import Modal from '../ui/Modal'
 import TextField from '../form/TextField'
-import SelectField from '../form/SelectField'
+import FloatingSelectField from '../form/FloatingSelectField'
 import TextArea from '../form/TextArea'
 import { submitContributorApplication } from '../../lib/publicApi'
 
@@ -46,47 +46,49 @@ export default function ContributorModal({ universityId, universityName, onClose
   }
 
   return (
-    <Modal title="Become a Contributor" onClose={onClose}>
+    <Modal title="BECOME A CONTRIBUTOR" onClose={onClose} centerTitle>
       {submitted ? (
         <p className="py-8 text-center text-sm text-gray-500">
           Thanks! Your application has been submitted for review. The {universityName} team will get back to you.
         </p>
       ) : (
         <form onSubmit={handleSubmit} className="space-y-4">
-          <p className="text-sm text-gray-500">
+          <p className="text-base text-gray-500">
             Fill in the details below to apply as a contributor for {universityName}.
           </p>
 
-          <div className="grid grid-cols-2 gap-4">
-            <TextField label="Full Name" name="name" required placeholder="Enter your full name" />
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <TextField label="Full Name" name="name" required labelClassName="text-gray-400" />
             <TextField
               label="Official University Email"
               name="email"
               type="email"
               required
+              labelClassName="text-gray-400"
               placeholder="name@university.edu"
             />
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
-            <TextField label="University" value={universityName} disabled />
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <TextField label="University" value={universityName} disabled labelClassName="text-gray-400" />
             <TextField
               label="Course / Programme"
               name="courseOfStudy"
+              labelClassName="text-gray-400"
               placeholder="Enter your course or programme"
             />
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
-            <SelectField
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <FloatingSelectField
               label="Year of Study"
               name="yearOfStudy"
-              placeholder="Select year"
               options={YEAR_OPTIONS}
             />
             <TextField
               label="Expected Graduation Year"
               name="expectedGraduationYear"
+              labelClassName="text-gray-400"
               placeholder="e.g. 2026"
             />
           </div>
@@ -94,11 +96,12 @@ export default function ContributorModal({ universityId, universityName, onClose
           <TextArea
             label="Why do you want to become a Contributor?"
             name="reason"
+            labelClassName="text-gray-400"
             rows={2}
           />
 
           <div>
-            <label className="mb-1.5 block text-sm font-medium text-gray-900">
+            <label className="mb-1.5 block text-sm font-medium text-gray-400">
               Proof of university association
             </label>
             <label className="flex cursor-pointer items-center justify-center gap-2 rounded-lg border-2 border-dashed border-gray-200 px-4 py-2.5 text-center text-sm text-gray-500 hover:border-blue-400">

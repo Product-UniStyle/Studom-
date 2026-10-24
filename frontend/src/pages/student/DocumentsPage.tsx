@@ -138,7 +138,7 @@ export default function DocumentsPage() {
 
   return (
     <DashboardLayout navItems={studentNav} userName={student.fullName} userRole="Student">
-      <h1 className="text-2xl font-bold text-black">Documents</h1>
+      <h1 className="text-2xl font-bold uppercase text-black">Documents</h1>
       <p className="mt-1 text-sm text-gray-500">
         Manage and upload your application documents.
       </p>
@@ -148,7 +148,7 @@ export default function DocumentsPage() {
       {!activeFolder ? (
         <>
           <div className="mt-8 flex items-center justify-between">
-            <h2 className="font-semibold text-black">Folders</h2>
+            <h2 className="font-semibold uppercase text-black">Folders</h2>
             <button
               onClick={() => {
                 setFolderName('')
@@ -231,7 +231,7 @@ export default function DocumentsPage() {
               >
                 <ArrowLeft className="h-4 w-4" />
               </button>
-              <h2 className="font-semibold text-black">
+              <h2 className="font-semibold uppercase text-black">
                 {activeFolder === UNCATEGORIZED ? 'Uncategorized' : activeFolder}
               </h2>
               {activeFolder !== UNCATEGORIZED && activeFolder !== BUILD_PROFILE_DOCUMENT_FOLDER && (

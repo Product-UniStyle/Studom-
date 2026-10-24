@@ -91,7 +91,7 @@ export default function SettingsPage() {
 
   return (
     <DashboardLayout navItems={studentNav} userName={student.fullName} userRole="Student">
-      <h1 className="text-2xl font-bold text-black">Settings</h1>
+      <h1 className="text-2xl font-bold uppercase text-black">Settings</h1>
       <p className="mt-1 text-sm text-gray-500">
         Manage your account, preferences and security settings.
       </p>
@@ -110,9 +110,9 @@ export default function SettingsPage() {
         <ChevronDown className="h-5 w-5 text-gray-400" />
       </div>
 
-      <SettingsSection title="Account Settings" rows={ACCOUNT_ROWS} />
-      <SettingsSection title="Preferences" rows={PREFERENCE_ROWS} />
-      <SettingsSection title="Security" rows={SECURITY_ROWS} />
+      <SettingsSection title="Account Settings" rows={ACCOUNT_ROWS} uppercaseTitle />
+      <SettingsSection title="Preferences" rows={PREFERENCE_ROWS} uppercaseTitle />
+      <SettingsSection title="Security" rows={SECURITY_ROWS} uppercaseTitle />
       <SettingsSection title="Support & Legal" rows={SUPPORT_ROWS} />
 
       <button
@@ -179,10 +179,18 @@ interface Row {
   onClick?: () => void
 }
 
-function SettingsSection({ title, rows }: { title: string; rows: Row[] }) {
+function SettingsSection({
+  title,
+  rows,
+  uppercaseTitle = false,
+}: {
+  title: string
+  rows: Row[]
+  uppercaseTitle?: boolean
+}) {
   return (
     <div className="mt-6">
-      <h2 className="mb-3 font-semibold text-black">{title}</h2>
+      <h2 className={`mb-3 font-semibold text-black ${uppercaseTitle ? 'uppercase' : ''}`}>{title}</h2>
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         {rows.map((r) => (
           <div

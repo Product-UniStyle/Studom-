@@ -6,12 +6,14 @@ interface TextAreaProps extends TextareaHTMLAttributes<HTMLTextAreaElement> {
   label?: string
   required?: boolean
   hint?: string
+  labelClassName?: string
 }
 
 export default function TextArea({
   label,
   required,
   hint,
+  labelClassName,
   className,
   id,
   placeholder,
@@ -36,7 +38,8 @@ export default function TextArea({
           <label
             htmlFor={inputId}
             className={cn(
-              'pointer-events-none absolute -top-5 left-0 text-sm font-medium text-gray-900 duration-150 peer-placeholder-shown:top-2.5 peer-focus:-top-5 peer-focus:text-brand-blue'
+              'pointer-events-none absolute -top-5 left-0 text-sm font-medium text-gray-900 duration-150 peer-placeholder-shown:top-2.5 peer-focus:-top-5 peer-focus:text-brand-blue',
+              labelClassName
             )}
           >
             {label} {required && <span className="text-red-500">*</span>}

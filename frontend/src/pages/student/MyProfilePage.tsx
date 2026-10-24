@@ -76,7 +76,7 @@ export default function MyProfilePage() {
 
   return (
     <DashboardLayout navItems={studentNav} userName={student.fullName} userRole="Student" contentClassName="font-poppins">
-      <h1 className="text-2xl font-bold text-black">My Profile</h1>
+      <h1 className="text-2xl font-bold uppercase text-black">My Profile</h1>
       <p className="mt-1 text-sm text-gray-500">
         Manage your personal details, academics and documents.
       </p>
@@ -116,7 +116,7 @@ export default function MyProfilePage() {
       <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-2">
         <div className="rounded-2xl border border-gray-200 p-6">
           <div className="mb-4 flex items-center justify-between">
-            <h2 className="font-semibold text-black">Activities &amp; Achievements</h2>
+            <h2 className="font-semibold uppercase text-black">Activities &amp; Achievements</h2>
             <button
               onClick={() => setEditingSection('activities')}
               className="flex items-center gap-1.5 rounded-lg border border-gray-200 px-3 py-1.5 text-sm font-medium text-black hover:bg-gray-50"
@@ -148,7 +148,7 @@ export default function MyProfilePage() {
 
         <div className="rounded-2xl border border-gray-200 p-6">
           <div className="mb-4 flex items-center justify-between">
-            <h2 className="font-semibold text-black">Documents</h2>
+            <h2 className="font-semibold uppercase text-black">Documents</h2>
             <button
               onClick={() => setEditingSection('documents')}
               className="flex items-center gap-1.5 rounded-lg border border-gray-200 px-3 py-1.5 text-sm font-medium text-black hover:bg-gray-50"
@@ -177,7 +177,7 @@ export default function MyProfilePage() {
 
       <div className="mt-6 rounded-2xl border border-gray-200 p-6">
         <div className="mb-4 flex items-center justify-between">
-          <h2 className="font-semibold text-black">Account &amp; Preferences</h2>
+          <h2 className="font-semibold uppercase text-black">Account &amp; Preferences</h2>
           <button
             onClick={() => setEditingSection('preferences')}
             className="rounded-lg border border-gray-200 px-4 py-1.5 text-sm font-medium text-black hover:bg-gray-50"
@@ -268,7 +268,7 @@ function Section({
   return (
     <div className="mt-6 rounded-2xl border border-gray-200 p-6">
       <div className="mb-4 flex items-center justify-between">
-        <h2 className="font-semibold text-black">{title}</h2>
+        <h2 className="font-semibold uppercase text-black">{title}</h2>
         <button
           onClick={onEdit}
           className="flex items-center gap-1.5 rounded-lg border border-gray-200 px-3 py-1.5 text-sm font-medium text-black hover:bg-gray-50"

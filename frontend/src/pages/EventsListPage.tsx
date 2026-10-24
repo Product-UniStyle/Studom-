@@ -68,7 +68,7 @@ export default function EventsListPage() {
   return (
     <PageShell>
       <div className="mx-auto max-w-[1440px] px-[6.5rem] py-10">
-        <h1 className="text-3xl font-bold text-brand-blue">Events</h1>
+        <h1 className="text-3xl font-bold uppercase text-brand-blue">Events</h1>
 
         <div className="mt-6 flex flex-wrap items-center gap-3">
           <div className="flex shrink-0 rounded-xl bg-gray-100 p-1">
